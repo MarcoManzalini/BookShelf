@@ -32,7 +32,7 @@ class StatusChip extends StatelessWidget {
       ),
       child: Text(
         status.label(context.l10n).toUpperCase(),
-        style: AppFonts.mono(
+        style: AppFonts.label(
           size: 11,
           weight: FontWeight.w700,
           letterSpacing: 1.3,

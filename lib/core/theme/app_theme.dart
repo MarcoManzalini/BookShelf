@@ -52,8 +52,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: scheme.surfaceContainerLowest,
-        labelStyle: AppFonts.mono(size: 14, color: scheme.onSurfaceVariant),
-        floatingLabelStyle: AppFonts.mono(
+        labelStyle: AppFonts.label(size: 14, color: scheme.onSurfaceVariant),
+        floatingLabelStyle: AppFonts.label(
           size: 13,
           weight: FontWeight.w700,
           color: scheme.primary,
@@ -116,7 +116,7 @@ class AppTheme {
         backgroundColor: scheme.surfaceContainerLowest,
         selectedColor: scheme.primaryContainer,
         side: hairline,
-        labelStyle: AppFonts.mono(
+        labelStyle: AppFonts.label(
           size: 12.5,
           weight: FontWeight.w700,
           color: scheme.onSurface,
@@ -127,7 +127,7 @@ class AppTheme {
         style: SegmentedButton.styleFrom(
           shape: shape,
           side: BorderSide(color: scheme.outline),
-          textStyle: AppFonts.mono(size: 12.5, weight: FontWeight.w700),
+          textStyle: AppFonts.label(size: 12.5, weight: FontWeight.w700),
           selectedBackgroundColor: scheme.primaryContainer,
           selectedForegroundColor: scheme.onPrimaryContainer,
         ),
@@ -141,7 +141,7 @@ class AppTheme {
         indicatorShape: shape,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return AppFonts.mono(
+          return AppFonts.label(
             size: 12,
             weight: FontWeight.w700,
             letterSpacing: 0.6,
@@ -185,7 +185,7 @@ class AppTheme {
       ),
       listTileTheme: ListTileThemeData(
         titleTextStyle: textTheme.titleSmall,
-        subtitleTextStyle: AppFonts.mono(
+        subtitleTextStyle: AppFonts.label(
           size: 13,
           color: scheme.onSurfaceVariant,
         ),

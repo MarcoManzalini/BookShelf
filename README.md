@@ -98,7 +98,7 @@ Il tema è quello di una biblioteca: una sala di lettura con inchiostro verde, s
 | Elemento | Dove |
 |---|---|
 | Palette chiara (carta con leggera tinta verde) e scura ("sala di lettura", ottone acceso) | `core/theme/app_colors.dart` |
-| Literata (titoli e testi, font variabile) + Courier Prime (dati catalografici) | `core/theme/app_typography.dart`, `assets/fonts/` |
+| Literata (unico font dell'app, variabile: peso e dimensione ottica) | `core/theme/app_typography.dart`, `assets/fonts/` |
 | Copertina in tela con titolo e filetto oro quando manca l'immagine; il colore dipende dal titolo | `core/widgets/book_cover.dart` (`ClothCover`) |
 | Segnalibro a nastro sulla copertina: bordeaux = in lettura, ottone = letto | `library/presentation/widgets/status_ribbon.dart` |
 | Stato di lettura come timbro di biblioteca | `library/presentation/widgets/status_chip.dart` |

@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
 import 'core/config/app_config.dart';
 import 'core/di/injection.dart';
+import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 
 Future<void> main() async {
@@ -34,6 +35,7 @@ class _MissingConfigApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
       home: Scaffold(
         body: SafeArea(
           child: Padding(

@@ -17,7 +17,7 @@ class SectionTitle extends StatelessWidget {
         children: [
           Text(
             text.toUpperCase(),
-            style: AppFonts.mono(
+            style: AppFonts.label(
               size: 12.5,
               weight: FontWeight.w700,
               letterSpacing: 1.8,

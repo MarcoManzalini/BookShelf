@@ -19,7 +19,7 @@ class CatalogCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final ruleColor = scheme.outlineVariant;
-    final typed = AppFonts.mono(size: 13.5, color: scheme.onSurface);
+    final typed = AppFonts.label(size: 13.5, color: scheme.onSurface);
 
     return Container(
       decoration: BoxDecoration(
@@ -46,7 +46,7 @@ class CatalogCard extends StatelessWidget {
                     (headerStart ?? '').toUpperCase(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: AppFonts.mono(
+                    style: AppFonts.label(
                       size: 12,
                       weight: FontWeight.w700,
                       letterSpacing: 1,
@@ -58,8 +58,10 @@ class CatalogCard extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     headerEnd!,
-                    style:
-                        AppFonts.mono(size: 12, color: scheme.onSurfaceVariant),
+                    style: AppFonts.label(
+                      size: 12,
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ],
@@ -77,7 +79,7 @@ class CatalogCard extends StatelessWidget {
                     width: 104,
                     child: Text(
                       label.toUpperCase(),
-                      style: AppFonts.mono(
+                      style: AppFonts.label(
                         size: 11.5,
                         letterSpacing: 1,
                         color: scheme.onSurfaceVariant,

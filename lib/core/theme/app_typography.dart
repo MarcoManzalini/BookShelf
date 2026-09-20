@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Literata (made for long-form reading) for titles and text, Courier Prime
-/// (typewriter) for catalogue data: labels, stamps, ISBNs, dates.
+/// Literata (made for long-form reading) is the only typeface in the app.
 abstract final class AppFonts {
   static const serifFamily = 'Literata';
-  static const monoFamily = 'CourierPrime';
 
   static TextStyle serif({
     required double size,
@@ -30,17 +28,17 @@ abstract final class AppFonts {
     );
   }
 
-  static TextStyle mono({
+  /// Small, letter-spaced style for labels, stamps and catalogue data.
+  static TextStyle label({
     required double size,
     FontWeight weight = FontWeight.w400,
     double height = 1.3,
     double letterSpacing = 0.4,
     Color? color,
   }) {
-    return TextStyle(
-      fontFamily: monoFamily,
-      fontSize: size,
-      fontWeight: weight,
+    return serif(
+      size: size,
+      weight: weight,
       height: height,
       letterSpacing: letterSpacing,
       color: color,
@@ -71,20 +69,20 @@ abstract final class AppFonts {
       bodyLarge: serif(size: 16, height: 1.5, color: ink),
       bodyMedium: serif(size: 14.5, height: 1.5, color: ink),
       bodySmall: serif(size: 12.5, height: 1.4, color: scheme.onSurfaceVariant),
-      labelLarge: mono(
+      labelLarge: label(
         size: 14,
         weight: FontWeight.w700,
         letterSpacing: 0.6,
         color: ink,
       ),
-      labelMedium: mono(
+      labelMedium: label(
         size: 12.5,
         weight: FontWeight.w700,
         letterSpacing: 0.5,
         color: ink,
       ),
       labelSmall:
-          mono(size: 11.5, letterSpacing: 0.4, color: scheme.onSurfaceVariant),
+          label(size: 11.5, letterSpacing: 0.4, color: scheme.onSurfaceVariant),
     );
   }
 }

@@ -80,11 +80,6 @@ flutter:
         - asset: assets/fonts/Literata.ttf
         - asset: assets/fonts/Literata-Italic.ttf
           style: italic
-    - family: CourierPrime
-      fonts:
-        - asset: assets/fonts/CourierPrime-Regular.ttf
-        - asset: assets/fonts/CourierPrime-Bold.ttf
-          weight: 700
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

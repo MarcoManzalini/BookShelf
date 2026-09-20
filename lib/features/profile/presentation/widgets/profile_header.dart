@@ -85,7 +85,7 @@ class ProfileHeader extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           email,
-          style: AppFonts.mono(
+          style: AppFonts.label(
             size: 13,
             color: theme.colorScheme.onSurfaceVariant,
           ),
