@@ -27,7 +27,13 @@ class SearchResultTile extends StatelessWidget {
             children: [
               Hero(
                 tag: 'cover_${book.externalId}',
-                child: BookCover(url: book.coverUrl, width: 56, height: 84),
+                child: BookCover(
+                  url: book.coverUrl,
+                  title: book.title,
+                  author: book.authorsLabel,
+                  width: 56,
+                  height: 84,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -38,9 +44,7 @@ class SearchResultTile extends StatelessWidget {
                       book.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: theme.textTheme.titleSmall,
                     ),
                     if (subtitle.isNotEmpty) ...[
                       const SizedBox(height: 2),
@@ -49,7 +53,7 @@ class SearchResultTile extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
                     ],

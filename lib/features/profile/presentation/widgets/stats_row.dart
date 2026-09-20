@@ -15,32 +15,35 @@ class StatsRow extends StatelessWidget {
     final number = NumberFormat.decimalPattern(
       Localizations.localeOf(context).toString(),
     );
-    return Row(
-      children: [
-        Expanded(
-          child: _StatCard(
-            icon: Icons.check_circle_outline_rounded,
-            value: number.format(stats.booksRead),
-            label: l10n.statBooksRead,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _StatCard(
+              icon: Icons.check_circle_outline_rounded,
+              value: number.format(stats.booksRead),
+              label: l10n.statBooksRead,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _StatCard(
-            icon: Icons.menu_book_rounded,
-            value: number.format(stats.totalPages),
-            label: l10n.statPagesRead,
+          const SizedBox(width: 10),
+          Expanded(
+            child: _StatCard(
+              icon: Icons.menu_book_rounded,
+              value: number.format(stats.totalPages),
+              label: l10n.statPagesRead,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _StatCard(
-            icon: Icons.calendar_today_rounded,
-            value: number.format(stats.booksThisYear),
-            label: l10n.statBooksThisYear,
+          const SizedBox(width: 10),
+          Expanded(
+            child: _StatCard(
+              icon: Icons.calendar_today_rounded,
+              value: number.format(stats.booksThisYear),
+              label: l10n.statBooksThisYear,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

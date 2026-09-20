@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -10,7 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'BookShelf';
 
   @override
-  String get tabLibrary => 'My books';
+  String get tabLibrary => 'Shelf';
 
   @override
   String get tabSearch => 'Search';
@@ -186,7 +188,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validationPageInvalid => 'Invalid page number';
 
   @override
-  String get libraryTitle => 'My books';
+  String get libraryTitle => 'My shelf';
 
   @override
   String get filterAll => 'All';
@@ -198,14 +200,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewGrid => 'Grid view';
 
   @override
-  String get libraryEmptyTitle => 'Your library is empty';
+  String get libraryEmptyTitle => 'Your shelf is empty';
 
   @override
   String get libraryEmptyMessage =>
-      'Search for a book and add it to start tracking your reading.';
+      'Search for a book and put it on the shelf: track every read from here.';
 
   @override
-  String get libraryEmptyCta => 'Search books';
+  String get libraryEmptyCta => 'Find a book';
 
   @override
   String get libraryFilterEmptyTitle => 'No books here';

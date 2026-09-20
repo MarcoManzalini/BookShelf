@@ -5,6 +5,7 @@ import 'package:bookshelf/core/widgets/rating_bar.dart';
 import 'package:bookshelf/features/library/domain/entities/reading_status.dart';
 import 'package:bookshelf/features/library/presentation/bloc/library_bloc.dart';
 import 'package:bookshelf/features/library/presentation/pages/library_page.dart';
+import 'package:bookshelf/features/library/presentation/widgets/library_book_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,8 +37,8 @@ void main() {
       const LibraryState(status: RequestStatus.success),
     );
 
-    expect(find.text('La tua libreria è vuota'), findsOneWidget);
-    expect(find.text('Cerca libri'), findsOneWidget);
+    expect(find.text('Lo scaffale è vuoto'), findsOneWidget);
+    expect(find.text('Cerca un libro'), findsOneWidget);
   });
 
   testWidgets('shows an error with retry when the first load fails',
@@ -74,8 +75,9 @@ void main() {
       ),
     );
 
-    expect(find.text('Dune'), findsOneWidget);
-    expect(find.text('Emma'), findsOneWidget);
+    expect(find.byType(LibraryBookTile), findsNWidgets(2));
+    expect(find.text('Dune'), findsWidgets);
+    expect(find.text('Emma'), findsWidgets);
     expect(find.text('100 / 400 pagine'), findsOneWidget);
     expect(find.text('Letto'), findsWidgets);
   });

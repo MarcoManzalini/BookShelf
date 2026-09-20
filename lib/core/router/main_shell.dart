@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/library/presentation/bloc/library_bloc.dart';
 import '../errors/failure_message.dart';
+import '../theme/app_colors.dart';
 import '../utils/l10n_extension.dart';
 
 class MainShell extends StatelessWidget {
@@ -27,29 +28,34 @@ class MainShell extends StatelessWidget {
       },
       child: Scaffold(
         body: navigationShell,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: (index) => navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
+        bottomNavigationBar: DecoratedBox(
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: AppColors.brass, width: 1.2)),
           ),
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.local_library_outlined),
-              selectedIcon: const Icon(Icons.local_library_rounded),
-              label: l10n.tabLibrary,
+          child: NavigationBar(
+            selectedIndex: navigationShell.currentIndex,
+            onDestinationSelected: (index) => navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.search_rounded),
-              selectedIcon: const Icon(Icons.manage_search_rounded),
-              label: l10n.tabSearch,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline_rounded),
-              selectedIcon: const Icon(Icons.person_rounded),
-              label: l10n.tabProfile,
-            ),
-          ],
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.local_library_outlined),
+                selectedIcon: const Icon(Icons.local_library_rounded),
+                label: l10n.tabLibrary,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.search_rounded),
+                selectedIcon: const Icon(Icons.manage_search_rounded),
+                label: l10n.tabSearch,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.person_outline_rounded),
+                selectedIcon: const Icon(Icons.person_rounded),
+                label: l10n.tabProfile,
+              ),
+            ],
+          ),
         ),
       ),
     );

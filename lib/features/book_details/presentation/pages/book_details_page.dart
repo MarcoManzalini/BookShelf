@@ -177,22 +177,26 @@ class _Content extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       children: [
-        BookImageCarousel(images: book.images, heroTag: heroTag),
+        BookImageCarousel(
+          images: book.images,
+          heroTag: heroTag,
+          title: book.title,
+          author: book.authorsLabel,
+        ),
         const SizedBox(height: 12),
         Text(
           book.title,
           textAlign: TextAlign.center,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-            height: 1.2,
-          ),
+          style: theme.textTheme.headlineMedium,
         ),
         if (book.authors.isNotEmpty) ...[
           const SizedBox(height: 6),
           Text(
             book.authorsLabel,
             textAlign: TextAlign.center,
-            style: theme.textTheme.titleSmall?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w400,
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
@@ -301,7 +305,6 @@ class _StatusSelector extends StatelessWidget {
         for (final s in ReadingStatus.values)
           ButtonSegment(
             value: s,
-            icon: Icon(s.icon, size: 18),
             label: Text(
               s.label(l10n),
               maxLines: 1,

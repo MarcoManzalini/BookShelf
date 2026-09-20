@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/utils/l10n_extension.dart';
 import '../../../../core/utils/language_names.dart';
+import '../../../../core/widgets/catalog_card.dart';
 import '../../../search/domain/entities/book.dart';
 
 class BookInfoSection extends StatelessWidget {
@@ -21,44 +22,10 @@ class BookInfoSection extends StatelessWidget {
       if (book.language != null) (l10n.language, languageName(book.language!)),
     ];
     if (rows.isEmpty) return const SizedBox.shrink();
-
-    final theme = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          children: [
-            for (var i = 0; i < rows.length; i++) ...[
-              if (i > 0) const Divider(height: 1),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 110,
-                      child: Text(
-                        rows[i].$1,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        rows[i].$2,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
+    return CatalogCard(
+      headerStart: book.authors.isEmpty ? null : book.authorsLabel,
+      headerEnd: book.externalId,
+      rows: rows,
     );
   }
 }

@@ -107,7 +107,7 @@ abstract class AppLocalizations {
   /// No description provided for @tabLibrary.
   ///
   /// In it, this message translates to:
-  /// **'I miei libri'**
+  /// **'Scaffale'**
   String get tabLibrary;
 
   /// No description provided for @tabSearch.
@@ -437,7 +437,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryTitle.
   ///
   /// In it, this message translates to:
-  /// **'I miei libri'**
+  /// **'Il mio scaffale'**
   String get libraryTitle;
 
   /// No description provided for @filterAll.
@@ -461,19 +461,19 @@ abstract class AppLocalizations {
   /// No description provided for @libraryEmptyTitle.
   ///
   /// In it, this message translates to:
-  /// **'La tua libreria è vuota'**
+  /// **'Lo scaffale è vuoto'**
   String get libraryEmptyTitle;
 
   /// No description provided for @libraryEmptyMessage.
   ///
   /// In it, this message translates to:
-  /// **'Cerca un libro e aggiungilo per iniziare a tenere traccia delle tue letture.'**
+  /// **'Cerca un libro e mettilo sullo scaffale: da qui segui ogni lettura.'**
   String get libraryEmptyMessage;
 
   /// No description provided for @libraryEmptyCta.
   ///
   /// In it, this message translates to:
-  /// **'Cerca libri'**
+  /// **'Cerca un libro'**
   String get libraryEmptyCta;
 
   /// No description provided for @libraryFilterEmptyTitle.

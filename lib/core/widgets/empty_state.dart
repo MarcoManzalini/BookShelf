@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
-    required this.icon,
+    this.icon,
+    this.leading,
     required this.title,
     this.message,
     this.actionLabel,
     this.onAction,
-  });
+  }) : assert(icon != null || leading != null);
 
-  final IconData icon;
+  final IconData? icon;
+
+  /// Replaces the default icon medallion (e.g. with the brand mark).
+  final Widget? leading;
   final String title;
   final String? message;
   final String? actionLabel;
@@ -26,24 +32,11 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                size: 40,
-                color: theme.colorScheme.onSecondaryContainer,
-              ),
-            ),
-            const SizedBox(height: 20),
+            leading ?? _Medallion(icon: icon!),
+            const SizedBox(height: 24),
             Text(
               title,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: theme.textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
             if (message != null) ...[
@@ -52,6 +45,7 @@ class EmptyState extends StatelessWidget {
                 message!,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -60,12 +54,40 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: onAction,
-                style: FilledButton.styleFrom(minimumSize: const Size(160, 48)),
+                style: FilledButton.styleFrom(minimumSize: const Size(180, 48)),
                 child: Text(actionLabel!),
               ),
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Double-ringed medallion, like an ex libris plate.
+class _Medallion extends StatelessWidget {
+  const _Medallion({required this.icon});
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.brass, width: 1.5),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: scheme.surfaceContainerLow,
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        child: Icon(icon, size: 36, color: scheme.primary),
       ),
     );
   }

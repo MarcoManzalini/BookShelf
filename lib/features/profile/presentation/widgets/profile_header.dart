@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
+
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
     super.key,
@@ -30,16 +33,23 @@ class ProfileHeader extends StatelessWidget {
       children: [
         Stack(
           children: [
-            CircleAvatar(
-              radius: 52,
-              backgroundColor: theme.colorScheme.primaryContainer,
-              foregroundImage:
-                  url == null ? null : CachedNetworkImageProvider(url),
-              child: Text(
-                initial,
-                style: theme.textTheme.displaySmall?.copyWith(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w700,
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.brass, width: 1.6),
+              ),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: theme.colorScheme.primaryContainer,
+                foregroundImage:
+                    url == null ? null : CachedNetworkImageProvider(url),
+                child: Text(
+                  initial,
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),
@@ -70,14 +80,13 @@ class ProfileHeader extends StatelessWidget {
         const SizedBox(height: 14),
         Text(
           name,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+          style: theme.textTheme.headlineSmall,
         ),
         const SizedBox(height: 2),
         Text(
           email,
-          style: theme.textTheme.bodyMedium?.copyWith(
+          style: AppFonts.mono(
+            size: 13,
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),

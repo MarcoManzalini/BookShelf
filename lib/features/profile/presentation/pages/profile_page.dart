@@ -270,17 +270,14 @@ class _ProfileBody extends StatelessWidget {
                     segments: [
                       ButtonSegment(
                         value: ThemeMode.system,
-                        icon: const Icon(Icons.brightness_auto_rounded),
                         label: Text(l10n.themeSystem),
                       ),
                       ButtonSegment(
                         value: ThemeMode.light,
-                        icon: const Icon(Icons.light_mode_rounded),
                         label: Text(l10n.themeLight),
                       ),
                       ButtonSegment(
                         value: ThemeMode.dark,
-                        icon: const Icon(Icons.dark_mode_rounded),
                         label: Text(l10n.themeDark),
                       ),
                     ],

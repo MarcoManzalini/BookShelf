@@ -10,11 +10,15 @@ class BookImageCarousel extends StatefulWidget {
     super.key,
     required this.images,
     required this.heroTag,
+    this.title,
+    this.author,
     this.height = 300,
   });
 
   final List<String> images;
   final Object heroTag;
+  final String? title;
+  final String? author;
   final double height;
 
   @override
@@ -48,19 +52,21 @@ class _BookImageCarouselState extends State<BookImageCarousel> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(4),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withAlpha(46),
-                        blurRadius: 18,
-                        offset: const Offset(0, 8),
+                        blurRadius: 20,
+                        offset: const Offset(4, 10),
                       ),
                     ],
                   ),
                   child: BookCover(
                     url: images[index],
+                    title: widget.title,
+                    author: widget.author,
                     size: CoverSize.large,
-                    borderRadius: 12,
+                    borderRadius: 4,
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: double.infinity,

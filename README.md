@@ -8,7 +8,7 @@ App Flutter per tracciare i libri letti. Material 3, BLoC, Supabase (auth, datab
 
 ## Requisiti
 
-- Flutter 3.24+ (Dart 3.5+) — sviluppato e testato con Flutter 3.24.0
+- Flutter 3.47+ (stable) — testato con Flutter 3.47.5
 - Un progetto Supabase (il piano gratuito basta)
 
 ## Setup
@@ -66,9 +66,9 @@ lib/
     di/        get_it: registrazione di datasource, repository, use case, bloc
     errors/    Failure + mapError (Dio/Supabase/socket -> Failure) + messaggi localizzati
     router/    go_router, guard di autenticazione, MainShell (bottom nav)
-    theme/     Material 3 chiaro/scuro
+    theme/     palette (AppColors), tipografia (AppFonts), tema Material 3 chiaro/scuro
     utils/     RequestStatus, transformer Bloc (debounce + restartable), validatori
-    widgets/   BookCover, AppRatingBar, EmptyState, ErrorView, skeleton, ExpandableText
+    widgets/   BookCover/ClothCover, CatalogCard, BookshelfMark, AppRatingBar, EmptyState, ErrorView, skeleton, ExpandableText
   features/
     auth/          login, registrazione, recupero e reset password, AuthBloc
     library/       i miei libri: lista/griglia, filtri, LibraryBloc, use case AddBookToLibrary
@@ -90,6 +90,23 @@ Ogni feature ha `data` (datasource + repository impl + mapper), `domain` (entit�
 - **Ricerca**: `SearchBloc` usa `debounce(400 ms) + restartable` per la digitazione e `droppable` per le pagine successive. Il footer della lista carica la pagina successiva quando diventa visibile.
 - **Dettaglio**: `BookDetailsBloc` gestisce sia il libro in libreria (`/book/:id`) sia l'anteprima da ricerca (`/preview/:externalId`, con il `Book` passato come `extra`). Le modifiche sono ottimistiche con rollback in caso di errore. Le regole (es. "letto" imposta pagina finale e date) stanno in `UserBook.withStatus/withProgress`.
 - **Statistiche** del profilo calcolate da `ReadingStats.fromBooks` sui libri già caricati.
+
+## Identità visiva
+
+Il tema è quello di una biblioteca: una sala di lettura con inchiostro verde, segnalibro bordeaux, ottone e ripiani in noce, non un'app Material generica.
+
+| Elemento | Dove |
+|---|---|
+| Palette chiara (carta con leggera tinta verde) e scura ("sala di lettura", ottone acceso) | `core/theme/app_colors.dart` |
+| Literata (titoli e testi, font variabile) + Courier Prime (dati catalografici) | `core/theme/app_typography.dart`, `assets/fonts/` |
+| Copertina in tela con titolo e filetto oro quando manca l'immagine; il colore dipende dal titolo | `core/widgets/book_cover.dart` (`ClothCover`) |
+| Segnalibro a nastro sulla copertina: bordeaux = in lettura, ottone = letto | `library/presentation/widgets/status_ribbon.dart` |
+| Stato di lettura come timbro di biblioteca | `library/presentation/widgets/status_chip.dart` |
+| Vista griglia: le copertine poggiano su un ripiano | `library/presentation/widgets/library_book_grid_item.dart` |
+| Dati del libro come scheda di catalogo (filetto rosso, righe, foro) | `core/widgets/catalog_card.dart` |
+| Marchio con tre dorsi di libri | `core/widgets/bookshelf_mark.dart` |
+
+Per cambiare identità basta modificare `app_colors.dart` e `app_typography.dart`: i widget leggono colori e stili dal tema. I font sono distribuiti con licenza SIL OFL (testi in `assets/fonts/licenses/`).
 
 ## Open Library
 

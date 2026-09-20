@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/l10n_extension.dart';
+import '../../../../core/widgets/bookshelf_mark.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../bloc/library_bloc.dart';
@@ -118,7 +119,7 @@ class _Body extends StatelessWidget {
       return RefreshIndicator(
         onRefresh: () => _refresh(context),
         child: EmptyState(
-          icon: Icons.auto_stories_rounded,
+          leading: const BookshelfMark(size: 96),
           title: l10n.libraryEmptyTitle,
           message: l10n.libraryEmptyMessage,
           actionLabel: l10n.libraryEmptyCta,
@@ -156,12 +157,12 @@ class _Body extends StatelessWidget {
             )
           : GridView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 24),
               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 170,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 14,
-                childAspectRatio: 0.42,
+                maxCrossAxisExtent: 190,
+                mainAxisSpacing: 22,
+                crossAxisSpacing: 0,
+                childAspectRatio: 0.44,
               ),
               itemCount: books.length,
               itemBuilder: (_, i) => LibraryBookGridItem(

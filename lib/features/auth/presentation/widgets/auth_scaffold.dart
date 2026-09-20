@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/bookshelf_mark.dart';
+
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({
     super.key,
@@ -28,31 +31,19 @@ class AuthScaffold extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(
-                      Icons.auto_stories_rounded,
-                      size: 32,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: BookshelfMark(size: 72),
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    title,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  Text(title, style: theme.textTheme.displaySmall),
+                  const SizedBox(height: 12),
+                  Container(width: 44, height: 2, color: AppColors.brass),
+                  const SizedBox(height: 12),
                   Text(
                     subtitle,
                     style: theme.textTheme.bodyLarge?.copyWith(
+                      fontStyle: FontStyle.italic,
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),

@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -10,7 +12,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get appTitle => 'BookShelf';
 
   @override
-  String get tabLibrary => 'I miei libri';
+  String get tabLibrary => 'Scaffale';
 
   @override
   String get tabSearch => 'Cerca';
@@ -187,7 +189,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get validationPageInvalid => 'Numero di pagina non valido';
 
   @override
-  String get libraryTitle => 'I miei libri';
+  String get libraryTitle => 'Il mio scaffale';
 
   @override
   String get filterAll => 'Tutti';
@@ -199,14 +201,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get viewGrid => 'Vista griglia';
 
   @override
-  String get libraryEmptyTitle => 'La tua libreria è vuota';
+  String get libraryEmptyTitle => 'Lo scaffale è vuoto';
 
   @override
   String get libraryEmptyMessage =>
-      'Cerca un libro e aggiungilo per iniziare a tenere traccia delle tue letture.';
+      'Cerca un libro e mettilo sullo scaffale: da qui segui ogni lettura.';
 
   @override
-  String get libraryEmptyCta => 'Cerca libri';
+  String get libraryEmptyCta => 'Cerca un libro';
 
   @override
   String get libraryFilterEmptyTitle => 'Nessun libro qui';
