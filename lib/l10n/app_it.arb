@@ -1,0 +1,170 @@
+{
+  "@@locale": "it",
+  "appTitle": "BookShelf",
+  "tabLibrary": "I miei libri",
+  "tabSearch": "Cerca",
+  "tabProfile": "Profilo",
+  "retry": "Riprova",
+  "cancel": "Annulla",
+  "save": "Salva",
+  "remove": "Rimuovi",
+  "clear": "Cancella",
+  "offlineTitle": "Sei offline",
+  "errorTitle": "Qualcosa è andato storto",
+  "errorNetwork": "Nessuna connessione a internet. Controlla la rete e riprova.",
+  "errorTimeout": "La richiesta ha impiegato troppo tempo. Riprova.",
+  "errorServer": "Il servizio non risponde correttamente. Riprova tra poco.",
+  "errorNotFound": "Elemento non trovato.",
+  "errorUnauthorized": "Sessione scaduta o permessi insufficienti. Accedi di nuovo.",
+  "errorInvalidCredentials": "Email o password non corrette.",
+  "errorEmailNotConfirmed": "Conferma prima il tuo indirizzo email dal link che ti abbiamo inviato.",
+  "errorUserAlreadyExists": "Esiste già un account con questa email.",
+  "errorWeakPassword": "La password è troppo debole.",
+  "errorRateLimited": "Troppe richieste. Attendi un momento e riprova.",
+  "errorUnknown": "Errore imprevisto. Riprova.",
+  "statusWantToRead": "Da leggere",
+  "statusReading": "In lettura",
+  "statusRead": "Letto",
+  "addToLibraryAs": "Aggiungi alla libreria come",
+  "loginTitle": "Bentornato",
+  "loginSubtitle": "Accedi per ritrovare la tua libreria.",
+  "registerTitle": "Crea il tuo account",
+  "registerSubtitle": "Tieni traccia di ogni libro che leggi.",
+  "emailLabel": "Email",
+  "passwordLabel": "Password",
+  "confirmPasswordLabel": "Conferma password",
+  "newPasswordLabel": "Nuova password",
+  "displayNameLabel": "Nome visualizzato",
+  "loginButton": "Accedi",
+  "registerButton": "Registrati",
+  "noAccountPrompt": "Non hai un account?",
+  "haveAccountPrompt": "Hai già un account?",
+  "forgotPasswordLink": "Password dimenticata?",
+  "forgotPasswordTitle": "Recupera password",
+  "forgotPasswordSubtitle": "Ti invieremo un link per impostare una nuova password.",
+  "sendResetLink": "Invia link",
+  "resetLinkSent": "Se l'email è registrata, riceverai un link per reimpostare la password.",
+  "confirmationEmailSent": "Registrazione completata. Controlla la tua email per confermare l'account.",
+  "resetPasswordTitle": "Nuova password",
+  "resetPasswordSubtitle": "Scegli una nuova password per il tuo account.",
+  "updatePasswordButton": "Aggiorna password",
+  "passwordUpdated": "Password aggiornata.",
+  "continueWithGoogle": "Continua con Google",
+  "continueWithApple": "Continua con Apple",
+  "validationRequired": "Campo obbligatorio",
+  "validationEmail": "Inserisci un indirizzo email valido",
+  "validationPasswordShort": "Almeno {min} caratteri",
+  "@validationPasswordShort": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "validationPasswordMismatch": "Le password non coincidono",
+  "validationPageInvalid": "Numero di pagina non valido",
+  "libraryTitle": "I miei libri",
+  "filterAll": "Tutti",
+  "viewList": "Vista elenco",
+  "viewGrid": "Vista griglia",
+  "libraryEmptyTitle": "La tua libreria è vuota",
+  "libraryEmptyMessage": "Cerca un libro e aggiungilo per iniziare a tenere traccia delle tue letture.",
+  "libraryEmptyCta": "Cerca libri",
+  "libraryFilterEmptyTitle": "Nessun libro qui",
+  "libraryFilterEmptyMessage": "Non ci sono libri con questo stato.",
+  "pagesProgress": "{current} / {total} pagine",
+  "@pagesProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "currentPageOnly": "Pagina {current}",
+  "@currentPageOnly": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      }
+    }
+  },
+  "searchTitle": "Cerca",
+  "searchHint": "Titolo, autore o ISBN",
+  "searchInitialTitle": "Trova il tuo prossimo libro",
+  "searchInitialMessage": "Cerca per titolo, autore o ISBN tra milioni di libri.",
+  "searchNoResultsTitle": "Nessun risultato",
+  "searchNoResultsMessage": "Nessun libro trovato per «{query}». Prova con altre parole.",
+  "@searchNoResultsMessage": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "addToLibrary": "Aggiungi alla libreria",
+  "added": "Aggiunto",
+  "description": "Descrizione",
+  "details": "Dettagli",
+  "subjects": "Categorie",
+  "showMore": "Mostra di più",
+  "showLess": "Mostra meno",
+  "publisher": "Editore",
+  "publishedYear": "Anno",
+  "isbn": "ISBN",
+  "pages": "Pagine",
+  "language": "Lingua",
+  "myProgress": "Il mio progresso",
+  "currentPage": "Pagina corrente",
+  "editCurrentPage": "Modifica pagina corrente",
+  "pageOfTotal": "Pagina {current} di {total}",
+  "@pageOfTotal": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "myRating": "Il mio voto",
+  "readingDates": "Date di lettura",
+  "startedOn": "Iniziato il",
+  "finishedOn": "Finito il",
+  "notSet": "Non impostata",
+  "notes": "Note personali",
+  "notesHint": "Scrivi qui i tuoi appunti…",
+  "removeBook": "Rimuovi dalla libreria",
+  "removeBookTitle": "Rimuovere il libro?",
+  "removeBookMessage": "«{title}» verrà rimosso dalla tua libreria, insieme a voto e note.",
+  "@removeBookMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "bookRemoved": "Libro rimosso dalla libreria",
+  "profileTitle": "Profilo",
+  "profileUpdated": "Profilo aggiornato",
+  "avatarUpdated": "Foto profilo aggiornata",
+  "editDisplayName": "Modifica nome",
+  "changePassword": "Cambia password",
+  "theme": "Tema",
+  "themeSystem": "Sistema",
+  "themeLight": "Chiaro",
+  "themeDark": "Scuro",
+  "statBooksRead": "Libri letti",
+  "statPagesRead": "Pagine lette",
+  "statBooksThisYear": "Letti quest'anno",
+  "logout": "Esci",
+  "logoutTitle": "Uscire dall'account?",
+  "logoutMessage": "Dovrai accedere di nuovo per vedere la tua libreria.",
+  "deleteAccount": "Elimina account",
+  "deleteAccountTitle": "Eliminare l'account?",
+  "deleteAccountMessage": "Verranno cancellati definitivamente il tuo profilo, la tua libreria, i voti e le note. L'operazione non può essere annullata.",
+  "deleteAccountConfirm": "Elimina definitivamente"
+}

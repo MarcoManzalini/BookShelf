@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/utils/cover_url.dart';
+import '../../../../core/widgets/book_cover.dart';
+import '../../domain/entities/user_book.dart';
+import 'book_progress.dart';
+import 'status_chip.dart';
+
+class LibraryBookTile extends StatelessWidget {
+  const LibraryBookTile({super.key, required this.book, required this.onTap});
+
+  final UserBook book;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Hero(
+                tag: 'cover_${book.id}',
+                child: BookCover(
+                  url: book.book.coverUrl,
+                  width: 72,
+                  height: 108,
+                  size: CoverSize.medium,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      book.book.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
+                    ),
+                    if (book.book.authors.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        book.book.authorsLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    StatusChip(status: book.status),
+                    const SizedBox(height: 8),
+                    BookProgress(book: book),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

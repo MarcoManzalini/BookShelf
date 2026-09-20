@@ -1,0 +1,67 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/widgets/book_cover.dart';
+import '../../domain/entities/book.dart';
+import 'add_to_library_button.dart';
+
+class SearchResultTile extends StatelessWidget {
+  const SearchResultTile({super.key, required this.book, required this.onTap});
+
+  final Book book;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final subtitle = [
+      if (book.authors.isNotEmpty) book.authorsLabel,
+      if (book.publishedYear != null) '${book.publishedYear}',
+    ].join(' · ');
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Hero(
+                tag: 'cover_${book.externalId}',
+                child: BookCover(url: book.coverUrl, width: 56, height: 84),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      book.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (subtitle.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              AddToLibraryButton(book: book),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

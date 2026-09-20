@@ -1,0 +1,120 @@
+import 'package:bookshelf/core/errors/error_mapper.dart';
+import 'package:bookshelf/core/errors/failure.dart';
+import 'package:bookshelf/core/router/app_router.dart';
+import 'package:bookshelf/core/utils/cover_url.dart';
+import 'package:bookshelf/features/auth/domain/entities/auth_snapshot.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('authRedirect', () {
+    test('unauthenticated users are sent to login', () {
+      expect(
+        authRedirect(AuthStatus.unauthenticated, AppRoutes.library),
+        AppRoutes.login,
+      );
+      expect(
+        authRedirect(AuthStatus.unauthenticated, '/book/abc'),
+        AppRoutes.login,
+      );
+    });
+
+    test('unauthenticated users can use the auth pages', () {
+      expect(authRedirect(AuthStatus.unauthenticated, AppRoutes.login), isNull);
+      expect(
+        authRedirect(AuthStatus.unauthenticated, AppRoutes.register),
+        isNull,
+      );
+      expect(
+        authRedirect(AuthStatus.unauthenticated, AppRoutes.forgotPassword),
+        isNull,
+      );
+    });
+
+    test('reset-password is not reachable without a recovery session', () {
+      expect(
+        authRedirect(AuthStatus.unauthenticated, AppRoutes.resetPassword),
+        AppRoutes.login,
+      );
+    });
+
+    test('authenticated users skip the auth pages', () {
+      expect(
+        authRedirect(AuthStatus.authenticated, AppRoutes.login),
+        AppRoutes.library,
+      );
+      expect(authRedirect(AuthStatus.authenticated, AppRoutes.search), isNull);
+    });
+
+    test('password recovery is forced onto the reset page', () {
+      expect(
+        authRedirect(AuthStatus.passwordRecovery, AppRoutes.library),
+        AppRoutes.resetPassword,
+      );
+      expect(
+        authRedirect(AuthStatus.passwordRecovery, AppRoutes.resetPassword),
+        isNull,
+      );
+    });
+  });
+
+  group('mapError', () {
+    test('maps Dio connection errors to network', () {
+      final failure = mapError(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionError,
+        ),
+      );
+      expect(failure.code, FailureCode.network);
+    });
+
+    test('maps Dio timeouts and HTTP statuses', () {
+      expect(
+        mapError(
+          DioException(
+            requestOptions: RequestOptions(),
+            type: DioExceptionType.receiveTimeout,
+          ),
+        ).code,
+        FailureCode.timeout,
+      );
+      Failure status(int code) => mapError(
+            DioException(
+              requestOptions: RequestOptions(),
+              type: DioExceptionType.badResponse,
+              response: Response(
+                requestOptions: RequestOptions(),
+                statusCode: code,
+              ),
+            ),
+          );
+      expect(status(404).code, FailureCode.notFound);
+      expect(status(429).code, FailureCode.rateLimited);
+      expect(status(500).code, FailureCode.server);
+    });
+
+    test('passes Failures through unchanged', () {
+      const failure = Failure(FailureCode.weakPassword);
+      expect(mapError(failure), same(failure));
+    });
+  });
+
+  group('resizeCoverUrl', () {
+    const url = 'https://covers.openlibrary.org/b/id/1-L.jpg?default=false';
+
+    test('swaps the Open Library size suffix', () {
+      expect(
+        resizeCoverUrl(url, CoverSize.small),
+        'https://covers.openlibrary.org/b/id/1-S.jpg?default=false',
+      );
+    });
+
+    test('leaves other hosts untouched', () {
+      expect(
+        resizeCoverUrl('https://example.com/a-L.jpg', CoverSize.small),
+        'https://example.com/a-L.jpg',
+      );
+    });
+  });
+}
