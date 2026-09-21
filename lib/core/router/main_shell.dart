@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/library/presentation/bloc/library_bloc.dart';
 import '../errors/failure_message.dart';
-import '../theme/app_colors.dart';
 import '../utils/l10n_extension.dart';
 
 class MainShell extends StatelessWidget {
@@ -28,10 +27,7 @@ class MainShell extends StatelessWidget {
       },
       child: Scaffold(
         body: navigationShell,
-        bottomNavigationBar: DecoratedBox(
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: AppColors.brass, width: 1.2)),
-          ),
+        bottomNavigationBar: _FloatingNavBar(
           child: NavigationBar(
             selectedIndex: navigationShell.currentIndex,
             onDestinationSelected: (index) => navigationShell.goBranch(
@@ -58,6 +54,36 @@ class MainShell extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// White tab bar with rounded top corners, lifted off the page by a soft
+/// shadow.
+class _FloatingNavBar extends StatelessWidget {
+  const _FloatingNavBar({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    const radius = BorderRadius.vertical(top: Radius.circular(28));
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
+        borderRadius: radius,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(
+              scheme.brightness == Brightness.dark ? 110 : 30,
+            ),
+            blurRadius: 24,
+            offset: const Offset(0, -6),
+          ),
+        ],
+      ),
+      child: ClipRRect(borderRadius: radius, child: child),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../search/domain/entities/book.dart';
+import '../../../search/domain/entities/book_edition.dart';
 import 'reading_status.dart';
 
 class UserBook extends Equatable {
@@ -15,6 +16,7 @@ class UserBook extends Equatable {
     this.notes,
     this.startedAt,
     this.finishedAt,
+    this.shelves = const [],
   });
 
   final String id;
@@ -26,6 +28,9 @@ class UserBook extends Equatable {
   final DateTime? startedAt;
   final DateTime? finishedAt;
   final DateTime createdAt;
+
+  /// Custom shelves this book is on (see `ShelfNames`).
+  final List<String> shelves;
 
   int? get pageCount => book.pageCount;
 
@@ -39,6 +44,8 @@ class UserBook extends Equatable {
 
   /// [ValueGetter] parameters allow explicitly setting a field to null.
   UserBook copyWith({
+    Book? book,
+    List<String>? shelves,
     ReadingStatus? status,
     int? currentPage,
     ValueGetter<int?>? rating,
@@ -48,7 +55,8 @@ class UserBook extends Equatable {
   }) {
     return UserBook(
       id: id,
-      book: book,
+      book: book ?? this.book,
+      shelves: shelves ?? this.shelves,
       status: status ?? this.status,
       createdAt: createdAt,
       currentPage: currentPage ?? this.currentPage,
@@ -58,6 +66,10 @@ class UserBook extends Equatable {
       finishedAt: finishedAt != null ? finishedAt() : this.finishedAt,
     );
   }
+
+  /// The same reading record, with the book's details taken from [edition].
+  UserBook withEdition(BookEdition edition) =>
+      copyWith(book: edition.applyTo(book));
 
   UserBook withStatus(ReadingStatus newStatus, {DateTime? now}) {
     final n = now ?? DateTime.now();
@@ -105,5 +117,6 @@ class UserBook extends Equatable {
         startedAt,
         finishedAt,
         createdAt,
+        shelves,
       ];
 }

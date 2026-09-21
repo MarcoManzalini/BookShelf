@@ -188,16 +188,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validationPageInvalid => 'Invalid page number';
 
   @override
-  String get libraryTitle => 'My shelf';
+  String get libraryTitle => 'Bookshelf';
 
   @override
   String get filterAll => 'All';
 
   @override
-  String get viewList => 'List view';
+  String get viewSwipe => 'Swipe view';
 
   @override
-  String get viewGrid => 'Grid view';
+  String get viewShelf => 'Shelf view';
+
+  @override
+  String get filterTitle => 'Filter your shelf';
 
   @override
   String get libraryEmptyTitle => 'Your shelf is empty';
@@ -227,17 +230,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get searchTitle => 'Search';
+  String get searchTitle => 'Explore';
 
   @override
   String get searchHint => 'Title, author or ISBN';
-
-  @override
-  String get searchInitialTitle => 'Find your next book';
-
-  @override
-  String get searchInitialMessage =>
-      'Search by title, author or ISBN among millions of books.';
 
   @override
   String get searchNoResultsTitle => 'No results';
@@ -390,4 +386,368 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountConfirm => 'Delete permanently';
+
+  @override
+  String get aboutAuthor => 'About the author';
+
+  @override
+  String moreByAuthor(String author) {
+    return 'More by $author';
+  }
+
+  @override
+  String get similarBooks => 'Similar books';
+
+  @override
+  String authorWorkCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count works',
+      one: '1 work',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ratingSummary(String average, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ratings',
+      one: '1 rating',
+    );
+    return '$average out of 5 · $_temp0';
+  }
+
+  @override
+  String get exploreBestSellers => 'Best sellers';
+
+  @override
+  String get exploreNewArrivals => 'New arrivals';
+
+  @override
+  String get explorePopular => 'Popular';
+
+  @override
+  String get exploreForYou => 'Based on your latest reads';
+
+  @override
+  String get exploreForYouHint => 'Similar to the books you finished recently';
+
+  @override
+  String get exploreRankedHint => 'Ranked by rating and number of votes';
+
+  @override
+  String get exploreTopByGenre => 'Top rated by genre';
+
+  @override
+  String get genreFantasy => 'Fantasy';
+
+  @override
+  String get genreScienceFiction => 'Science fiction';
+
+  @override
+  String get genreMystery => 'Mystery';
+
+  @override
+  String get genreThriller => 'Thriller';
+
+  @override
+  String get genreRomance => 'Romance';
+
+  @override
+  String get genreHistoricalFiction => 'Historical fiction';
+
+  @override
+  String get genreHorror => 'Horror';
+
+  @override
+  String get genreClassics => 'Classics';
+
+  @override
+  String get genreBiography => 'Biography';
+
+  @override
+  String get genreYoungAdult => 'Young adult';
+
+  @override
+  String get viewAll => 'View all';
+
+  @override
+  String get scanTitle => 'Scan ISBN';
+
+  @override
+  String get scanHint =>
+      'Point the camera at the barcode on the back of the book';
+
+  @override
+  String get scanLooking => 'Looking for the book…';
+
+  @override
+  String scanNotFound(String isbn) {
+    return 'No book found for ISBN $isbn';
+  }
+
+  @override
+  String get scanAgain => 'Scan another';
+
+  @override
+  String get scanDetails => 'Details';
+
+  @override
+  String get scanTorch => 'Torch';
+
+  @override
+  String get scanCameraDenied =>
+      'Camera access is needed to scan barcodes. Enable it in your phone settings.';
+
+  @override
+  String get scanCameraError => 'The camera could not be started.';
+
+  @override
+  String get shelvesTitle => 'Shelves';
+
+  @override
+  String get addShelf => 'Add shelf';
+
+  @override
+  String get newShelfHint => 'New shelf (e.g. Gifts)';
+
+  @override
+  String get myShelves => 'My shelves';
+
+  @override
+  String shelfFilterLabel(String name) {
+    return 'Shelf: $name';
+  }
+
+  @override
+  String get editionTitle => 'Choose the edition';
+
+  @override
+  String get editionChange => 'Change edition';
+
+  @override
+  String get editionNone => 'No editions found for this language.';
+
+  @override
+  String pagesCount(int count) {
+    return '$count pages';
+  }
+
+  @override
+  String get statsTitle => 'Statistics';
+
+  @override
+  String statsGoalTitle(int year) {
+    return '$year goal';
+  }
+
+  @override
+  String statsGoalProgress(int read, int goal) {
+    return '$read of $goal books';
+  }
+
+  @override
+  String get statsGoalSet => 'Set a yearly goal';
+
+  @override
+  String get statsGoalEdit => 'Edit';
+
+  @override
+  String get statsGoalRemove => 'Remove goal';
+
+  @override
+  String get statsGoalDialogTitle =>
+      'How many books do you want to read this year?';
+
+  @override
+  String get statsGoalHint => 'Number of books';
+
+  @override
+  String statsGoalLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count to go',
+      one: '1 to go',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get statsGoalDone => 'Goal reached!';
+
+  @override
+  String get statsStreak => 'Day streak';
+
+  @override
+  String get statsPagesPerDay => 'Pages per day';
+
+  @override
+  String get statsTimeRead => 'Reading time';
+
+  @override
+  String get statsAvgRating => 'Average rating';
+
+  @override
+  String get statsBooksPerMonth => 'Books per month';
+
+  @override
+  String get statsPagesRecent => 'Pages, last 14 days';
+
+  @override
+  String get statsTopSubjects => 'Most read categories';
+
+  @override
+  String statsHours(String hours) {
+    return '$hours h';
+  }
+
+  @override
+  String get statsNoData => '—';
+
+  @override
+  String get sessionRegister => 'Log a session';
+
+  @override
+  String get sessionTitle => 'Reading session';
+
+  @override
+  String get sessionStart => 'Start';
+
+  @override
+  String get sessionPause => 'Pause';
+
+  @override
+  String get sessionMinutes => 'Minutes read';
+
+  @override
+  String get sessionEndPage => 'Page reached';
+
+  @override
+  String get sessionsRecent => 'Recent sessions';
+
+  @override
+  String minutesShort(int count) {
+    return '$count min';
+  }
+
+  @override
+  String get offlineBanner =>
+      'You are offline: showing the copy saved on this device.';
+
+  @override
+  String offlinePending(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count changes',
+      one: '1 change',
+    );
+    return '$_temp0 to sync';
+  }
+
+  @override
+  String get ioTitle => 'Import and export';
+
+  @override
+  String get ioImportTitle => 'Import from Goodreads';
+
+  @override
+  String get ioImportBody =>
+      'On Goodreads open “My Books” → “Import and export” → “Export Library”, then pick the downloaded .csv file here. Status, rating, dates, notes and shelves are kept.';
+
+  @override
+  String get ioPickFile => 'Choose the CSV file';
+
+  @override
+  String ioFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Found $count books',
+      one: 'Found 1 book',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ioFoundBreakdown(int read, int reading, int wanted) {
+    return '$read read · $reading reading · $wanted to read';
+  }
+
+  @override
+  String ioSkippedLines(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lines without a title were ignored',
+      one: '1 line without a title was ignored',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get ioStart => 'Import';
+
+  @override
+  String get ioRunning => 'Importing…';
+
+  @override
+  String get ioRunningHint =>
+      'You can leave this page open: each book is looked up on Open Library.';
+
+  @override
+  String get ioCancel => 'Stop';
+
+  @override
+  String get ioImported => 'Imported';
+
+  @override
+  String get ioDuplicates => 'Already in your library';
+
+  @override
+  String get ioNotFound => 'Not found';
+
+  @override
+  String get ioFailed => 'Not saved';
+
+  @override
+  String get ioDone => 'Done';
+
+  @override
+  String get ioCancelled =>
+      'Import stopped: the books already imported stay in your library.';
+
+  @override
+  String get ioAborted =>
+      'Connection lost: the import stopped. Try again later; books already added are skipped.';
+
+  @override
+  String get ioInvalidFile =>
+      'This file does not look like a book export (no “Title” column).';
+
+  @override
+  String get ioTryAnother => 'Choose another file';
+
+  @override
+  String get ioExportTitle => 'Export your library';
+
+  @override
+  String get ioExportBody =>
+      'Creates a CSV file with all your books, compatible with Goodreads and spreadsheets.';
+
+  @override
+  String get ioExportButton => 'Export as CSV';
+
+  @override
+  String get ioExportEmpty => 'There are no books to export yet.';
+
+  @override
+  String get ioExportError => 'The file could not be created.';
+
+  @override
+  String get ioProfileEntry => 'Import and export';
 }

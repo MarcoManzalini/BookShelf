@@ -17,7 +17,8 @@ class BookShelfApp extends StatefulWidget {
   State<BookShelfApp> createState() => _BookShelfAppState();
 }
 
-class _BookShelfAppState extends State<BookShelfApp> {
+class _BookShelfAppState extends State<BookShelfApp>
+    with WidgetsBindingObserver {
   final _authBloc = getIt<AuthBloc>();
   final _libraryBloc = getIt<LibraryBloc>();
   final _themeCubit = getIt<ThemeCubit>();
@@ -26,8 +27,24 @@ class _BookShelfAppState extends State<BookShelfApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     if (_authBloc.state.user != null) {
       _libraryBloc.add(const LibraryStarted());
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Coming back to the app is a good moment to sync: the connection may have
+  /// returned while it was in the background.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _authBloc.state.user != null) {
+      _libraryBloc.add(const LibraryRefreshRequested());
     }
   }
 

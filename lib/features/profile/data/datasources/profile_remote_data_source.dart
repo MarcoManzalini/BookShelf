@@ -39,6 +39,17 @@ class ProfileRemoteDataSource {
     return _fromRow(row);
   }
 
+  /// [goal] null clears the yearly target.
+  Future<Profile> updateReadingGoal(int? goal) async {
+    final row = await _client
+        .from(_table)
+        .update({'reading_goal': goal})
+        .eq('id', _userId)
+        .select()
+        .single();
+    return _fromRow(row);
+  }
+
   Future<Profile> uploadAvatar(Uint8List bytes, String extension) async {
     final ext = extension.toLowerCase().replaceAll('.', '');
     final path = '$_userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
@@ -88,5 +99,6 @@ class ProfileRemoteDataSource {
         id: row['id'] as String,
         displayName: row['display_name'] as String?,
         avatarUrl: row['avatar_url'] as String?,
+        readingGoal: (row['reading_goal'] as num?)?.toInt(),
       );
 }

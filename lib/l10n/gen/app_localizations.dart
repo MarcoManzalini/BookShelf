@@ -437,7 +437,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryTitle.
   ///
   /// In it, this message translates to:
-  /// **'Il mio scaffale'**
+  /// **'Bookshelf'**
   String get libraryTitle;
 
   /// No description provided for @filterAll.
@@ -446,17 +446,23 @@ abstract class AppLocalizations {
   /// **'Tutti'**
   String get filterAll;
 
-  /// No description provided for @viewList.
+  /// No description provided for @viewSwipe.
   ///
   /// In it, this message translates to:
-  /// **'Vista elenco'**
-  String get viewList;
+  /// **'Vista a scorrimento'**
+  String get viewSwipe;
 
-  /// No description provided for @viewGrid.
+  /// No description provided for @viewShelf.
   ///
   /// In it, this message translates to:
-  /// **'Vista griglia'**
-  String get viewGrid;
+  /// **'Vista scaffale'**
+  String get viewShelf;
+
+  /// No description provided for @filterTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Filtra la libreria'**
+  String get filterTitle;
 
   /// No description provided for @libraryEmptyTitle.
   ///
@@ -503,7 +509,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchTitle.
   ///
   /// In it, this message translates to:
-  /// **'Cerca'**
+  /// **'Esplora'**
   String get searchTitle;
 
   /// No description provided for @searchHint.
@@ -511,18 +517,6 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Titolo, autore o ISBN'**
   String get searchHint;
-
-  /// No description provided for @searchInitialTitle.
-  ///
-  /// In it, this message translates to:
-  /// **'Trova il tuo prossimo libro'**
-  String get searchInitialTitle;
-
-  /// No description provided for @searchInitialMessage.
-  ///
-  /// In it, this message translates to:
-  /// **'Cerca per titolo, autore o ISBN tra milioni di libri.'**
-  String get searchInitialMessage;
 
   /// No description provided for @searchNoResultsTitle.
   ///
@@ -811,6 +805,582 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Elimina definitivamente'**
   String get deleteAccountConfirm;
+
+  /// No description provided for @aboutAuthor.
+  ///
+  /// In it, this message translates to:
+  /// **'Sull\'autore'**
+  String get aboutAuthor;
+
+  /// No description provided for @moreByAuthor.
+  ///
+  /// In it, this message translates to:
+  /// **'Altri libri di {author}'**
+  String moreByAuthor(String author);
+
+  /// No description provided for @similarBooks.
+  ///
+  /// In it, this message translates to:
+  /// **'Libri simili'**
+  String get similarBooks;
+
+  /// No description provided for @authorWorkCount.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, =1{1 opera} other{{count} opere}}'**
+  String authorWorkCount(int count);
+
+  /// No description provided for @ratingSummary.
+  ///
+  /// In it, this message translates to:
+  /// **'{average} su 5 · {count, plural, =1{1 valutazione} other{{count} valutazioni}}'**
+  String ratingSummary(String average, int count);
+
+  /// No description provided for @exploreBestSellers.
+  ///
+  /// In it, this message translates to:
+  /// **'Best seller'**
+  String get exploreBestSellers;
+
+  /// No description provided for @exploreNewArrivals.
+  ///
+  /// In it, this message translates to:
+  /// **'Novità'**
+  String get exploreNewArrivals;
+
+  /// No description provided for @explorePopular.
+  ///
+  /// In it, this message translates to:
+  /// **'Più apprezzati'**
+  String get explorePopular;
+
+  /// No description provided for @exploreForYou.
+  ///
+  /// In it, this message translates to:
+  /// **'In base alle tue ultime letture'**
+  String get exploreForYou;
+
+  /// No description provided for @exploreForYouHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Simili ai libri che hai finito da poco'**
+  String get exploreForYouHint;
+
+  /// No description provided for @exploreRankedHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Classifica per voto e numero di valutazioni'**
+  String get exploreRankedHint;
+
+  /// No description provided for @exploreTopByGenre.
+  ///
+  /// In it, this message translates to:
+  /// **'Migliori per genere'**
+  String get exploreTopByGenre;
+
+  /// No description provided for @genreFantasy.
+  ///
+  /// In it, this message translates to:
+  /// **'Fantasy'**
+  String get genreFantasy;
+
+  /// No description provided for @genreScienceFiction.
+  ///
+  /// In it, this message translates to:
+  /// **'Fantascienza'**
+  String get genreScienceFiction;
+
+  /// No description provided for @genreMystery.
+  ///
+  /// In it, this message translates to:
+  /// **'Giallo'**
+  String get genreMystery;
+
+  /// No description provided for @genreThriller.
+  ///
+  /// In it, this message translates to:
+  /// **'Thriller'**
+  String get genreThriller;
+
+  /// No description provided for @genreRomance.
+  ///
+  /// In it, this message translates to:
+  /// **'Romance'**
+  String get genreRomance;
+
+  /// No description provided for @genreHistoricalFiction.
+  ///
+  /// In it, this message translates to:
+  /// **'Romanzo storico'**
+  String get genreHistoricalFiction;
+
+  /// No description provided for @genreHorror.
+  ///
+  /// In it, this message translates to:
+  /// **'Horror'**
+  String get genreHorror;
+
+  /// No description provided for @genreClassics.
+  ///
+  /// In it, this message translates to:
+  /// **'Classici'**
+  String get genreClassics;
+
+  /// No description provided for @genreBiography.
+  ///
+  /// In it, this message translates to:
+  /// **'Biografie'**
+  String get genreBiography;
+
+  /// No description provided for @genreYoungAdult.
+  ///
+  /// In it, this message translates to:
+  /// **'Young adult'**
+  String get genreYoungAdult;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In it, this message translates to:
+  /// **'Vedi tutti'**
+  String get viewAll;
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Scansiona ISBN'**
+  String get scanTitle;
+
+  /// No description provided for @scanHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Inquadra il codice a barre sul retro del libro'**
+  String get scanHint;
+
+  /// No description provided for @scanLooking.
+  ///
+  /// In it, this message translates to:
+  /// **'Cerco il libro…'**
+  String get scanLooking;
+
+  /// No description provided for @scanNotFound.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun libro trovato per l\'ISBN {isbn}'**
+  String scanNotFound(String isbn);
+
+  /// No description provided for @scanAgain.
+  ///
+  /// In it, this message translates to:
+  /// **'Scansiona un altro'**
+  String get scanAgain;
+
+  /// No description provided for @scanDetails.
+  ///
+  /// In it, this message translates to:
+  /// **'Dettagli'**
+  String get scanDetails;
+
+  /// No description provided for @scanTorch.
+  ///
+  /// In it, this message translates to:
+  /// **'Torcia'**
+  String get scanTorch;
+
+  /// No description provided for @scanCameraDenied.
+  ///
+  /// In it, this message translates to:
+  /// **'Per scansionare i codici a barre serve l\'accesso alla fotocamera. Abilitalo dalle impostazioni del telefono.'**
+  String get scanCameraDenied;
+
+  /// No description provided for @scanCameraError.
+  ///
+  /// In it, this message translates to:
+  /// **'Impossibile avviare la fotocamera.'**
+  String get scanCameraError;
+
+  /// No description provided for @shelvesTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Scaffali'**
+  String get shelvesTitle;
+
+  /// No description provided for @addShelf.
+  ///
+  /// In it, this message translates to:
+  /// **'Aggiungi scaffale'**
+  String get addShelf;
+
+  /// No description provided for @newShelfHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Nuovo scaffale (es. Regali)'**
+  String get newShelfHint;
+
+  /// No description provided for @myShelves.
+  ///
+  /// In it, this message translates to:
+  /// **'I miei scaffali'**
+  String get myShelves;
+
+  /// No description provided for @shelfFilterLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'Scaffale: {name}'**
+  String shelfFilterLabel(String name);
+
+  /// No description provided for @editionTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Scegli l\'edizione'**
+  String get editionTitle;
+
+  /// No description provided for @editionChange.
+  ///
+  /// In it, this message translates to:
+  /// **'Cambia edizione'**
+  String get editionChange;
+
+  /// No description provided for @editionNone.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessuna edizione trovata per questa lingua.'**
+  String get editionNone;
+
+  /// No description provided for @pagesCount.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} pagine'**
+  String pagesCount(int count);
+
+  /// No description provided for @statsTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Statistiche'**
+  String get statsTitle;
+
+  /// No description provided for @statsGoalTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Obiettivo {year}'**
+  String statsGoalTitle(int year);
+
+  /// No description provided for @statsGoalProgress.
+  ///
+  /// In it, this message translates to:
+  /// **'{read} di {goal} libri'**
+  String statsGoalProgress(int read, int goal);
+
+  /// No description provided for @statsGoalSet.
+  ///
+  /// In it, this message translates to:
+  /// **'Imposta un obiettivo annuale'**
+  String get statsGoalSet;
+
+  /// No description provided for @statsGoalEdit.
+  ///
+  /// In it, this message translates to:
+  /// **'Modifica'**
+  String get statsGoalEdit;
+
+  /// No description provided for @statsGoalRemove.
+  ///
+  /// In it, this message translates to:
+  /// **'Rimuovi obiettivo'**
+  String get statsGoalRemove;
+
+  /// No description provided for @statsGoalDialogTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Quanti libri vuoi leggere quest\'anno?'**
+  String get statsGoalDialogTitle;
+
+  /// No description provided for @statsGoalHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Numero di libri'**
+  String get statsGoalHint;
+
+  /// No description provided for @statsGoalLeft.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, =1{Ne manca 1} other{Ne mancano {count}}}'**
+  String statsGoalLeft(int count);
+
+  /// No description provided for @statsGoalDone.
+  ///
+  /// In it, this message translates to:
+  /// **'Obiettivo raggiunto!'**
+  String get statsGoalDone;
+
+  /// No description provided for @statsStreak.
+  ///
+  /// In it, this message translates to:
+  /// **'Giorni di fila'**
+  String get statsStreak;
+
+  /// No description provided for @statsPagesPerDay.
+  ///
+  /// In it, this message translates to:
+  /// **'Pagine al giorno'**
+  String get statsPagesPerDay;
+
+  /// No description provided for @statsTimeRead.
+  ///
+  /// In it, this message translates to:
+  /// **'Tempo di lettura'**
+  String get statsTimeRead;
+
+  /// No description provided for @statsAvgRating.
+  ///
+  /// In it, this message translates to:
+  /// **'Voto medio'**
+  String get statsAvgRating;
+
+  /// No description provided for @statsBooksPerMonth.
+  ///
+  /// In it, this message translates to:
+  /// **'Libri per mese'**
+  String get statsBooksPerMonth;
+
+  /// No description provided for @statsPagesRecent.
+  ///
+  /// In it, this message translates to:
+  /// **'Pagine, ultimi 14 giorni'**
+  String get statsPagesRecent;
+
+  /// No description provided for @statsTopSubjects.
+  ///
+  /// In it, this message translates to:
+  /// **'Categorie più lette'**
+  String get statsTopSubjects;
+
+  /// No description provided for @statsHours.
+  ///
+  /// In it, this message translates to:
+  /// **'{hours} h'**
+  String statsHours(String hours);
+
+  /// No description provided for @statsNoData.
+  ///
+  /// In it, this message translates to:
+  /// **'—'**
+  String get statsNoData;
+
+  /// No description provided for @sessionRegister.
+  ///
+  /// In it, this message translates to:
+  /// **'Registra sessione'**
+  String get sessionRegister;
+
+  /// No description provided for @sessionTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Sessione di lettura'**
+  String get sessionTitle;
+
+  /// No description provided for @sessionStart.
+  ///
+  /// In it, this message translates to:
+  /// **'Avvia'**
+  String get sessionStart;
+
+  /// No description provided for @sessionPause.
+  ///
+  /// In it, this message translates to:
+  /// **'Pausa'**
+  String get sessionPause;
+
+  /// No description provided for @sessionMinutes.
+  ///
+  /// In it, this message translates to:
+  /// **'Minuti letti'**
+  String get sessionMinutes;
+
+  /// No description provided for @sessionEndPage.
+  ///
+  /// In it, this message translates to:
+  /// **'Pagina raggiunta'**
+  String get sessionEndPage;
+
+  /// No description provided for @sessionsRecent.
+  ///
+  /// In it, this message translates to:
+  /// **'Sessioni recenti'**
+  String get sessionsRecent;
+
+  /// No description provided for @minutesShort.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} min'**
+  String minutesShort(int count);
+
+  /// No description provided for @offlineBanner.
+  ///
+  /// In it, this message translates to:
+  /// **'Sei offline: vedi la copia salvata sul dispositivo.'**
+  String get offlineBanner;
+
+  /// No description provided for @offlinePending.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, =1{1 modifica} other{{count} modifiche}} da sincronizzare'**
+  String offlinePending(int count);
+
+  /// No description provided for @ioTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa ed esporta'**
+  String get ioTitle;
+
+  /// No description provided for @ioImportTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa da Goodreads'**
+  String get ioImportTitle;
+
+  /// No description provided for @ioImportBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Su Goodreads apri «I miei libri» → «Importa ed esporta» → «Esporta libreria», poi scegli qui il file .csv scaricato. Stato, voto, date, note e scaffali vengono ripresi.'**
+  String get ioImportBody;
+
+  /// No description provided for @ioPickFile.
+  ///
+  /// In it, this message translates to:
+  /// **'Scegli il file CSV'**
+  String get ioPickFile;
+
+  /// No description provided for @ioFound.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, =1{Trovato 1 libro} other{Trovati {count} libri}}'**
+  String ioFound(int count);
+
+  /// No description provided for @ioFoundBreakdown.
+  ///
+  /// In it, this message translates to:
+  /// **'{read} letti · {reading} in lettura · {wanted} da leggere'**
+  String ioFoundBreakdown(int read, int reading, int wanted);
+
+  /// No description provided for @ioSkippedLines.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, =1{1 riga senza titolo ignorata} other{{count} righe senza titolo ignorate}}'**
+  String ioSkippedLines(int count);
+
+  /// No description provided for @ioStart.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa'**
+  String get ioStart;
+
+  /// No description provided for @ioRunning.
+  ///
+  /// In it, this message translates to:
+  /// **'Importazione in corso…'**
+  String get ioRunning;
+
+  /// No description provided for @ioRunningHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Puoi lasciare aperta questa pagina: ogni libro viene cercato su Open Library.'**
+  String get ioRunningHint;
+
+  /// No description provided for @ioCancel.
+  ///
+  /// In it, this message translates to:
+  /// **'Interrompi'**
+  String get ioCancel;
+
+  /// No description provided for @ioImported.
+  ///
+  /// In it, this message translates to:
+  /// **'Importati'**
+  String get ioImported;
+
+  /// No description provided for @ioDuplicates.
+  ///
+  /// In it, this message translates to:
+  /// **'Già nella libreria'**
+  String get ioDuplicates;
+
+  /// No description provided for @ioNotFound.
+  ///
+  /// In it, this message translates to:
+  /// **'Non trovati'**
+  String get ioNotFound;
+
+  /// No description provided for @ioFailed.
+  ///
+  /// In it, this message translates to:
+  /// **'Non salvati'**
+  String get ioFailed;
+
+  /// No description provided for @ioDone.
+  ///
+  /// In it, this message translates to:
+  /// **'Fatto'**
+  String get ioDone;
+
+  /// No description provided for @ioCancelled.
+  ///
+  /// In it, this message translates to:
+  /// **'Importazione interrotta: i libri già importati restano nella libreria.'**
+  String get ioCancelled;
+
+  /// No description provided for @ioAborted.
+  ///
+  /// In it, this message translates to:
+  /// **'Connessione persa: importazione fermata. Riprova più tardi: i libri già presenti vengono saltati.'**
+  String get ioAborted;
+
+  /// No description provided for @ioInvalidFile.
+  ///
+  /// In it, this message translates to:
+  /// **'Questo file non sembra un\'esportazione di libri (manca la colonna «Title»).'**
+  String get ioInvalidFile;
+
+  /// No description provided for @ioTryAnother.
+  ///
+  /// In it, this message translates to:
+  /// **'Scegli un altro file'**
+  String get ioTryAnother;
+
+  /// No description provided for @ioExportTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta la libreria'**
+  String get ioExportTitle;
+
+  /// No description provided for @ioExportBody.
+  ///
+  /// In it, this message translates to:
+  /// **'Crea un file CSV con tutti i tuoi libri, compatibile con Goodreads e con i fogli di calcolo.'**
+  String get ioExportBody;
+
+  /// No description provided for @ioExportButton.
+  ///
+  /// In it, this message translates to:
+  /// **'Esporta in CSV'**
+  String get ioExportButton;
+
+  /// No description provided for @ioExportEmpty.
+  ///
+  /// In it, this message translates to:
+  /// **'Non c\'è ancora nessun libro da esportare.'**
+  String get ioExportEmpty;
+
+  /// No description provided for @ioExportError.
+  ///
+  /// In it, this message translates to:
+  /// **'Non è stato possibile creare il file.'**
+  String get ioExportError;
+
+  /// No description provided for @ioProfileEntry.
+  ///
+  /// In it, this message translates to:
+  /// **'Importa ed esporta'**
+  String get ioProfileEntry;
 }
 
 class _AppLocalizationsDelegate

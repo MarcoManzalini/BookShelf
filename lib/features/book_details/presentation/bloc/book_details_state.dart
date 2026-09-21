@@ -8,6 +8,10 @@ class BookDetailsState extends Equatable {
     this.saveStatus = RequestStatus.initial,
     this.removed = false,
     this.failure,
+    this.author,
+    this.moreByAuthor = const [],
+    this.similarBooks = const [],
+    this.logs = const [],
   });
 
   /// Status of the initial load.
@@ -24,6 +28,14 @@ class BookDetailsState extends Equatable {
   final bool removed;
   final Failure? failure;
 
+  /// Profile of the first author; null until loaded (or when unavailable).
+  final AuthorInfo? author;
+  final List<Book> moreByAuthor;
+  final List<Book> similarBooks;
+
+  /// Reading sessions of this book, newest first (saved books only).
+  final List<ReadingLog> logs;
+
   bool get isInLibrary => userBook != null;
 
   BookDetailsState copyWith({
@@ -33,6 +45,10 @@ class BookDetailsState extends Equatable {
     RequestStatus? saveStatus,
     bool? removed,
     Failure? Function()? failure,
+    AuthorInfo? author,
+    List<Book>? moreByAuthor,
+    List<Book>? similarBooks,
+    List<ReadingLog>? logs,
   }) {
     return BookDetailsState(
       status: status ?? this.status,
@@ -41,10 +57,24 @@ class BookDetailsState extends Equatable {
       saveStatus: saveStatus ?? this.saveStatus,
       removed: removed ?? this.removed,
       failure: failure != null ? failure() : this.failure,
+      author: author ?? this.author,
+      moreByAuthor: moreByAuthor ?? this.moreByAuthor,
+      similarBooks: similarBooks ?? this.similarBooks,
+      logs: logs ?? this.logs,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [status, book, userBook, saveStatus, removed, failure];
+  List<Object?> get props => [
+        status,
+        book,
+        userBook,
+        saveStatus,
+        removed,
+        failure,
+        author,
+        moreByAuthor,
+        similarBooks,
+        logs,
+      ];
 }

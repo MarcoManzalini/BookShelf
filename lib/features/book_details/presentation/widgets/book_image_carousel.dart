@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/cover_url.dart';
 import '../../../../core/widgets/book_cover.dart';
 
 /// Swipeable images. Today it holds the cover only; it is ready for spine and
@@ -9,14 +8,12 @@ class BookImageCarousel extends StatefulWidget {
   const BookImageCarousel({
     super.key,
     required this.images,
-    required this.heroTag,
     this.title,
     this.author,
     this.height = 300,
   });
 
   final List<String> images;
-  final Object heroTag;
   final String? title;
   final String? author;
   final double height;
@@ -48,36 +45,16 @@ class _BookImageCarouselState extends State<BookImageCarousel> {
             itemCount: images.length,
             onPageChanged: (i) => setState(() => _page = i),
             itemBuilder: (context, index) {
-              final cover = Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(46),
-                        blurRadius: 20,
-                        offset: const Offset(4, 10),
-                      ),
-                    ],
-                  ),
-                  child: BookCover(
-                    url: images[index],
-                    title: widget.title,
-                    author: widget.author,
-                    size: CoverSize.large,
-                    borderRadius: 4,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
-                ),
+              final cover = NaturalBookCover(
+                url: images[index],
+                title: widget.title,
+                author: widget.author,
+                height: widget.height - 24,
               );
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: index == 0
-                    ? Hero(tag: widget.heroTag, child: cover)
-                    : cover,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                child: Center(child: cover),
               );
             },
           ),

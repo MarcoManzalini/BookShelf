@@ -7,7 +7,10 @@ class AppConfig {
   static const openLibraryBaseUrl = 'https://openlibrary.org';
   static const authRedirectUrl = 'io.supabase.bookshelf://login-callback/';
   static const avatarsBucket = 'avatars';
-  static const searchDebounce = Duration(milliseconds: 400);
+  static const searchDebounce = Duration(milliseconds: 350);
+
+  /// Shorter queries match too much of the catalogue to be worth a request.
+  static const searchMinChars = 2;
 
   /// Google/Apple login is wired in the data layer but hidden until enabled.
   static const socialLoginEnabled = false;

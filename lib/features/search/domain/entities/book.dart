@@ -14,6 +14,10 @@ class Book extends Equatable {
     this.publishedYear,
     this.subjects = const [],
     this.language,
+    this.authorKeys = const [],
+    this.ratingAverage,
+    this.ratingsCount,
+    this.editionKey,
   });
 
   /// Open Library work id, e.g. `OL45804W`.
@@ -33,6 +37,20 @@ class Book extends Equatable {
   final List<String> subjects;
   final String? language;
 
+  /// Open Library author ids (`OL79034A`), parallel to [authors] when known.
+  /// Not stored in the library: loaded again from the work when needed.
+  final List<String> authorKeys;
+
+  /// Community rating from Open Library (0-5) and the number of votes.
+  final double? ratingAverage;
+  final int? ratingsCount;
+
+  /// Open Library edition the reader picked (`OL123M`); null = work default.
+  final String? editionKey;
+
+  bool get hasCommunityRating =>
+      ratingAverage != null && (ratingsCount ?? 0) > 0;
+
   String get authorsLabel => authors.join(', ');
 
   /// Every image available for the details carousel, cover first.
@@ -46,6 +64,15 @@ class Book extends Equatable {
     List<String>? extraImages,
     List<String>? subjects,
     String? coverUrl,
+    List<String>? authorKeys,
+    double? ratingAverage,
+    int? ratingsCount,
+    String? isbn,
+    int? pageCount,
+    String? publisher,
+    int? publishedYear,
+    String? language,
+    String? editionKey,
   }) {
     return Book(
       externalId: externalId,
@@ -54,12 +81,16 @@ class Book extends Equatable {
       coverUrl: coverUrl ?? this.coverUrl,
       extraImages: extraImages ?? this.extraImages,
       description: description ?? this.description,
-      isbn: isbn,
-      pageCount: pageCount,
-      publisher: publisher,
-      publishedYear: publishedYear,
+      isbn: isbn ?? this.isbn,
+      pageCount: pageCount ?? this.pageCount,
+      publisher: publisher ?? this.publisher,
+      publishedYear: publishedYear ?? this.publishedYear,
       subjects: subjects ?? this.subjects,
-      language: language,
+      language: language ?? this.language,
+      authorKeys: authorKeys ?? this.authorKeys,
+      ratingAverage: ratingAverage ?? this.ratingAverage,
+      ratingsCount: ratingsCount ?? this.ratingsCount,
+      editionKey: editionKey ?? this.editionKey,
     );
   }
 
@@ -77,5 +108,9 @@ class Book extends Equatable {
         publishedYear,
         subjects,
         language,
+        authorKeys,
+        ratingAverage,
+        ratingsCount,
+        editionKey,
       ];
 }

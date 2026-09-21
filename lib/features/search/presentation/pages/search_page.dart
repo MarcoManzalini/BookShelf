@@ -6,10 +6,15 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/errors/failure_message.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/l10n_extension.dart';
+import '../../../../core/utils/language_names.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../library/presentation/widgets/library_skeleton.dart';
+import '../bloc/explore_bloc.dart';
+import '../bloc/genre_shelf_cubit.dart';
+import '../bloc/recommendations_cubit.dart';
 import '../bloc/search_bloc.dart';
+import '../widgets/explore_home.dart';
 import '../widgets/search_result_tile.dart';
 
 class SearchPage extends StatelessWidget {
@@ -17,8 +22,15 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<SearchBloc>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<SearchBloc>()),
+        BlocProvider(
+          create: (_) => getIt<ExploreBloc>()..add(const ExploreStarted()),
+        ),
+        BlocProvider(create: (_) => getIt<GenreShelfCubit>()..load()),
+        BlocProvider(create: (_) => getIt<RecommendationsCubit>()..load()),
+      ],
       child: const SearchView(),
     );
   }
@@ -58,29 +70,117 @@ class _SearchViewState extends State<SearchView> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-            child: TextField(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: _SearchField(
               controller: _controller,
-              textInputAction: TextInputAction.search,
+              hint: l10n.searchHint,
               onChanged: _onQueryChanged,
-              decoration: InputDecoration(
-                hintText: l10n.searchHint,
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _controller.text.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        onPressed: _clear,
-                      ),
-              ),
+              onClear: _clear,
             ),
           ),
+          const _LanguageFilter(),
           Expanded(
             child: BlocBuilder<SearchBloc, SearchState>(
               builder: (context, state) => _Results(state: state),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Quick filter to search only books that exist in one language. Shown once a
+/// search is under way, so the Explore page stays clean.
+class _LanguageFilter extends StatelessWidget {
+  const _LanguageFilter();
+
+  @override
+  Widget build(BuildContext context) {
+    final searching = context.select(
+      (SearchBloc bloc) => !bloc.state.status.isInitial,
+    );
+    final selected = context.select((SearchBloc bloc) => bloc.state.language);
+    if (!searching) return const SizedBox.shrink();
+    final l10n = context.l10n;
+
+    Widget chip(String label, String? code) => Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: ChoiceChip(
+            label: Text(label),
+            selected: selected == code,
+            onSelected: (_) =>
+                context.read<SearchBloc>().add(SearchLanguageChanged(code)),
+          ),
+        );
+
+    return SizedBox(
+      height: 44,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          chip(l10n.filterAll, null),
+          for (final code in filterLanguages) chip(languageName(code), code),
+        ],
+      ),
+    );
+  }
+}
+
+/// White pill-cornered field lifted off the page by a soft shadow.
+class _SearchField extends StatelessWidget {
+  const _SearchField({
+    required this.controller,
+    required this.hint,
+    required this.onChanged,
+    required this.onClear,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    const border = OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(14)),
+      borderSide: BorderSide.none,
+    );
+    return Material(
+      elevation: 4,
+      shadowColor: Colors.black.withAlpha(50),
+      borderRadius: BorderRadius.circular(14),
+      color: scheme.surfaceContainerLowest,
+      child: TextField(
+        controller: controller,
+        textInputAction: TextInputAction.search,
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          hintText: hint,
+          prefixIcon: const Icon(Icons.search_rounded, size: 22),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (controller.text.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: onClear,
+                ),
+              IconButton(
+                tooltip: context.l10n.scanTitle,
+                icon: const Icon(Icons.qr_code_scanner_rounded),
+                onPressed: () => context.push(AppRoutes.scan),
+              ),
+            ],
+          ),
+          fillColor: scheme.surfaceContainerLowest,
+          border: border,
+          enabledBorder: border,
+          focusedBorder: border,
+        ),
       ),
     );
   }
@@ -96,13 +196,7 @@ class _Results extends StatelessWidget {
     final l10n = context.l10n;
     final bloc = context.read<SearchBloc>();
 
-    if (state.status.isInitial) {
-      return EmptyState(
-        icon: Icons.travel_explore_rounded,
-        title: l10n.searchInitialTitle,
-        message: l10n.searchInitialMessage,
-      );
-    }
+    if (state.status.isInitial) return const ExploreHome();
     if (state.status.isLoading) return const LibrarySkeleton();
     if (state.status.isFailure) {
       return ErrorView(

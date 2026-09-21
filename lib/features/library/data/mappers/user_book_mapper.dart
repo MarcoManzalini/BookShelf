@@ -20,7 +20,9 @@ class UserBookMapper {
         publishedYear: json['published_year'] as int?,
         subjects: _stringList(json['subjects']),
         language: json['language'] as String?,
+        editionKey: json['edition_key'] as String?,
       ),
+      shelves: _stringList(json['shelves']),
       status: ReadingStatus.fromDb(json['status'] as String),
       currentPage: (json['current_page'] as int?) ?? 0,
       rating: json['rating'] as int?,
@@ -44,6 +46,7 @@ class UserBookMapper {
       'published_year': book.publishedYear,
       'subjects': book.subjects,
       'language': book.language,
+      'edition_key': book.editionKey,
       'status': status.dbValue,
     };
   }
@@ -56,6 +59,44 @@ class UserBookMapper {
       'notes': book.notes,
       'started_at': _formatDate(book.startedAt),
       'finished_at': _formatDate(book.finishedAt),
+      'shelves': book.shelves,
+      // The reader can switch edition, which changes these book fields.
+      'isbn': book.book.isbn,
+      'page_count': book.book.pageCount,
+      'publisher': book.book.publisher,
+      'published_year': book.book.publishedYear,
+      'cover_url': book.book.coverUrl,
+      'language': book.book.language,
+      'edition_key': book.book.editionKey,
+    };
+  }
+
+  /// The full row as the server would return it: what the offline cache
+  /// stores, read back by [fromJson].
+  static Map<String, dynamic> toCacheJson(UserBook userBook) {
+    final book = userBook.book;
+    return {
+      'id': userBook.id,
+      'external_id': book.externalId,
+      'title': book.title,
+      'authors': book.authors,
+      'cover_url': book.coverUrl,
+      'description': book.description,
+      'isbn': book.isbn,
+      'page_count': book.pageCount,
+      'publisher': book.publisher,
+      'published_year': book.publishedYear,
+      'subjects': book.subjects,
+      'language': book.language,
+      'edition_key': book.editionKey,
+      'status': userBook.status.dbValue,
+      'current_page': userBook.currentPage,
+      'rating': userBook.rating,
+      'notes': userBook.notes,
+      'started_at': _formatDate(userBook.startedAt),
+      'finished_at': _formatDate(userBook.finishedAt),
+      'created_at': userBook.createdAt.toIso8601String(),
+      'shelves': userBook.shelves,
     };
   }
 

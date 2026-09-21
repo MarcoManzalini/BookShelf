@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
-
 class EmptyState extends StatelessWidget {
   const EmptyState({
     super.key,
@@ -65,7 +63,7 @@ class EmptyState extends StatelessWidget {
   }
 }
 
-/// Double-ringed medallion, like an ex libris plate.
+/// Soft round plate behind the illustration icon.
 class _Medallion extends StatelessWidget {
   const _Medallion({required this.icon});
 
@@ -75,20 +73,12 @@ class _Medallion extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(26),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.brass, width: 1.5),
+        color: scheme.surfaceContainer,
       ),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: scheme.surfaceContainerLow,
-          border: Border.all(color: scheme.outlineVariant),
-        ),
-        child: Icon(icon, size: 36, color: scheme.primary),
-      ),
+      child: Icon(icon, size: 40, color: scheme.onSurfaceVariant),
     );
   }
 }

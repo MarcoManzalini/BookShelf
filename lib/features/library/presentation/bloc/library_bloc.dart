@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/utils/request_status.dart';
 import '../../../search/domain/entities/book.dart';
 import '../../domain/entities/reading_status.dart';
+import '../../domain/entities/shelf_names.dart';
+import '../../domain/entities/sync_status.dart';
 import '../../domain/entities/user_book.dart';
 import '../../domain/repositories/library_repository.dart';
 import '../../domain/usecases/add_book_to_library.dart';
@@ -20,26 +25,67 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<LibraryFilterChanged>(
       (event, emit) => emit(state.copyWith(filter: event.filter)),
     );
+    on<LibraryShelfFilterChanged>(
+      (event, emit) => emit(state.copyWith(shelfFilter: () => event.shelf)),
+    );
     on<LibraryViewModeToggled>(
       (event, emit) => emit(
         state.copyWith(
-          viewMode: state.viewMode == LibraryViewMode.list
-              ? LibraryViewMode.grid
-              : LibraryViewMode.list,
+          viewMode: state.viewMode == LibraryViewMode.shelf
+              ? LibraryViewMode.swipe
+              : LibraryViewMode.shelf,
         ),
       ),
     );
+    on<LibrarySyncChanged>(_onSyncChanged);
     on<LibraryBookAdded>(_onBookAdded);
     on<LibraryCleared>(_onCleared);
   }
 
   final LibraryRepository _repository;
   final AddBookToLibrary _addBook;
+  StreamSubscription<SyncStatus>? _syncSubscription;
+  Timer? _retryTimer;
+
+  /// While offline, the server is tried again on this schedule so queued
+  /// edits go out soon after the connection is back.
+  static const retryInterval = Duration(seconds: 30);
+
+  void _listenToSync() {
+    _syncSubscription ??=
+        _repository.syncStatus.listen((sync) => add(LibrarySyncChanged(sync)));
+  }
+
+  void _onSyncChanged(LibrarySyncChanged event, Emitter<LibraryState> emit) {
+    emit(
+      state.copyWith(
+        offline: event.sync.offline,
+        pendingChanges: event.sync.pending,
+      ),
+    );
+    if (event.sync.offline) {
+      _retryTimer ??= Timer.periodic(
+        retryInterval,
+        (_) => add(const LibraryRefreshRequested()),
+      );
+    } else {
+      _retryTimer?.cancel();
+      _retryTimer = null;
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _retryTimer?.cancel();
+    return _syncSubscription?.cancel().then((_) => super.close()) ??
+        super.close();
+  }
 
   Future<void> _onStarted(
     LibraryStarted event,
     Emitter<LibraryState> emit,
   ) async {
+    _listenToSync();
     emit(state.copyWith(status: RequestStatus.loading, failure: () => null));
     try {
       final books = await _repository.fetchAll();
@@ -117,6 +163,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
   void _onCleared(LibraryCleared event, Emitter<LibraryState> emit) {
     _repository.clear();
+    _retryTimer?.cancel();
+    _retryTimer = null;
     emit(const LibraryState());
   }
 }

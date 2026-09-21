@@ -7,11 +7,13 @@ import '../../../../core/utils/l10n_extension.dart';
 import '../../../../core/widgets/bookshelf_mark.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../domain/entities/user_book.dart';
 import '../bloc/library_bloc.dart';
-import '../widgets/library_book_grid_item.dart';
-import '../widgets/library_book_tile.dart';
+import '../widgets/library_filter_sheet.dart';
 import '../widgets/library_skeleton.dart';
-import '../widgets/reading_status_ui.dart';
+import '../widgets/shelf_color.dart';
+import '../widgets/shelf_view.dart';
+import '../widgets/swipe_view.dart';
 
 class LibraryPage extends StatelessWidget {
   const LibraryPage({super.key});
@@ -21,28 +23,31 @@ class LibraryPage extends StatelessWidget {
     final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(l10n.libraryTitle),
+        leading: const _FilterButton(),
         actions: [
           BlocSelector<LibraryBloc, LibraryState, LibraryViewMode>(
             selector: (state) => state.viewMode,
-            builder: (context, mode) => IconButton(
-              tooltip:
-                  mode == LibraryViewMode.list ? l10n.viewGrid : l10n.viewList,
-              icon: Icon(
-                mode == LibraryViewMode.list
-                    ? Icons.grid_view_rounded
-                    : Icons.view_list_rounded,
-              ),
-              onPressed: () => context
-                  .read<LibraryBloc>()
-                  .add(const LibraryViewModeToggled()),
-            ),
+            builder: (context, mode) {
+              final onShelf = mode == LibraryViewMode.shelf;
+              return IconButton(
+                tooltip: onShelf ? l10n.viewSwipe : l10n.viewShelf,
+                icon: Icon(
+                  onShelf ? Icons.view_carousel_outlined : Icons.shelves,
+                ),
+                onPressed: () => context
+                    .read<LibraryBloc>()
+                    .add(const LibraryViewModeToggled()),
+              );
+            },
           ),
         ],
       ),
       body: Column(
         children: [
-          const _FilterBar(),
+          const _OfflineBanner(),
+          const _ShelfFilterChip(),
           Expanded(
             child: BlocBuilder<LibraryBloc, LibraryState>(
               builder: (context, state) => _Body(state: state),
@@ -54,38 +59,106 @@ class LibraryPage extends StatelessWidget {
   }
 }
 
-class _FilterBar extends StatelessWidget {
-  const _FilterBar();
+/// Opens the status filter; a dot marks a filter that hides some books.
+class _FilterButton extends StatelessWidget {
+  const _FilterButton();
 
   @override
   Widget build(BuildContext context) {
+    final filtered =
+        context.select((LibraryBloc bloc) => bloc.state.hasActiveFilter);
+    return IconButton(
+      tooltip: context.l10n.filterTitle,
+      icon: Badge(
+        isLabelVisible: filtered,
+        smallSize: 8,
+        child: const Icon(Icons.tune_rounded),
+      ),
+      onPressed: () => showLibraryFilterSheet(context),
+    );
+  }
+}
+
+/// Tells the reader the list is the saved copy, and how many edits wait to be
+/// sent. Tapping "retry" tries the server right away.
+class _OfflineBanner extends StatelessWidget {
+  const _OfflineBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final offline = context.select((LibraryBloc bloc) => bloc.state.offline);
+    final pending =
+        context.select((LibraryBloc bloc) => bloc.state.pendingChanges);
+    if (!offline) return const SizedBox.shrink();
     final l10n = context.l10n;
-    final selected = context.select((LibraryBloc bloc) => bloc.state.filter);
-    String label(LibraryFilter filter) => switch (filter) {
-          LibraryFilter.all => l10n.filterAll,
-          LibraryFilter.wantToRead => l10n.statusWantToRead,
-          LibraryFilter.reading => l10n.statusReading,
-          LibraryFilter.read => l10n.statusRead,
-        };
-    return SizedBox(
-      height: 52,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        itemCount: LibraryFilter.values.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final filter = LibraryFilter.values[index];
-          return ChoiceChip(
-            label: Text(label(filter)),
-            avatar: filter.status == null
-                ? null
-                : Icon(filter.status!.icon, size: 18),
-            selected: filter == selected,
-            onSelected: (_) =>
-                context.read<LibraryBloc>().add(LibraryFilterChanged(filter)),
-          );
-        },
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      padding: const EdgeInsets.fromLTRB(14, 8, 6, 8),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.cloud_off_rounded,
+            size: 20,
+            color: theme.colorScheme.onSecondaryContainer,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.offlineBanner,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSecondaryContainer,
+                  ),
+                ),
+                if (pending > 0)
+                  Text(
+                    l10n.offlinePending(pending),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSecondaryContainer,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => context
+                .read<LibraryBloc>()
+                .add(const LibraryRefreshRequested()),
+            child: Text(l10n.retry),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shows which custom shelf the list is narrowed to, with a way to clear it.
+class _ShelfFilterChip extends StatelessWidget {
+  const _ShelfFilterChip();
+
+  @override
+  Widget build(BuildContext context) {
+    final shelf = context.select((LibraryBloc bloc) => bloc.state.shelfFilter);
+    if (shelf == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: InputChip(
+          avatar: CircleAvatar(radius: 6, backgroundColor: shelfColor(shelf)),
+          label: Text(context.l10n.shelfFilterLabel(shelf)),
+          onDeleted: () => context
+              .read<LibraryBloc>()
+              .add(const LibraryShelfFilterChanged(null)),
+        ),
       ),
     );
   }
@@ -140,36 +213,28 @@ class _Body extends StatelessWidget {
       );
     }
 
-    void open(String id) => context.push(AppRoutes.bookDetails(id));
+    void open(UserBook book) => context.push(AppRoutes.bookDetails(book.id));
 
-    return RefreshIndicator(
-      onRefresh: () => _refresh(context),
-      child: state.viewMode == LibraryViewMode.list
-          ? ListView.separated(
+    return switch (state.viewMode) {
+      LibraryViewMode.shelf => ShelfView(
+          books: books,
+          onOpen: open,
+          onRefresh: () => _refresh(context),
+        ),
+      LibraryViewMode.swipe => RefreshIndicator(
+          onRefresh: () => _refresh(context),
+          // Pull-to-refresh needs a vertical scrollable; the carousel scrolls
+          // sideways, so a bare one wraps it.
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
-              itemCount: books.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (_, i) => LibraryBookTile(
-                book: books[i],
-                onTap: () => open(books[i].id),
-              ),
-            )
-          : GridView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(0, 8, 0, 24),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 190,
-                mainAxisSpacing: 22,
-                crossAxisSpacing: 0,
-                childAspectRatio: 0.44,
-              ),
-              itemCount: books.length,
-              itemBuilder: (_, i) => LibraryBookGridItem(
-                book: books[i],
-                onTap: () => open(books[i].id),
+              child: SizedBox(
+                height: constraints.maxHeight,
+                child: SwipeView(books: books, onOpen: open),
               ),
             ),
-    );
+          ),
+        ),
+    };
   }
 }

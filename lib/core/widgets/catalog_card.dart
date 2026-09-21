@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_typography.dart';
 
-/// Library index card: typed header, red rule, ruled rows and a punch hole.
+/// Key/value sheet: a soft white card with a heading and hairline-separated
+/// rows.
 class CatalogCard extends StatelessWidget {
   const CatalogCard({
     super.key,
@@ -18,92 +19,87 @@ class CatalogCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final ruleColor = scheme.outlineVariant;
-    final typed = AppFonts.label(size: 13.5, color: scheme.onSurface);
 
     return Container(
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(3),
-        border: Border.all(color: scheme.outlineVariant),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(20),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: Colors.black.withAlpha(
+              scheme.brightness == Brightness.dark ? 90 : 24,
+            ),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (headerStart != null || headerEnd != null) ...[
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    (headerStart ?? '').toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppFonts.label(
-                      size: 12,
-                      weight: FontWeight.w700,
-                      letterSpacing: 1,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                ),
-                if (headerEnd != null) ...[
-                  const SizedBox(width: 12),
-                  Text(
-                    headerEnd!,
-                    style: AppFonts.label(
-                      size: 12,
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 8),
-            Container(height: 1.5, color: scheme.secondary.withAlpha(170)),
-          ],
-          for (final (label, value) in rows) ...[
+          if (headerStart != null || headerEnd != null)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 9),
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      headerStart ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppFonts.text(
+                        size: 14,
+                        weight: FontWeight.w700,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  if (headerEnd != null) ...[
+                    const SizedBox(width: 12),
+                    Text(
+                      headerEnd!,
+                      style: AppFonts.label(
+                        size: 12,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0 || headerStart != null || headerEnd != null)
+              Divider(height: 1, color: scheme.outlineVariant),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     width: 104,
                     child: Text(
-                      label.toUpperCase(),
+                      rows[i].$1,
                       style: AppFonts.label(
-                        size: 11.5,
-                        letterSpacing: 1,
+                        size: 13,
                         color: scheme.onSurfaceVariant,
                       ),
                     ),
                   ),
-                  Expanded(child: Text(value, style: typed)),
+                  Expanded(
+                    child: Text(
+                      rows[i].$2,
+                      style: AppFonts.text(
+                        size: 13.5,
+                        weight: FontWeight.w600,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-            Container(height: 1, color: ruleColor),
           ],
-          const SizedBox(height: 14),
-          Center(
-            child: Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: scheme.surface,
-                border: Border.all(color: scheme.outlineVariant),
-              ),
-            ),
-          ),
         ],
       ),
     );

@@ -108,4 +108,119 @@ void main() {
       expect(book.coverUrl, OpenLibraryMapper.coverUrl(7));
     });
   });
+
+  group('search doc extras', () {
+    test('reads author ids and community rating', () {
+      final book = OpenLibraryMapper.bookFromSearchDoc({
+        'key': '/works/OL1W',
+        'title': 'Dune',
+        'author_key': ['OL79034A'],
+        'ratings_average': 4.3018017,
+        'ratings_count': 444,
+      })!;
+      expect(book.authorKeys, ['OL79034A']);
+      expect(book.ratingAverage, closeTo(4.3, 0.01));
+      expect(book.ratingsCount, 444);
+      expect(book.hasCommunityRating, isTrue);
+    });
+
+    test('books nobody rated have no community rating', () {
+      final book = OpenLibraryMapper.bookFromSearchDoc({
+        'key': '/works/OL1W',
+        'title': 'Dune',
+      })!;
+      expect(book.hasCommunityRating, isFalse);
+    });
+  });
+
+  group('applyWork author ids', () {
+    final work = {
+      'authors': [
+        {
+          'author': {'key': '/authors/OL79034A'},
+          'type': {'key': '/type/author_role'},
+        },
+      ],
+    };
+
+    test('reads them for books that had none (saved books)', () {
+      final book = OpenLibraryMapper.applyWork(buildBook(), work);
+      expect(book.authorKeys, ['OL79034A']);
+    });
+
+    test('keeps the search ids when present', () {
+      final base = buildBook().copyWith(authorKeys: const ['OL1A']);
+      expect(OpenLibraryMapper.applyWork(base, work).authorKeys, ['OL1A']);
+    });
+  });
+
+  group('applyRatings', () {
+    test('merges the summary', () {
+      final book = OpenLibraryMapper.applyRatings(buildBook(), {
+        'summary': {'average': 4.25, 'count': 12},
+      });
+      expect(book.ratingAverage, 4.25);
+      expect(book.ratingsCount, 12);
+    });
+
+    test('ignores works without votes', () {
+      final base = buildBook();
+      final book = OpenLibraryMapper.applyRatings(base, {
+        'summary': {'average': 0, 'count': 0},
+      });
+      expect(book, base);
+    });
+  });
+
+  group('authorFromJson', () {
+    test('maps profile, photo and life dates', () {
+      final author = OpenLibraryMapper.authorFromJson(
+        {
+          'key': '/authors/OL79034A',
+          'name': ' Frank Herbert ',
+          'bio': {'type': '/type/text', 'value': 'American author.'},
+          'birth_date': '8 October 1920',
+          'death_date': '11 February 1986',
+          'photos': [-1, 14852808],
+        },
+        workCount: 138,
+      )!;
+      expect(author.key, 'OL79034A');
+      expect(author.name, 'Frank Herbert');
+      expect(author.bio, 'American author.');
+      expect(author.lifespan, '1920 – 1986');
+      expect(author.workCount, 138);
+      expect(
+        author.photoUrl,
+        'https://covers.openlibrary.org/a/id/14852808-M.jpg?default=false',
+      );
+    });
+
+    test('drops the source footer Open Library appends to bios', () {
+      final author = OpenLibraryMapper.authorFromJson({
+        'key': '/authors/OL1A',
+        'name': 'A',
+        'bio': 'Real bio.\n\n----------\nSource: [wiki](http://x)',
+      })!;
+      expect(author.bio, 'Real bio.');
+    });
+
+    test('handles living authors and missing data', () {
+      final author = OpenLibraryMapper.authorFromJson({
+        'key': '/authors/OL1A',
+        'name': 'A',
+        'birth_date': '1965',
+      })!;
+      expect(author.lifespan, '* 1965');
+      expect(author.photoUrl, isNull);
+      expect(author.bio, isNull);
+    });
+
+    test('rejects records without a name', () {
+      expect(
+        OpenLibraryMapper.authorFromJson({'key': '/authors/OL1A'}),
+        isNull,
+      );
+    });
+  });
 }

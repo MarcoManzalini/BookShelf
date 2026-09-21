@@ -37,7 +37,7 @@ class ProfileHeader extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.brass, width: 1.6),
+                border: Border.all(color: AppColors.accent, width: 2),
               ),
               child: CircleAvatar(
                 radius: 50,

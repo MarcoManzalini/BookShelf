@@ -1,47 +1,45 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/l10n_extension.dart';
 import '../../domain/entities/reading_status.dart';
 import 'reading_status_ui.dart';
 
-/// Reading status as a library rubber stamp.
+/// Reading status as a small rounded tag.
 class StatusChip extends StatelessWidget {
-  const StatusChip({super.key, required this.status, this.tilt = false});
+  const StatusChip({super.key, required this.status});
 
   final ReadingStatus status;
-
-  /// Slightly rotates the stamp, as if pressed by hand.
-  final bool tilt;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final ink = switch (status) {
-      ReadingStatus.wantToRead => scheme.onSurfaceVariant,
-      ReadingStatus.reading => scheme.secondary,
-      ReadingStatus.read => scheme.tertiary,
+    final (background, foreground) = switch (status) {
+      ReadingStatus.wantToRead => (
+          scheme.surfaceContainerHigh,
+          scheme.onSurfaceVariant,
+        ),
+      ReadingStatus.reading => (
+          scheme.secondaryContainer,
+          AppColors.accentDeep
+        ),
+      ReadingStatus.read => (scheme.primary, scheme.onPrimary),
     };
-    final stamp = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        border: Border.all(color: ink, width: 1.4),
-        borderRadius: BorderRadius.circular(3),
+        color: background,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        status.label(context.l10n).toUpperCase(),
+        status.label(context.l10n),
         style: AppFonts.label(
-          size: 11,
+          size: 12,
           weight: FontWeight.w700,
-          letterSpacing: 1.3,
-          color: ink,
+          color: foreground,
         ),
       ),
     );
-    return tilt
-        ? Transform.rotate(angle: -2 * math.pi / 180, child: stamp)
-        : stamp;
   }
 }

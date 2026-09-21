@@ -55,10 +55,11 @@
   "validationPasswordShort": "At least {min} characters",
   "validationPasswordMismatch": "Passwords don't match",
   "validationPageInvalid": "Invalid page number",
-  "libraryTitle": "My shelf",
+  "libraryTitle": "Bookshelf",
   "filterAll": "All",
-  "viewList": "List view",
-  "viewGrid": "Grid view",
+  "viewSwipe": "Swipe view",
+  "viewShelf": "Shelf view",
+  "filterTitle": "Filter your shelf",
   "libraryEmptyTitle": "Your shelf is empty",
   "libraryEmptyMessage": "Search for a book and put it on the shelf: track every read from here.",
   "libraryEmptyCta": "Find a book",
@@ -66,10 +67,8 @@
   "libraryFilterEmptyMessage": "There are no books with this status.",
   "pagesProgress": "{current} / {total} pages",
   "currentPageOnly": "Page {current}",
-  "searchTitle": "Search",
+  "searchTitle": "Explore",
   "searchHint": "Title, author or ISBN",
-  "searchInitialTitle": "Find your next book",
-  "searchInitialMessage": "Search by title, author or ISBN among millions of books.",
   "searchNoResultsTitle": "No results",
   "searchNoResultsMessage": "No books found for “{query}”. Try different words.",
   "addToLibrary": "Add to library",
@@ -118,5 +117,218 @@
   "deleteAccountTitle": "Delete your account?",
   "deleteAccountMessage": "Your profile, library, ratings and notes will be permanently deleted. This cannot be undone.",
   "deleteAccountConfirm": "Delete permanently",
-  "appTitle": "BookShelf"
+  "appTitle": "BookShelf",
+  "aboutAuthor": "About the author",
+  "moreByAuthor": "More by {author}",
+  "@moreByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "similarBooks": "Similar books",
+  "authorWorkCount": "{count, plural, =1{1 work} other{{count} works}}",
+  "@authorWorkCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ratingSummary": "{average} out of 5 · {count, plural, =1{1 rating} other{{count} ratings}}",
+  "@ratingSummary": {
+    "placeholders": {
+      "average": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exploreBestSellers": "Best sellers",
+  "exploreNewArrivals": "New arrivals",
+  "explorePopular": "Popular",
+  "exploreForYou": "Based on your latest reads",
+  "exploreForYouHint": "Similar to the books you finished recently",
+  "exploreRankedHint": "Ranked by rating and number of votes",
+  "exploreTopByGenre": "Top rated by genre",
+  "genreFantasy": "Fantasy",
+  "genreScienceFiction": "Science fiction",
+  "genreMystery": "Mystery",
+  "genreThriller": "Thriller",
+  "genreRomance": "Romance",
+  "genreHistoricalFiction": "Historical fiction",
+  "genreHorror": "Horror",
+  "genreClassics": "Classics",
+  "genreBiography": "Biography",
+  "genreYoungAdult": "Young adult",
+  "viewAll": "View all",
+  "scanTitle": "Scan ISBN",
+  "scanHint": "Point the camera at the barcode on the back of the book",
+  "scanLooking": "Looking for the book…",
+  "scanNotFound": "No book found for ISBN {isbn}",
+  "@scanNotFound": {
+    "placeholders": {
+      "isbn": {
+        "type": "String"
+      }
+    }
+  },
+  "scanAgain": "Scan another",
+  "scanDetails": "Details",
+  "scanTorch": "Torch",
+  "scanCameraDenied": "Camera access is needed to scan barcodes. Enable it in your phone settings.",
+  "scanCameraError": "The camera could not be started.",
+  "shelvesTitle": "Shelves",
+  "addShelf": "Add shelf",
+  "newShelfHint": "New shelf (e.g. Gifts)",
+  "myShelves": "My shelves",
+  "shelfFilterLabel": "Shelf: {name}",
+  "@shelfFilterLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editionTitle": "Choose the edition",
+  "editionChange": "Change edition",
+  "editionNone": "No editions found for this language.",
+  "pagesCount": "{count} pages",
+  "@pagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsTitle": "Statistics",
+  "statsGoalTitle": "{year} goal",
+  "@statsGoalTitle": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "statsGoalProgress": "{read} of {goal} books",
+  "@statsGoalProgress": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "statsGoalSet": "Set a yearly goal",
+  "statsGoalEdit": "Edit",
+  "statsGoalRemove": "Remove goal",
+  "statsGoalDialogTitle": "How many books do you want to read this year?",
+  "statsGoalHint": "Number of books",
+  "statsGoalLeft": "{count, plural, =1{1 to go} other{{count} to go}}",
+  "@statsGoalLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsGoalDone": "Goal reached!",
+  "statsStreak": "Day streak",
+  "statsPagesPerDay": "Pages per day",
+  "statsTimeRead": "Reading time",
+  "statsAvgRating": "Average rating",
+  "statsBooksPerMonth": "Books per month",
+  "statsPagesRecent": "Pages, last 14 days",
+  "statsTopSubjects": "Most read categories",
+  "statsHours": "{hours} h",
+  "@statsHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "statsNoData": "—",
+  "sessionRegister": "Log a session",
+  "sessionTitle": "Reading session",
+  "sessionStart": "Start",
+  "sessionPause": "Pause",
+  "sessionMinutes": "Minutes read",
+  "sessionEndPage": "Page reached",
+  "sessionsRecent": "Recent sessions",
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineBanner": "You are offline: showing the copy saved on this device.",
+  "offlinePending": "{count, plural, =1{1 change} other{{count} changes}} to sync",
+  "@offlinePending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ioTitle": "Import and export",
+  "ioImportTitle": "Import from Goodreads",
+  "ioImportBody": "On Goodreads open “My Books” → “Import and export” → “Export Library”, then pick the downloaded .csv file here. Status, rating, dates, notes and shelves are kept.",
+  "ioPickFile": "Choose the CSV file",
+  "ioFound": "{count, plural, =1{Found 1 book} other{Found {count} books}}",
+  "@ioFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ioFoundBreakdown": "{read} read · {reading} reading · {wanted} to read",
+  "@ioFoundBreakdown": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "reading": {
+        "type": "int"
+      },
+      "wanted": {
+        "type": "int"
+      }
+    }
+  },
+  "ioSkippedLines": "{count, plural, =1{1 line without a title was ignored} other{{count} lines without a title were ignored}}",
+  "@ioSkippedLines": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ioStart": "Import",
+  "ioRunning": "Importing…",
+  "ioRunningHint": "You can leave this page open: each book is looked up on Open Library.",
+  "ioCancel": "Stop",
+  "ioImported": "Imported",
+  "ioDuplicates": "Already in your library",
+  "ioNotFound": "Not found",
+  "ioFailed": "Not saved",
+  "ioDone": "Done",
+  "ioCancelled": "Import stopped: the books already imported stay in your library.",
+  "ioAborted": "Connection lost: the import stopped. Try again later; books already added are skipped.",
+  "ioInvalidFile": "This file does not look like a book export (no “Title” column).",
+  "ioTryAnother": "Choose another file",
+  "ioExportTitle": "Export your library",
+  "ioExportBody": "Creates a CSV file with all your books, compatible with Goodreads and spreadsheets.",
+  "ioExportButton": "Export as CSV",
+  "ioExportEmpty": "There are no books to export yet.",
+  "ioExportError": "The file could not be created.",
+  "ioProfileEntry": "Import and export"
 }

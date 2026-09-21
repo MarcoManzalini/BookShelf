@@ -18,7 +18,11 @@ class BookshelfMark extends StatelessWidget {
       height: size,
       child: CustomPaint(
         painter: _MarkPainter(
-          spines: [scheme.primary, scheme.secondary, AppColors.brass],
+          spines: [
+            AppColors.accent,
+            scheme.primary,
+            AppColors.posterCovers[2],
+          ],
           shelf: scheme.onSurface,
           band: scheme.surface,
         ),

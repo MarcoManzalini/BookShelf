@@ -8,6 +8,9 @@ abstract interface class ProfileRepository {
 
   Future<Profile> updateDisplayName(String displayName);
 
+  /// Sets (or with null, clears) the books-per-year goal.
+  Future<Profile> updateReadingGoal(int? goal);
+
   Future<Profile> uploadAvatar(Uint8List bytes, String extension);
 
   /// Calls the `delete_my_account` RPC, then clears the local session.

@@ -63,10 +63,11 @@
   },
   "validationPasswordMismatch": "Le password non coincidono",
   "validationPageInvalid": "Numero di pagina non valido",
-  "libraryTitle": "Il mio scaffale",
+  "libraryTitle": "Bookshelf",
   "filterAll": "Tutti",
-  "viewList": "Vista elenco",
-  "viewGrid": "Vista griglia",
+  "viewSwipe": "Vista a scorrimento",
+  "viewShelf": "Vista scaffale",
+  "filterTitle": "Filtra la libreria",
   "libraryEmptyTitle": "Lo scaffale è vuoto",
   "libraryEmptyMessage": "Cerca un libro e mettilo sullo scaffale: da qui segui ogni lettura.",
   "libraryEmptyCta": "Cerca un libro",
@@ -91,10 +92,8 @@
       }
     }
   },
-  "searchTitle": "Cerca",
+  "searchTitle": "Esplora",
   "searchHint": "Titolo, autore o ISBN",
-  "searchInitialTitle": "Trova il tuo prossimo libro",
-  "searchInitialMessage": "Cerca per titolo, autore o ISBN tra milioni di libri.",
   "searchNoResultsTitle": "Nessun risultato",
   "searchNoResultsMessage": "Nessun libro trovato per «{query}». Prova con altre parole.",
   "@searchNoResultsMessage": {
@@ -166,5 +165,218 @@
   "deleteAccount": "Elimina account",
   "deleteAccountTitle": "Eliminare l'account?",
   "deleteAccountMessage": "Verranno cancellati definitivamente il tuo profilo, la tua libreria, i voti e le note. L'operazione non può essere annullata.",
-  "deleteAccountConfirm": "Elimina definitivamente"
+  "deleteAccountConfirm": "Elimina definitivamente",
+  "aboutAuthor": "Sull'autore",
+  "moreByAuthor": "Altri libri di {author}",
+  "@moreByAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "similarBooks": "Libri simili",
+  "authorWorkCount": "{count, plural, =1{1 opera} other{{count} opere}}",
+  "@authorWorkCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ratingSummary": "{average} su 5 · {count, plural, =1{1 valutazione} other{{count} valutazioni}}",
+  "@ratingSummary": {
+    "placeholders": {
+      "average": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exploreBestSellers": "Best seller",
+  "exploreNewArrivals": "Novità",
+  "explorePopular": "Più apprezzati",
+  "exploreForYou": "In base alle tue ultime letture",
+  "exploreForYouHint": "Simili ai libri che hai finito da poco",
+  "exploreRankedHint": "Classifica per voto e numero di valutazioni",
+  "exploreTopByGenre": "Migliori per genere",
+  "genreFantasy": "Fantasy",
+  "genreScienceFiction": "Fantascienza",
+  "genreMystery": "Giallo",
+  "genreThriller": "Thriller",
+  "genreRomance": "Romance",
+  "genreHistoricalFiction": "Romanzo storico",
+  "genreHorror": "Horror",
+  "genreClassics": "Classici",
+  "genreBiography": "Biografie",
+  "genreYoungAdult": "Young adult",
+  "viewAll": "Vedi tutti",
+  "scanTitle": "Scansiona ISBN",
+  "scanHint": "Inquadra il codice a barre sul retro del libro",
+  "scanLooking": "Cerco il libro…",
+  "scanNotFound": "Nessun libro trovato per l'ISBN {isbn}",
+  "@scanNotFound": {
+    "placeholders": {
+      "isbn": {
+        "type": "String"
+      }
+    }
+  },
+  "scanAgain": "Scansiona un altro",
+  "scanDetails": "Dettagli",
+  "scanTorch": "Torcia",
+  "scanCameraDenied": "Per scansionare i codici a barre serve l'accesso alla fotocamera. Abilitalo dalle impostazioni del telefono.",
+  "scanCameraError": "Impossibile avviare la fotocamera.",
+  "shelvesTitle": "Scaffali",
+  "addShelf": "Aggiungi scaffale",
+  "newShelfHint": "Nuovo scaffale (es. Regali)",
+  "myShelves": "I miei scaffali",
+  "shelfFilterLabel": "Scaffale: {name}",
+  "@shelfFilterLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editionTitle": "Scegli l'edizione",
+  "editionChange": "Cambia edizione",
+  "editionNone": "Nessuna edizione trovata per questa lingua.",
+  "pagesCount": "{count} pagine",
+  "@pagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsTitle": "Statistiche",
+  "statsGoalTitle": "Obiettivo {year}",
+  "@statsGoalTitle": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "statsGoalProgress": "{read} di {goal} libri",
+  "@statsGoalProgress": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "statsGoalSet": "Imposta un obiettivo annuale",
+  "statsGoalEdit": "Modifica",
+  "statsGoalRemove": "Rimuovi obiettivo",
+  "statsGoalDialogTitle": "Quanti libri vuoi leggere quest'anno?",
+  "statsGoalHint": "Numero di libri",
+  "statsGoalLeft": "{count, plural, =1{Ne manca 1} other{Ne mancano {count}}}",
+  "@statsGoalLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsGoalDone": "Obiettivo raggiunto!",
+  "statsStreak": "Giorni di fila",
+  "statsPagesPerDay": "Pagine al giorno",
+  "statsTimeRead": "Tempo di lettura",
+  "statsAvgRating": "Voto medio",
+  "statsBooksPerMonth": "Libri per mese",
+  "statsPagesRecent": "Pagine, ultimi 14 giorni",
+  "statsTopSubjects": "Categorie più lette",
+  "statsHours": "{hours} h",
+  "@statsHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "statsNoData": "—",
+  "sessionRegister": "Registra sessione",
+  "sessionTitle": "Sessione di lettura",
+  "sessionStart": "Avvia",
+  "sessionPause": "Pausa",
+  "sessionMinutes": "Minuti letti",
+  "sessionEndPage": "Pagina raggiunta",
+  "sessionsRecent": "Sessioni recenti",
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineBanner": "Sei offline: vedi la copia salvata sul dispositivo.",
+  "offlinePending": "{count, plural, =1{1 modifica} other{{count} modifiche}} da sincronizzare",
+  "@offlinePending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ioTitle": "Importa ed esporta",
+  "ioImportTitle": "Importa da Goodreads",
+  "ioImportBody": "Su Goodreads apri «I miei libri» → «Importa ed esporta» → «Esporta libreria», poi scegli qui il file .csv scaricato. Stato, voto, date, note e scaffali vengono ripresi.",
+  "ioPickFile": "Scegli il file CSV",
+  "ioFound": "{count, plural, =1{Trovato 1 libro} other{Trovati {count} libri}}",
+  "@ioFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ioFoundBreakdown": "{read} letti · {reading} in lettura · {wanted} da leggere",
+  "@ioFoundBreakdown": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "reading": {
+        "type": "int"
+      },
+      "wanted": {
+        "type": "int"
+      }
+    }
+  },
+  "ioSkippedLines": "{count, plural, =1{1 riga senza titolo ignorata} other{{count} righe senza titolo ignorate}}",
+  "@ioSkippedLines": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ioStart": "Importa",
+  "ioRunning": "Importazione in corso…",
+  "ioRunningHint": "Puoi lasciare aperta questa pagina: ogni libro viene cercato su Open Library.",
+  "ioCancel": "Interrompi",
+  "ioImported": "Importati",
+  "ioDuplicates": "Già nella libreria",
+  "ioNotFound": "Non trovati",
+  "ioFailed": "Non salvati",
+  "ioDone": "Fatto",
+  "ioCancelled": "Importazione interrotta: i libri già importati restano nella libreria.",
+  "ioAborted": "Connessione persa: importazione fermata. Riprova più tardi: i libri già presenti vengono saltati.",
+  "ioInvalidFile": "Questo file non sembra un'esportazione di libri (manca la colonna «Title»).",
+  "ioTryAnother": "Scegli un altro file",
+  "ioExportTitle": "Esporta la libreria",
+  "ioExportBody": "Crea un file CSV con tutti i tuoi libri, compatibile con Goodreads e con i fogli di calcolo.",
+  "ioExportButton": "Esporta in CSV",
+  "ioExportEmpty": "Non c'è ancora nessun libro da esportare.",
+  "ioExportError": "Non è stato possibile creare il file.",
+  "ioProfileEntry": "Importa ed esporta"
 }

@@ -15,6 +15,7 @@ part 'profile_state.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc(this._repository) : super(const ProfileState()) {
     on<ProfileStarted>(_onStarted);
+    on<ProfileRefreshRequested>(_onRefresh, transformer: droppable());
     on<ProfileDisplayNameSubmitted>(
       _onNameSubmitted,
       transformer: sequential(),
@@ -43,6 +44,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           failure: () => failure,
         ),
       );
+    }
+  }
+
+  Future<void> _onRefresh(
+    ProfileRefreshRequested event,
+    Emitter<ProfileState> emit,
+  ) async {
+    try {
+      final profile = await _repository.getProfile();
+      emit(state.copyWith(profile: profile));
+    } on Failure {
+      // Keep showing what we have.
     }
   }
 

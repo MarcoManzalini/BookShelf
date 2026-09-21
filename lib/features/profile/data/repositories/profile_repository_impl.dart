@@ -18,6 +18,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
       _guard(() => _remote.updateDisplayName(displayName));
 
   @override
+  Future<Profile> updateReadingGoal(int? goal) =>
+      _guard(() => _remote.updateReadingGoal(goal));
+
+  @override
   Future<Profile> uploadAvatar(Uint8List bytes, String extension) =>
       _guard(() => _remote.uploadAvatar(bytes, extension));
 

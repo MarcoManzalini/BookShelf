@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/book_cover.dart';
+import '../../../../core/widgets/book_open_target.dart';
 import '../../domain/entities/book.dart';
 import 'add_to_library_button.dart';
 
@@ -20,13 +21,18 @@ class SearchResultTile extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          BookOpenTarget.capture(context);
+          onTap();
+        },
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              Hero(
-                tag: 'cover_${book.externalId}',
+              BookOpenTarget(
+                url: book.coverUrl,
+                title: book.title,
+                author: book.authorsLabel,
                 child: BookCover(
                   url: book.coverUrl,
                   title: book.title,

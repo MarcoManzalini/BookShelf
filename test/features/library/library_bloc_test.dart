@@ -4,6 +4,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:bookshelf/core/errors/failure.dart';
 import 'package:bookshelf/core/utils/request_status.dart';
 import 'package:bookshelf/features/library/domain/entities/reading_status.dart';
+import 'package:bookshelf/features/library/domain/entities/sync_status.dart';
 import 'package:bookshelf/features/library/domain/entities/user_book.dart';
 import 'package:bookshelf/features/library/presentation/bloc/library_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,7 @@ void main() {
   late MockLibraryRepository repository;
   late MockAddBookToLibrary addBook;
   late StreamController<List<UserBook>> changes;
+  late StreamController<SyncStatus> syncChanges;
 
   final reading = buildUserBook(
     id: 'a',
@@ -37,7 +39,9 @@ void main() {
     repository = MockLibraryRepository();
     addBook = MockAddBookToLibrary();
     changes = StreamController<List<UserBook>>.broadcast();
+    syncChanges = StreamController<SyncStatus>.broadcast();
     when(() => repository.books).thenAnswer((_) => changes.stream);
+    when(() => repository.syncStatus).thenAnswer((_) => syncChanges.stream);
   });
 
   tearDown(() => changes.close());
@@ -106,14 +110,14 @@ void main() {
     );
 
     blocTest<LibraryBloc, LibraryState>(
-      'toggles list/grid',
+      'toggles shelf/swipe',
       build: build,
       act: (bloc) => bloc
         ..add(const LibraryViewModeToggled())
         ..add(const LibraryViewModeToggled()),
       expect: () => const [
-        LibraryState(viewMode: LibraryViewMode.grid),
-        LibraryState(viewMode: LibraryViewMode.list),
+        LibraryState(viewMode: LibraryViewMode.swipe),
+        LibraryState(viewMode: LibraryViewMode.shelf),
       ],
     );
   });

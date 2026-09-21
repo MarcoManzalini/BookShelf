@@ -14,15 +14,20 @@ enum LibraryFilter {
       };
 }
 
-enum LibraryViewMode { list, grid }
+/// [shelf]: three covers per row on shelves; [swipe]: one large cover at a
+/// time.
+enum LibraryViewMode { shelf, swipe }
 
 class LibraryState extends Equatable {
   const LibraryState({
     this.status = RequestStatus.initial,
     this.books = const [],
     this.filter = LibraryFilter.all,
-    this.viewMode = LibraryViewMode.list,
+    this.shelfFilter,
+    this.viewMode = LibraryViewMode.shelf,
     this.refreshing = false,
+    this.offline = false,
+    this.pendingChanges = 0,
     this.addingIds = const {},
     this.failure,
     this.actionFailure,
@@ -31,8 +36,17 @@ class LibraryState extends Equatable {
   final RequestStatus status;
   final List<UserBook> books;
   final LibraryFilter filter;
+
+  /// Custom shelf the list is narrowed to, or null for every book.
+  final String? shelfFilter;
   final LibraryViewMode viewMode;
   final bool refreshing;
+
+  /// The server is unreachable: the list is the copy saved on the device.
+  final bool offline;
+
+  /// Edits made offline that are still waiting to be sent.
+  final int pendingChanges;
 
   /// External ids currently being added.
   final Set<String> addingIds;
@@ -46,9 +60,35 @@ class LibraryState extends Equatable {
 
   List<UserBook> get visibleBooks {
     final wanted = filter.status;
-    if (wanted == null) return books;
-    return books.where((b) => b.status == wanted).toList();
+    final shelf = shelfFilter;
+    if (wanted == null && shelf == null) return books;
+    return books
+        .where((b) => wanted == null || b.status == wanted)
+        .where(
+          (b) =>
+              shelf == null || b.shelves.any((s) => ShelfNames.same(s, shelf)),
+        )
+        .toList();
   }
+
+  /// Every custom shelf in use with its number of books, by name.
+  Map<String, int> get shelfCounts {
+    final counts = <String, int>{};
+    final spelling = <String, String>{};
+    for (final book in books) {
+      for (final shelf in book.shelves) {
+        final key = shelf.toLowerCase();
+        final name = spelling.putIfAbsent(key, () => shelf);
+        counts[name] = (counts[name] ?? 0) + 1;
+      }
+    }
+    final names = counts.keys.toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return {for (final name in names) name: counts[name]!};
+  }
+
+  bool get hasActiveFilter =>
+      filter != LibraryFilter.all || shelfFilter != null;
 
   bool containsExternalId(String externalId) =>
       books.any((b) => b.book.externalId == externalId);
@@ -57,8 +97,11 @@ class LibraryState extends Equatable {
     RequestStatus? status,
     List<UserBook>? books,
     LibraryFilter? filter,
+    ValueGetter<String?>? shelfFilter,
     LibraryViewMode? viewMode,
     bool? refreshing,
+    bool? offline,
+    int? pendingChanges,
     Set<String>? addingIds,
     Failure? Function()? failure,
     Failure? Function()? actionFailure,
@@ -67,8 +110,11 @@ class LibraryState extends Equatable {
       status: status ?? this.status,
       books: books ?? this.books,
       filter: filter ?? this.filter,
+      shelfFilter: shelfFilter != null ? shelfFilter() : this.shelfFilter,
       viewMode: viewMode ?? this.viewMode,
       refreshing: refreshing ?? this.refreshing,
+      offline: offline ?? this.offline,
+      pendingChanges: pendingChanges ?? this.pendingChanges,
       addingIds: addingIds ?? this.addingIds,
       failure: failure != null ? failure() : this.failure,
       actionFailure:
@@ -81,8 +127,11 @@ class LibraryState extends Equatable {
         status,
         books,
         filter,
+        shelfFilter,
         viewMode,
         refreshing,
+        offline,
+        pendingChanges,
         addingIds,
         failure,
         actionFailure,

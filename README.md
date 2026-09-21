@@ -17,6 +17,8 @@ App Flutter per tracciare i libri letti. Material 3, BLoC, Supabase (auth, datab
 
 1. Crea un progetto su [supabase.com](https://supabase.com).
 2. Apri **SQL Editor → New query**, incolla **tutto** il contenuto di [`supabase/schema.sql`](supabase/schema.sql) ed esegui. Lo script è idempotente: puoi rilanciarlo.
+
+   > **Aggiornamento di un database esistente.** Le funzioni scaffali personalizzati, scelta dell'edizione, obiettivo annuale e registro delle letture aggiungono colonne (`user_books.shelves`, `user_books.edition_key`, `profiles.reading_goal`) e la tabella `reading_logs`. Rilancia `supabase/schema.sql` una volta prima di usare la nuova versione dell'app: senza, il salvataggio delle modifiche a un libro fallisce.
    Crea tabelle `profiles` e `user_books`, RLS, trigger (`handle_new_user`, `updated_at`), bucket `avatars` con policy e la funzione RPC `delete_my_account`.
 3. **Authentication → URL Configuration → Redirect URLs**: aggiungi `io.supabase.bookshelf://login-callback/`.
    Serve per i link di conferma email e recupero password, che riaprono l'app.

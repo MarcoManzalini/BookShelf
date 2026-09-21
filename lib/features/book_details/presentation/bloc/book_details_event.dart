@@ -27,6 +27,12 @@ final class BookDetailsPreviewRequested extends BookDetailsEvent {
   List<Object?> get props => [book];
 }
 
+/// Loads the author profile and related books. Dispatched by the bloc itself
+/// once the book is known.
+final class BookDetailsExtrasRequested extends BookDetailsEvent {
+  const BookDetailsExtrasRequested();
+}
+
 final class BookDetailsAddRequested extends BookDetailsEvent {
   const BookDetailsAddRequested(this.status);
 
@@ -54,6 +60,22 @@ final class BookDetailsProgressChanged extends BookDetailsEvent {
   List<Object?> get props => [page];
 }
 
+/// The reader finished a session: where they stopped and for how long.
+final class BookDetailsSessionLogged extends BookDetailsEvent {
+  const BookDetailsSessionLogged({required this.endPage, this.minutes});
+
+  final int endPage;
+  final int? minutes;
+
+  @override
+  List<Object?> get props => [endPage, minutes];
+}
+
+/// Loads the reading sessions of the saved book.
+final class BookDetailsLogsRequested extends BookDetailsEvent {
+  const BookDetailsLogsRequested();
+}
+
 final class BookDetailsRatingChanged extends BookDetailsEvent {
   const BookDetailsRatingChanged(this.rating);
 
@@ -71,6 +93,25 @@ final class BookDetailsNotesChanged extends BookDetailsEvent {
 
   @override
   List<Object?> get props => [notes];
+}
+
+/// The reader picked another edition of the book.
+final class BookDetailsEditionSelected extends BookDetailsEvent {
+  const BookDetailsEditionSelected(this.edition);
+
+  final BookEdition edition;
+
+  @override
+  List<Object?> get props => [edition];
+}
+
+final class BookDetailsShelvesChanged extends BookDetailsEvent {
+  const BookDetailsShelvesChanged(this.shelves);
+
+  final List<String> shelves;
+
+  @override
+  List<Object?> get props => [shelves];
 }
 
 enum ReadingDateField { startedAt, finishedAt }

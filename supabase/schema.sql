@@ -157,6 +157,60 @@ create policy "user_books_delete_own" on public.user_books
   using ((select auth.uid()) = user_id);
 
 -- ---------------------------------------------------------------------------
+-- v2 additions (custom shelves, editions, reading goal, reading log)
+-- Idempotent: safe to run on a database that already has the tables above.
+-- ---------------------------------------------------------------------------
+alter table public.user_books
+  add column if not exists shelves text[] not null default '{}';   -- custom shelves (tags)
+alter table public.user_books
+  add column if not exists edition_key text;                       -- chosen Open Library edition, e.g. OL123M
+
+alter table public.profiles
+  add column if not exists reading_goal integer
+    check (reading_goal is null or reading_goal between 1 and 1000); -- books per year
+
+create table if not exists public.reading_logs (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null default auth.uid()
+                 references auth.users (id) on delete cascade,
+  user_book_id uuid not null
+                 references public.user_books (id) on delete cascade,
+  logged_on    date not null default current_date,
+  pages        integer not null default 0 check (pages >= 0),
+  minutes      integer check (minutes is null or minutes > 0),
+  end_page     integer check (end_page is null or end_page >= 0),
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists reading_logs_user_day_idx
+  on public.reading_logs (user_id, logged_on);
+create index if not exists reading_logs_book_idx
+  on public.reading_logs (user_book_id);
+
+alter table public.reading_logs enable row level security;
+
+drop policy if exists "reading_logs_select_own" on public.reading_logs;
+create policy "reading_logs_select_own" on public.reading_logs
+  for select to authenticated
+  using ((select auth.uid()) = user_id);
+
+drop policy if exists "reading_logs_insert_own" on public.reading_logs;
+create policy "reading_logs_insert_own" on public.reading_logs
+  for insert to authenticated
+  with check ((select auth.uid()) = user_id);
+
+drop policy if exists "reading_logs_update_own" on public.reading_logs;
+create policy "reading_logs_update_own" on public.reading_logs
+  for update to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+drop policy if exists "reading_logs_delete_own" on public.reading_logs;
+create policy "reading_logs_delete_own" on public.reading_logs
+  for delete to authenticated
+  using ((select auth.uid()) = user_id);
+
+-- ---------------------------------------------------------------------------
 -- Storage: avatars bucket
 -- Files live under "<user_id>/<file>". The bucket is public so avatar URLs can
 -- be shown without signed URLs; writes are restricted to the owner's folder.

@@ -4,6 +4,9 @@ import 'package:bookshelf/core/utils/request_status.dart';
 import 'package:bookshelf/features/book_details/presentation/bloc/book_details_bloc.dart';
 import 'package:bookshelf/features/library/domain/entities/reading_status.dart';
 import 'package:bookshelf/features/library/domain/entities/user_book.dart';
+import 'package:bookshelf/features/search/domain/entities/author_info.dart';
+import 'package:bookshelf/features/search/domain/entities/book.dart';
+import 'package:bookshelf/features/stats/domain/entities/reading_log.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -14,6 +17,7 @@ void main() {
   late MockLibraryRepository library;
   late MockBookSearchRepository search;
   late MockAddBookToLibrary addBook;
+  late MockReadingLogRepository logs;
 
   final book = buildBook();
   final saved = buildUserBook(book: book);
@@ -28,12 +32,36 @@ void main() {
     library = MockLibraryRepository();
     search = MockBookSearchRepository();
     addBook = MockAddBookToLibrary();
+    logs = MockReadingLogRepository();
+    when(() => logs.forBook(any())).thenAnswer((_) async => []);
+    when(
+      () => logs.add(
+        userBookId: any(named: 'userBookId'),
+        pages: any(named: 'pages'),
+        minutes: any(named: 'minutes'),
+        endPage: any(named: 'endPage'),
+        on: any(named: 'on'),
+      ),
+    ).thenAnswer(
+      (i) async => ReadingLog(
+        id: 'log-${i.namedArguments[#pages]}',
+        userBookId: i.namedArguments[#userBookId] as String,
+        loggedOn: DateTime(2026, 9, 20),
+        pages: i.namedArguments[#pages] as int,
+        minutes: i.namedArguments[#minutes] as int?,
+        endPage: i.namedArguments[#endPage] as int?,
+      ),
+    );
+    // Saved books are looked up on Open Library for author ids and rating.
+    when(() => search.getBookDetails(any()))
+        .thenAnswer((i) async => i.positionalArguments.first as Book);
   });
 
   BookDetailsBloc build() => BookDetailsBloc(
         libraryRepository: library,
         searchRepository: search,
         addBook: addBook,
+        readingLogs: logs,
       );
 
   BookDetailsState libraryState(UserBook userBook) => BookDetailsState(
@@ -86,6 +114,84 @@ void main() {
     );
   });
 
+  group('extras', () {
+    const author = AuthorInfo(key: 'OL9A', name: 'Frank Herbert');
+    final withAuthor = book.copyWith(
+      authorKeys: const ['OL9A'],
+      subjects: const ['Science fiction', 'Ecology'],
+    );
+    final other = buildBook(id: 'OL2W', title: 'Dune Messiah');
+    final similar = buildBook(id: 'OL3W', title: 'Earth Abides');
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'loads author, more by author and similar books for a saved book',
+      setUp: () {
+        when(() => library.getById('ub-1')).thenAnswer(
+          (_) async => buildUserBook(book: withAuthor),
+        );
+        when(() => search.getAuthor('OL9A')).thenAnswer((_) async => author);
+        when(() => search.getBooksByAuthor('OL9A', exclude: 'OL1W'))
+            .thenAnswer((_) async => [other]);
+        when(() => search.getSimilarBooks(withAuthor))
+            .thenAnswer((_) async => [similar]);
+      },
+      build: build,
+      act: (bloc) => bloc.add(const BookDetailsLibraryRequested('ub-1')),
+      wait: const Duration(milliseconds: 50),
+      verify: (bloc) {
+        expect(bloc.state.author, author);
+        expect(bloc.state.moreByAuthor, [other]);
+        expect(bloc.state.similarBooks, [similar]);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a failing section stays empty without failing the page',
+      setUp: () {
+        when(() => library.getById('ub-1')).thenAnswer(
+          (_) async => buildUserBook(book: withAuthor),
+        );
+        when(() => search.getAuthor(any()))
+            .thenThrow(const Failure(FailureCode.network));
+        when(
+          () => search.getBooksByAuthor(any(), exclude: any(named: 'exclude')),
+        ).thenAnswer((_) async => [other]);
+        when(() => search.getSimilarBooks(any()))
+            .thenThrow(const Failure(FailureCode.timeout));
+      },
+      build: build,
+      act: (bloc) => bloc.add(const BookDetailsLibraryRequested('ub-1')),
+      wait: const Duration(milliseconds: 50),
+      verify: (bloc) {
+        expect(bloc.state.status, RequestStatus.success);
+        expect(bloc.state.author, isNull);
+        expect(bloc.state.moreByAuthor, [other]);
+        expect(bloc.state.similarBooks, isEmpty);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'uses the author ids found by the work lookup for saved books',
+      setUp: () {
+        when(() => library.getById('ub-1')).thenAnswer((_) async => saved);
+        when(() => search.getBookDetails(saved.book)).thenAnswer(
+          (_) async => saved.book.copyWith(authorKeys: const ['OL9A']),
+        );
+        when(() => search.getAuthor('OL9A')).thenAnswer((_) async => author);
+        when(() => search.getBooksByAuthor('OL9A', exclude: 'OL1W'))
+            .thenAnswer((_) async => const []);
+      },
+      build: build,
+      act: (bloc) => bloc.add(const BookDetailsLibraryRequested('ub-1')),
+      wait: const Duration(milliseconds: 50),
+      verify: (bloc) {
+        expect(bloc.state.book?.authorKeys, ['OL9A']);
+        expect(bloc.state.author, author);
+        verifyNever(() => search.getSimilarBooks(any()));
+      },
+    );
+  });
+
   group('preview mode', () {
     blocTest<BookDetailsBloc, BookDetailsState>(
       'shows the book, then enriches it with work details',
@@ -126,7 +232,7 @@ void main() {
       build: build,
       act: (bloc) => bloc.add(BookDetailsPreviewRequested(book)),
       expect: () => [libraryState(saved)],
-      verify: (_) => verifyNever(() => search.getBookDetails(any())),
+      verify: (_) => verify(() => search.getBookDetails(saved.book)).called(1),
     );
 
     blocTest<BookDetailsBloc, BookDetailsState>(
@@ -250,6 +356,158 @@ void main() {
             .single as UserBook;
         expect(updated.status, ReadingStatus.read);
         expect(updated.finishedAt, isNotNull);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'moving the bookmark forward logs the pages read',
+      setUp: () => when(() => library.update(any()))
+          .thenAnswer((i) async => i.positionalArguments.first as UserBook),
+      build: build,
+      seed: () => libraryState(
+        buildUserBook(
+          book: book,
+          status: ReadingStatus.reading,
+          currentPage: 100,
+        ),
+      ),
+      act: (bloc) => bloc.add(const BookDetailsProgressChanged(150)),
+      verify: (bloc) {
+        verify(
+          () => logs.add(userBookId: 'ub-1', pages: 50, endPage: 150),
+        ).called(1);
+        expect(bloc.state.logs.single.pages, 50);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'moving the bookmark backwards logs nothing',
+      setUp: () => when(() => library.update(any()))
+          .thenAnswer((i) async => i.positionalArguments.first as UserBook),
+      build: build,
+      seed: () => libraryState(
+        buildUserBook(
+          book: book,
+          status: ReadingStatus.reading,
+          currentPage: 100,
+        ),
+      ),
+      act: (bloc) => bloc.add(const BookDetailsProgressChanged(40)),
+      verify: (bloc) {
+        verifyNever(
+          () => logs.add(
+            userBookId: any(named: 'userBookId'),
+            pages: any(named: 'pages'),
+            minutes: any(named: 'minutes'),
+            endPage: any(named: 'endPage'),
+            on: any(named: 'on'),
+          ),
+        );
+        expect(bloc.state.logs, isEmpty);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a session saves the page and logs pages and minutes',
+      setUp: () => when(() => library.update(any()))
+          .thenAnswer((i) async => i.positionalArguments.first as UserBook),
+      build: build,
+      seed: () => libraryState(
+        buildUserBook(
+          book: book,
+          status: ReadingStatus.reading,
+          currentPage: 100,
+        ),
+      ),
+      act: (bloc) =>
+          bloc.add(const BookDetailsSessionLogged(endPage: 130, minutes: 25)),
+      verify: (bloc) {
+        expect(bloc.state.userBook!.currentPage, 130);
+        verify(
+          () => logs.add(
+            userBookId: 'ub-1',
+            pages: 30,
+            minutes: 25,
+            endPage: 130,
+          ),
+        ).called(1);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a time-only session (same page) is still logged',
+      build: build,
+      seed: () => libraryState(
+        buildUserBook(
+          book: book,
+          status: ReadingStatus.reading,
+          currentPage: 100,
+        ),
+      ),
+      act: (bloc) =>
+          bloc.add(const BookDetailsSessionLogged(endPage: 100, minutes: 15)),
+      verify: (bloc) {
+        verify(
+          () => logs.add(
+            userBookId: 'ub-1',
+            pages: 0,
+            minutes: 15,
+            endPage: 100,
+          ),
+        ).called(1);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a session that saves nothing (no pages, no minutes) logs nothing',
+      build: build,
+      seed: () => libraryState(
+        buildUserBook(
+          book: book,
+          status: ReadingStatus.reading,
+          currentPage: 100,
+        ),
+      ),
+      act: (bloc) => bloc.add(const BookDetailsSessionLogged(endPage: 100)),
+      verify: (_) => verifyNever(
+        () => logs.add(
+          userBookId: any(named: 'userBookId'),
+          pages: any(named: 'pages'),
+          minutes: any(named: 'minutes'),
+          endPage: any(named: 'endPage'),
+          on: any(named: 'on'),
+        ),
+      ),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a failing log write never fails the reading update',
+      setUp: () {
+        when(() => library.update(any()))
+            .thenAnswer((i) async => i.positionalArguments.first as UserBook);
+        when(
+          () => logs.add(
+            userBookId: any(named: 'userBookId'),
+            pages: any(named: 'pages'),
+            minutes: any(named: 'minutes'),
+            endPage: any(named: 'endPage'),
+            on: any(named: 'on'),
+          ),
+        ).thenThrow(const Failure(FailureCode.network));
+      },
+      build: build,
+      seed: () => libraryState(
+        buildUserBook(
+          book: book,
+          status: ReadingStatus.reading,
+          currentPage: 100,
+        ),
+      ),
+      act: (bloc) => bloc.add(const BookDetailsProgressChanged(150)),
+      verify: (bloc) {
+        expect(bloc.state.userBook!.currentPage, 150);
+        expect(bloc.state.saveStatus, RequestStatus.success);
+        expect(bloc.state.failure, isNull);
       },
     );
 

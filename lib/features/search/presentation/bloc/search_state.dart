@@ -10,6 +10,7 @@ class SearchState extends Equatable {
     this.isLoadingMore = false,
     this.failure,
     this.loadMoreFailure,
+    this.language,
   });
 
   final String query;
@@ -23,6 +24,9 @@ class SearchState extends Equatable {
   final Failure? failure;
   final Failure? loadMoreFailure;
 
+  /// Language filter applied to the search, or null for all.
+  final String? language;
+
   SearchState copyWith({
     String? query,
     RequestStatus? status,
@@ -32,6 +36,7 @@ class SearchState extends Equatable {
     bool? isLoadingMore,
     Failure? Function()? failure,
     Failure? Function()? loadMoreFailure,
+    String? Function()? language,
   }) {
     return SearchState(
       query: query ?? this.query,
@@ -43,6 +48,7 @@ class SearchState extends Equatable {
       failure: failure != null ? failure() : this.failure,
       loadMoreFailure:
           loadMoreFailure != null ? loadMoreFailure() : this.loadMoreFailure,
+      language: language != null ? language() : this.language,
     );
   }
 
@@ -56,5 +62,6 @@ class SearchState extends Equatable {
         isLoadingMore,
         failure,
         loadMoreFailure,
+        language,
       ];
 }

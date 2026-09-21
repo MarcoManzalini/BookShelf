@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/utils/l10n_extension.dart';
 import '../../../library/domain/entities/user_book.dart';
@@ -56,6 +57,7 @@ class _DateTile extends StatelessWidget {
       initialDate: date ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year, now.month, now.day),
+      initialEntryMode: DatePickerEntryMode.input,
     );
     if (picked != null) bloc.add(BookDetailsDateChanged(field, picked));
   }
@@ -70,7 +72,8 @@ class _DateTile extends StatelessWidget {
       subtitle: Text(
         value == null
             ? l10n.notSet
-            : MaterialLocalizations.of(context).formatMediumDate(value),
+            : DateFormat.yMMMd(Localizations.localeOf(context).toString())
+                .format(value),
       ),
       trailing: value == null
           ? null

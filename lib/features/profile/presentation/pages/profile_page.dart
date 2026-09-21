@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/errors/failure_message.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/l10n_extension.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -13,6 +15,7 @@ import '../bloc/profile_bloc.dart';
 import '../cubit/theme_cubit.dart';
 import '../widgets/change_password_dialog.dart';
 import '../widgets/profile_header.dart';
+import '../widgets/profile_shelves.dart';
 import '../widgets/stats_row.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -221,8 +224,29 @@ class _ProfileBody extends StatelessWidget {
           onChangePhoto: () => _pickAvatar(context),
         ),
         const SizedBox(height: 24),
-        StatsRow(stats: ReadingStats.fromBooks(books)),
+        InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () async {
+            final profileBloc = context.read<ProfileBloc>();
+            await context.push(AppRoutes.stats);
+            // The goal may have been changed there.
+            profileBloc.add(const ProfileRefreshRequested());
+          },
+          child: Column(
+            children: [
+              StatsRow(stats: ReadingStats.fromBooks(books)),
+              _GoalHint(
+                goal: profile.readingGoal,
+                stats: ReadingStats.fromBooks(books),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 24),
+        const ProfileShelves(),
+        if (context
+            .select((LibraryBloc bloc) => bloc.state.shelfCounts.isNotEmpty))
+          const SizedBox(height: 24),
         Card(
           child: Column(
             children: [
@@ -238,6 +262,13 @@ class _ProfileBody extends StatelessWidget {
                 leading: const Icon(Icons.mail_outline_rounded),
                 title: Text(l10n.emailLabel),
                 subtitle: Text(email),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.swap_vert_rounded),
+                title: Text(l10n.ioProfileEntry),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push(AppRoutes.data),
               ),
               const Divider(height: 1),
               ListTile(
@@ -322,6 +353,55 @@ class _ProfileBody extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// One line under the counters: progress towards the yearly goal, or an
+/// invitation to open the statistics.
+class _GoalHint extends StatelessWidget {
+  const _GoalHint({required this.goal, required this.stats});
+
+  final int? goal;
+  final ReadingStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final target = goal;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: target == null
+                ? Text(l10n.statsGoalSet, style: theme.textTheme.bodySmall)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.statsGoalProgress(stats.booksThisYear, target),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: (stats.booksThisYear / target).clamp(0.0, 1.0),
+                          minHeight: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+          const SizedBox(width: 12),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ],
+      ),
     );
   }
 }

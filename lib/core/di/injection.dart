@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -10,7 +13,9 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/cubit/auth_form_cubit.dart';
 import '../../features/book_details/presentation/bloc/book_details_bloc.dart';
+import '../../features/book_details/presentation/bloc/editions_cubit.dart';
 import '../../features/library/data/datasources/library_remote_data_source.dart';
+import '../../features/library/data/local/library_cache.dart';
 import '../../features/library/data/repositories/library_repository_impl.dart';
 import '../../features/library/domain/repositories/library_repository.dart';
 import '../../features/library/domain/usecases/add_book_to_library.dart';
@@ -20,14 +25,36 @@ import '../../features/profile/data/repositories/profile_repository_impl.dart';
 import '../../features/profile/domain/repositories/profile_repository.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/cubit/theme_cubit.dart';
+import '../../features/library_io/data/library_export_service.dart';
+import '../../features/library_io/domain/library_importer.dart';
+import '../../features/library_io/presentation/cubit/import_cubit.dart';
+import '../../features/scanner/presentation/cubit/isbn_scan_cubit.dart';
+import '../../features/stats/data/datasources/reading_log_remote_data_source.dart';
+import '../../features/stats/data/repositories/reading_log_repository_impl.dart';
+import '../../features/stats/domain/repositories/reading_log_repository.dart';
+import '../../features/stats/presentation/cubit/stats_cubit.dart';
 import '../../features/search/data/datasources/book_remote_data_source.dart';
+import '../../features/search/data/search_language_preference.dart';
 import '../../features/search/data/repositories/book_search_repository_impl.dart';
 import '../../features/search/domain/repositories/book_search_repository.dart';
+import '../../features/search/domain/entities/book.dart';
+import '../../features/search/domain/entities/explore_genre.dart';
+import '../../features/search/domain/entities/explore_section.dart';
+import '../../features/search/presentation/bloc/explore_bloc.dart';
+import '../../features/search/presentation/bloc/explore_genre_cubit.dart';
+import '../../features/search/presentation/bloc/explore_section_cubit.dart';
+import '../../features/search/presentation/bloc/genre_shelf_cubit.dart';
+import '../../features/search/presentation/bloc/recommendations_cubit.dart';
 import '../../features/search/presentation/bloc/search_bloc.dart';
 import '../config/app_config.dart';
 import '../router/app_router.dart';
 
 final getIt = GetIt.instance;
+
+Future<File> _libraryCacheFile() async {
+  final dir = await getApplicationSupportDirectory();
+  return File('${dir.path}/library_cache.json');
+}
 
 /// Registers everything. Requires `Supabase.initialize` to have run.
 Future<void> configureDependencies() async {
@@ -58,13 +85,23 @@ Future<void> configureDependencies() async {
       () => SupabaseLibraryDataSource(getIt()),
     )
     ..registerLazySingleton(() => ProfileRemoteDataSource(getIt()))
+    ..registerLazySingleton<ReadingLogRemoteDataSource>(
+      () => SupabaseReadingLogDataSource(getIt()),
+    )
     // Repositories
     ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt()))
     ..registerLazySingleton<BookSearchRepository>(
       () => BookSearchRepositoryImpl(getIt()),
     )
     ..registerLazySingleton<LibraryRepository>(
-      () => LibraryRepositoryImpl(getIt()),
+      () => LibraryRepositoryImpl(
+        getIt(),
+        cache: FileLibraryCache(_libraryCacheFile),
+        currentUserId: () => getIt<SupabaseClient>().auth.currentUser?.id,
+      ),
+    )
+    ..registerLazySingleton<ReadingLogRepository>(
+      () => ReadingLogRepositoryImpl(getIt()),
     )
     ..registerLazySingleton<ProfileRepository>(
       () => ProfileRepositoryImpl(getIt()),
@@ -84,13 +121,33 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<GoRouter>(() => createRouter(getIt<AuthBloc>()))
     // Screen-scoped blocs (new instance per page)
     ..registerFactory(() => AuthFormCubit(getIt()))
-    ..registerFactory(() => SearchBloc(getIt()))
+    ..registerLazySingleton(() => SearchLanguagePreference(getIt()))
+    ..registerFactory(
+      () => SearchBloc(getIt(), languagePreference: getIt()),
+    )
+    ..registerFactory(() => ExploreBloc(getIt()))
+    ..registerFactory(() => GenreShelfCubit(getIt()))
+    ..registerFactory(() => RecommendationsCubit(getIt(), getIt()))
+    ..registerFactory(() => IsbnScanCubit(getIt()))
+    ..registerFactory(() => StatsCubit(getIt(), getIt()))
+    ..registerLazySingleton(() => const LibraryExportService())
+    ..registerFactory(() => ImportCubit(LibraryImporter(getIt(), getIt())))
+    ..registerFactoryParam<EditionsCubit, Book, void>(
+      (book, _) => EditionsCubit(getIt(), book),
+    )
+    ..registerFactoryParam<ExploreGenreCubit, ExploreGenre, void>(
+      (genre, _) => ExploreGenreCubit(getIt(), genre),
+    )
+    ..registerFactoryParam<ExploreSectionCubit, ExploreSection, void>(
+      (section, _) => ExploreSectionCubit(getIt(), section),
+    )
     ..registerFactory(() => ProfileBloc(getIt()))
     ..registerFactory(
       () => BookDetailsBloc(
         libraryRepository: getIt(),
         searchRepository: getIt(),
         addBook: getIt(),
+        readingLogs: getIt(),
       ),
     );
 }

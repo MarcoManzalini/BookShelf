@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/bookshelf_mark.dart';
 
 class AuthScaffold extends StatelessWidget {
@@ -37,13 +36,10 @@ class AuthScaffold extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(title, style: theme.textTheme.displaySmall),
-                  const SizedBox(height: 12),
-                  Container(width: 44, height: 2, color: AppColors.brass),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   Text(
                     subtitle,
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      fontStyle: FontStyle.italic,
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),

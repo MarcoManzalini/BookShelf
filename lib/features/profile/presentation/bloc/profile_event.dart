@@ -11,6 +11,12 @@ final class ProfileStarted extends ProfileEvent {
   const ProfileStarted();
 }
 
+/// Reloads the profile without showing a loading state (e.g. after the goal
+/// was changed on the statistics page).
+final class ProfileRefreshRequested extends ProfileEvent {
+  const ProfileRefreshRequested();
+}
+
 final class ProfileDisplayNameSubmitted extends ProfileEvent {
   const ProfileDisplayNameSubmitted(this.displayName);
 

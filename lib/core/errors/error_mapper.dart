@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'failure.dart';
@@ -85,6 +86,14 @@ Failure _mapAuth(AuthException e) {
 }
 
 Failure _mapPostgrest(PostgrestException e) {
+  // The screen only shows a generic message; the real cause (missing column,
+  // policy, constraint) is here.
+  if (kDebugMode) {
+    debugPrint(
+      'PostgrestException code=${e.code} message=${e.message} '
+      'details=${e.details} hint=${e.hint}',
+    );
+  }
   if (e.code == 'PGRST116') return const Failure(FailureCode.notFound);
   if (e.code == '42501' || e.code == 'PGRST301') {
     return const Failure(FailureCode.unauthorized);
