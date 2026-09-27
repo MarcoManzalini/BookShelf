@@ -25,6 +25,16 @@
   "statusReading": "Reading",
   "statusRead": "Read",
   "addToLibraryAs": "Add to library as",
+  "welcomeTagline": "Your bookshelf, always with you. Keep track of every read.",
+  "welcomeTitleFind": "Find and organize",
+  "welcomeBodyFind": "Search millions of books or scan an ISBN, then put them on your shelf.",
+  "welcomeTitleTrack": "Read and measure",
+  "welcomeBodyTrack": "Log your sessions, see your stats and share your progress.",
+  "welcomeNext": "Next",
+  "welcomeSkip": "Skip",
+  "welcomeSignIn": "Sign in",
+  "welcomeStart": "Get started",
+  "welcomeHaveAccount": "I already have an account",
   "loginTitle": "Welcome back",
   "loginSubtitle": "Sign in to find your library again.",
   "registerTitle": "Create your account",
@@ -254,12 +264,96 @@
     }
   },
   "statsNoData": "—",
+  "statsMonthBooksFinished": "Books finished",
+  "statsMonthPagesRead": "Pages read",
+  "statsMonthActiveDays": "Active days",
+  "statsMonthNoBooks": "No book finished this month",
   "sessionRegister": "Log a session",
   "sessionTitle": "Reading session",
   "sessionStart": "Start",
   "sessionPause": "Pause",
   "sessionMinutes": "Minutes read",
   "sessionEndPage": "Page reached",
+  "sessionSaved": "Session logged",
+  "sessionShare": "Share",
+  "sessionShareTitle": "Share your session",
+  "sessionShareError": "Couldn't share the image.",
+  "shareSessionLabel": "READING SESSION",
+  "shareUnitPages": "pages",
+  "shareUnitMin": "min",
+  "shareUnitPagesPerHour": "p/h",
+  "shareUnitDays": "{count, plural, =1{day} other{days}}",
+  "@shareUnitDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareLabelTime": "TIME",
+  "shareLabelPace": "PACE",
+  "shareLabelStreak": "STREAK",
+  "shareLabelBook": "BOOK",
+  "shareNowReading": "NOW READING",
+  "shareThisWeek": "THIS WEEK",
+  "shareRange": "p. {from} → {to}",
+  "@shareRange": {
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      }
+    }
+  },
+  "sharePageAt": "p. {page}",
+  "@sharePageAt": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "shareOfTotal": "{percent}% of {total}",
+  "@shareOfTotal": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shareReadToday": "pages read today",
+  "shareRead": "pages read",
+  "sharePillPace": "{count} pages/h",
+  "@sharePillPace": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sharePillStreak": "{count}-day streak",
+  "@sharePillStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareTemplateStats": "Stats",
+  "shareTemplatePoster": "Poster",
+  "shareTemplatePhoto": "Photo",
+  "sessionPlace": "Place",
+  "sessionPlaceHint": "Where are you reading?",
+  "sessionQuote": "Quote",
+  "sessionQuoteHint": "A line that stuck with you",
+  "sessionPhotoTake": "Take photo",
+  "sessionPhotoChoose": "Gallery",
+  "sessionPhotoRemove": "Remove photo",
   "sessionsRecent": "Recent sessions",
   "minutesShort": "{count} min",
   "@minutesShort": {

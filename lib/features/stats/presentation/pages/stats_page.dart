@@ -7,10 +7,14 @@ import '../../../../core/errors/failure_message.dart';
 import '../../../../core/utils/l10n_extension.dart';
 import '../../../../core/widgets/bar_chart.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../../library/domain/entities/user_book.dart';
 import '../../../library/presentation/bloc/library_bloc.dart';
+import '../../domain/entities/month_detail.dart';
 import '../../domain/entities/reading_insights.dart';
+import '../../domain/entities/reading_log.dart';
 import '../cubit/stats_cubit.dart';
 import '../widgets/goal_card.dart';
+import '../widgets/month_detail_sheet.dart';
 import '../widgets/stat_tile.dart';
 import '../widgets/subject_bars.dart';
 
@@ -62,6 +66,8 @@ class StatsView extends StatelessWidget {
                 logs: state.logs,
                 goal: state.goal,
               ),
+              books: books,
+              logs: state.logs,
             );
           },
         ),
@@ -71,9 +77,31 @@ class StatsView extends StatelessWidget {
 }
 
 class _Content extends StatelessWidget {
-  const _Content({required this.insights});
+  const _Content({
+    required this.insights,
+    required this.books,
+    required this.logs,
+  });
 
   final ReadingInsights insights;
+  final List<UserBook> books;
+  final List<ReadingLog> logs;
+
+  void _openMonth(BuildContext context, int year, int month) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (_) => MonthDetailSheet(
+        detail: MonthDetail.compute(
+          books: books,
+          logs: logs,
+          year: year,
+          month: month,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +171,7 @@ class _Content extends StatelessWidget {
           values: insights.booksPerMonth,
           labels: monthInitials,
           highlight: now.month - 1,
+          onBarTap: (i) => _openMonth(context, now.year, i + 1),
         ),
         const SizedBox(height: 28),
         Text(l10n.statsPagesRecent, style: theme.textTheme.titleMedium),

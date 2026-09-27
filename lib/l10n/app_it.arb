@@ -26,6 +26,16 @@
   "statusReading": "In lettura",
   "statusRead": "Letto",
   "addToLibraryAs": "Aggiungi alla libreria come",
+  "welcomeTagline": "Il tuo scaffale, sempre con te. Tieni traccia di ogni lettura.",
+  "welcomeTitleFind": "Trova e organizza",
+  "welcomeBodyFind": "Cerca tra milioni di libri o scansiona il codice ISBN, poi mettili sul tuo scaffale.",
+  "welcomeTitleTrack": "Leggi e misura",
+  "welcomeBodyTrack": "Registra le sessioni, guarda le tue statistiche e condividi i progressi.",
+  "welcomeNext": "Avanti",
+  "welcomeSkip": "Salta",
+  "welcomeSignIn": "Accedi",
+  "welcomeStart": "Inizia",
+  "welcomeHaveAccount": "Ho già un account",
   "loginTitle": "Bentornato",
   "loginSubtitle": "Accedi per ritrovare la tua libreria.",
   "registerTitle": "Crea il tuo account",
@@ -302,12 +312,96 @@
     }
   },
   "statsNoData": "—",
+  "statsMonthBooksFinished": "Libri finiti",
+  "statsMonthPagesRead": "Pagine lette",
+  "statsMonthActiveDays": "Giorni attivi",
+  "statsMonthNoBooks": "Nessun libro finito questo mese",
   "sessionRegister": "Registra sessione",
   "sessionTitle": "Sessione di lettura",
   "sessionStart": "Avvia",
   "sessionPause": "Pausa",
   "sessionMinutes": "Minuti letti",
   "sessionEndPage": "Pagina raggiunta",
+  "sessionSaved": "Sessione registrata",
+  "sessionShare": "Condividi",
+  "sessionShareTitle": "Condividi la sessione",
+  "sessionShareError": "Impossibile condividere l'immagine.",
+  "shareSessionLabel": "SESSIONE DI LETTURA",
+  "shareUnitPages": "pagine",
+  "shareUnitMin": "min",
+  "shareUnitPagesPerHour": "pag/h",
+  "shareUnitDays": "{count, plural, =1{giorno} other{giorni}}",
+  "@shareUnitDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareLabelTime": "TEMPO",
+  "shareLabelPace": "RITMO",
+  "shareLabelStreak": "SERIE",
+  "shareLabelBook": "LIBRO",
+  "shareNowReading": "IN LETTURA ORA",
+  "shareThisWeek": "QUESTA SETTIMANA",
+  "shareRange": "p. {from} → {to}",
+  "@shareRange": {
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      }
+    }
+  },
+  "sharePageAt": "p. {page}",
+  "@sharePageAt": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "shareOfTotal": "{percent}% di {total}",
+  "@shareOfTotal": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shareReadToday": "pagine lette oggi",
+  "shareRead": "pagine lette",
+  "sharePillPace": "{count} pagine/h",
+  "@sharePillPace": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sharePillStreak": "{count, plural, =1{serie di 1 giorno} other{serie di {count} giorni}}",
+  "@sharePillStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shareTemplateStats": "Stats",
+  "shareTemplatePoster": "Poster",
+  "shareTemplatePhoto": "Foto",
+  "sessionPlace": "Luogo",
+  "sessionPlaceHint": "Dove stai leggendo?",
+  "sessionQuote": "Citazione",
+  "sessionQuoteHint": "Una frase che ti ha colpito",
+  "sessionPhotoTake": "Scatta",
+  "sessionPhotoChoose": "Galleria",
+  "sessionPhotoRemove": "Rimuovi foto",
   "sessionsRecent": "Sessioni recenti",
   "minutesShort": "{count} min",
   "@minutesShort": {

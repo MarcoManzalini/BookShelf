@@ -93,6 +93,39 @@ class AppLocalizationsIt extends AppLocalizations {
   String get addToLibraryAs => 'Aggiungi alla libreria come';
 
   @override
+  String get welcomeTagline =>
+      'Il tuo scaffale, sempre con te. Tieni traccia di ogni lettura.';
+
+  @override
+  String get welcomeTitleFind => 'Trova e organizza';
+
+  @override
+  String get welcomeBodyFind =>
+      'Cerca tra milioni di libri o scansiona il codice ISBN, poi mettili sul tuo scaffale.';
+
+  @override
+  String get welcomeTitleTrack => 'Leggi e misura';
+
+  @override
+  String get welcomeBodyTrack =>
+      'Registra le sessioni, guarda le tue statistiche e condividi i progressi.';
+
+  @override
+  String get welcomeNext => 'Avanti';
+
+  @override
+  String get welcomeSkip => 'Salta';
+
+  @override
+  String get welcomeSignIn => 'Accedi';
+
+  @override
+  String get welcomeStart => 'Inizia';
+
+  @override
+  String get welcomeHaveAccount => 'Ho già un account';
+
+  @override
   String get loginTitle => 'Bentornato';
 
   @override
@@ -607,6 +640,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get statsNoData => '—';
 
   @override
+  String get statsMonthBooksFinished => 'Libri finiti';
+
+  @override
+  String get statsMonthPagesRead => 'Pagine lette';
+
+  @override
+  String get statsMonthActiveDays => 'Giorni attivi';
+
+  @override
+  String get statsMonthNoBooks => 'Nessun libro finito questo mese';
+
+  @override
   String get sessionRegister => 'Registra sessione';
 
   @override
@@ -623,6 +668,126 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get sessionEndPage => 'Pagina raggiunta';
+
+  @override
+  String get sessionSaved => 'Sessione registrata';
+
+  @override
+  String get sessionShare => 'Condividi';
+
+  @override
+  String get sessionShareTitle => 'Condividi la sessione';
+
+  @override
+  String get sessionShareError => 'Impossibile condividere l\'immagine.';
+
+  @override
+  String get shareSessionLabel => 'SESSIONE DI LETTURA';
+
+  @override
+  String get shareUnitPages => 'pagine';
+
+  @override
+  String get shareUnitMin => 'min';
+
+  @override
+  String get shareUnitPagesPerHour => 'pag/h';
+
+  @override
+  String shareUnitDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'giorni',
+      one: 'giorno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shareLabelTime => 'TEMPO';
+
+  @override
+  String get shareLabelPace => 'RITMO';
+
+  @override
+  String get shareLabelStreak => 'SERIE';
+
+  @override
+  String get shareLabelBook => 'LIBRO';
+
+  @override
+  String get shareNowReading => 'IN LETTURA ORA';
+
+  @override
+  String get shareThisWeek => 'QUESTA SETTIMANA';
+
+  @override
+  String shareRange(int from, int to) {
+    return 'p. $from → $to';
+  }
+
+  @override
+  String sharePageAt(int page) {
+    return 'p. $page';
+  }
+
+  @override
+  String shareOfTotal(int percent, int total) {
+    return '$percent% di $total';
+  }
+
+  @override
+  String get shareReadToday => 'pagine lette oggi';
+
+  @override
+  String get shareRead => 'pagine lette';
+
+  @override
+  String sharePillPace(int count) {
+    return '$count pagine/h';
+  }
+
+  @override
+  String sharePillStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'serie di $count giorni',
+      one: 'serie di 1 giorno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shareTemplateStats => 'Stats';
+
+  @override
+  String get shareTemplatePoster => 'Poster';
+
+  @override
+  String get shareTemplatePhoto => 'Foto';
+
+  @override
+  String get sessionPlace => 'Luogo';
+
+  @override
+  String get sessionPlaceHint => 'Dove stai leggendo?';
+
+  @override
+  String get sessionQuote => 'Citazione';
+
+  @override
+  String get sessionQuoteHint => 'Una frase che ti ha colpito';
+
+  @override
+  String get sessionPhotoTake => 'Scatta';
+
+  @override
+  String get sessionPhotoChoose => 'Galleria';
+
+  @override
+  String get sessionPhotoRemove => 'Rimuovi foto';
 
   @override
   String get sessionsRecent => 'Sessioni recenti';

@@ -24,6 +24,8 @@ import '../widgets/reading_dates_section.dart';
 import '../widgets/shelves_section.dart';
 import '../widgets/reading_progress_section.dart';
 import '../widgets/reading_session_sheet.dart';
+import '../widgets/reading_share_card.dart';
+import '../widgets/reading_share_sheet.dart';
 import '../widgets/reading_sessions_list.dart';
 import '../widgets/related_books_row.dart';
 import '../widgets/section_title.dart';
@@ -276,6 +278,50 @@ class _Content extends StatelessWidget {
     );
   }
 
+  /// Registers a session and, once it is saved, offers to share it.
+  Future<void> _logSession(BuildContext context, UserBook userBook) async {
+    final bloc = context.read<BookDetailsBloc>();
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+    final session = await showReadingSessionSheet(context, userBook);
+    if (session == null) return;
+    final lastLog = bloc.state.logs.firstOrNull?.id;
+    bloc.add(
+      BookDetailsSessionLogged(
+        endPage: session.endPage,
+        minutes: session.minutes,
+      ),
+    );
+    final BookDetailsState saved;
+    try {
+      saved = await bloc.stream
+          .firstWhere((s) => s.logs.firstOrNull?.id != lastLog)
+          .timeout(const Duration(seconds: 8), onTimeout: () => bloc.state);
+    } on StateError {
+      return;
+    }
+    final log = saved.logs.firstOrNull;
+    final saveBook = saved.userBook;
+    // No new log: nothing was saved (or a time-less, page-less session).
+    if (log == null || log.id == lastLog || saveBook == null) return;
+    if (!context.mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.sessionSaved),
+        action: SnackBarAction(
+          label: l10n.sessionShare,
+          onPressed: () {
+            if (!context.mounted) return;
+            showReadingShareSheet(
+              context,
+              ReadingShareData.from(saveBook, log),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   List<Widget> _readingSections(BuildContext context, UserBook userBook) {
     final l10n = context.l10n;
     return [
@@ -289,23 +335,18 @@ class _Content extends StatelessWidget {
         child: TextButton.icon(
           icon: const Icon(Icons.timer_outlined, size: 18),
           label: Text(l10n.sessionRegister),
-          onPressed: () async {
-            final bloc = context.read<BookDetailsBloc>();
-            final session = await showReadingSessionSheet(context, userBook);
-            if (session != null) {
-              bloc.add(
-                BookDetailsSessionLogged(
-                  endPage: session.endPage,
-                  minutes: session.minutes,
-                ),
-              );
-            }
-          },
+          onPressed: () => _logSession(context, userBook),
         ),
       ),
       if (state.logs.isNotEmpty) ...[
         SectionTitle(l10n.sessionsRecent),
-        ReadingSessionsList(logs: state.logs),
+        ReadingSessionsList(
+          logs: state.logs,
+          onShare: (log) => showReadingShareSheet(
+            context,
+            ReadingShareData.from(userBook, log),
+          ),
+        ),
       ],
       SectionTitle(l10n.myRating),
       Align(

@@ -6,10 +6,18 @@ import '../../../stats/domain/entities/reading_log.dart';
 
 /// The latest reading sessions of a book: day, pages and minutes.
 class ReadingSessionsList extends StatelessWidget {
-  const ReadingSessionsList({super.key, required this.logs, this.limit = 5});
+  const ReadingSessionsList({
+    super.key,
+    required this.logs,
+    this.limit = 5,
+    this.onShare,
+  });
 
   final List<ReadingLog> logs;
   final int limit;
+
+  /// Null hides the share button of each session.
+  final ValueChanged<ReadingLog>? onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +48,14 @@ class ReadingSessionsList extends StatelessWidget {
                     style: theme.textTheme.bodyMedium,
                   ),
                 ),
+                if (onShare != null && log.hasActivity)
+                  IconButton(
+                    tooltip: l10n.sessionShare,
+                    visualDensity: VisualDensity.compact,
+                    iconSize: 18,
+                    icon: const Icon(Icons.ios_share_rounded),
+                    onPressed: () => onShare!(log),
+                  ),
               ],
             ),
           ),

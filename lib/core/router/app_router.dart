@@ -7,6 +7,7 @@ import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
+import '../../features/auth/presentation/pages/welcome_page.dart';
 import '../../features/book_details/presentation/pages/book_details_page.dart';
 import '../../features/library/presentation/pages/library_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
@@ -24,6 +25,7 @@ import 'go_router_refresh_stream.dart';
 import 'main_shell.dart';
 
 abstract final class AppRoutes {
+  static const welcome = '/auth/welcome';
   static const login = '/auth/login';
   static const register = '/auth/register';
   static const forgotPassword = '/auth/forgot-password';
@@ -56,6 +58,10 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(
         path: '/login-callback',
         redirect: (_, __) => AppRoutes.library,
+      ),
+      GoRoute(
+        path: AppRoutes.welcome,
+        builder: (_, __) => const WelcomePage(),
       ),
       GoRoute(
         path: AppRoutes.login,
@@ -165,7 +171,7 @@ String? authRedirect(AuthStatus status, String location) {
           : AppRoutes.resetPassword;
     case AuthStatus.unauthenticated:
       final allowed = inAuthArea && location != AppRoutes.resetPassword;
-      return allowed ? null : AppRoutes.login;
+      return allowed ? null : AppRoutes.welcome;
     case AuthStatus.authenticated:
       return inAuthArea ? AppRoutes.library : null;
   }

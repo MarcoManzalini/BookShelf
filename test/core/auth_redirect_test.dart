@@ -8,18 +8,22 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('authRedirect', () {
-    test('unauthenticated users are sent to login', () {
+    test('unauthenticated users are sent to the welcome page', () {
       expect(
         authRedirect(AuthStatus.unauthenticated, AppRoutes.library),
-        AppRoutes.login,
+        AppRoutes.welcome,
       );
       expect(
         authRedirect(AuthStatus.unauthenticated, '/book/abc'),
-        AppRoutes.login,
+        AppRoutes.welcome,
       );
     });
 
     test('unauthenticated users can use the auth pages', () {
+      expect(
+        authRedirect(AuthStatus.unauthenticated, AppRoutes.welcome),
+        isNull,
+      );
       expect(authRedirect(AuthStatus.unauthenticated, AppRoutes.login), isNull);
       expect(
         authRedirect(AuthStatus.unauthenticated, AppRoutes.register),
@@ -34,7 +38,7 @@ void main() {
     test('reset-password is not reachable without a recovery session', () {
       expect(
         authRedirect(AuthStatus.unauthenticated, AppRoutes.resetPassword),
-        AppRoutes.login,
+        AppRoutes.welcome,
       );
     });
 

@@ -93,6 +93,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addToLibraryAs => 'Add to library as';
 
   @override
+  String get welcomeTagline =>
+      'Your bookshelf, always with you. Keep track of every read.';
+
+  @override
+  String get welcomeTitleFind => 'Find and organize';
+
+  @override
+  String get welcomeBodyFind =>
+      'Search millions of books or scan an ISBN, then put them on your shelf.';
+
+  @override
+  String get welcomeTitleTrack => 'Read and measure';
+
+  @override
+  String get welcomeBodyTrack =>
+      'Log your sessions, see your stats and share your progress.';
+
+  @override
+  String get welcomeNext => 'Next';
+
+  @override
+  String get welcomeSkip => 'Skip';
+
+  @override
+  String get welcomeSignIn => 'Sign in';
+
+  @override
+  String get welcomeStart => 'Get started';
+
+  @override
+  String get welcomeHaveAccount => 'I already have an account';
+
+  @override
   String get loginTitle => 'Welcome back';
 
   @override
@@ -609,6 +642,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statsNoData => '—';
 
   @override
+  String get statsMonthBooksFinished => 'Books finished';
+
+  @override
+  String get statsMonthPagesRead => 'Pages read';
+
+  @override
+  String get statsMonthActiveDays => 'Active days';
+
+  @override
+  String get statsMonthNoBooks => 'No book finished this month';
+
+  @override
   String get sessionRegister => 'Log a session';
 
   @override
@@ -625,6 +670,120 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sessionEndPage => 'Page reached';
+
+  @override
+  String get sessionSaved => 'Session logged';
+
+  @override
+  String get sessionShare => 'Share';
+
+  @override
+  String get sessionShareTitle => 'Share your session';
+
+  @override
+  String get sessionShareError => 'Couldn\'t share the image.';
+
+  @override
+  String get shareSessionLabel => 'READING SESSION';
+
+  @override
+  String get shareUnitPages => 'pages';
+
+  @override
+  String get shareUnitMin => 'min';
+
+  @override
+  String get shareUnitPagesPerHour => 'p/h';
+
+  @override
+  String shareUnitDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get shareLabelTime => 'TIME';
+
+  @override
+  String get shareLabelPace => 'PACE';
+
+  @override
+  String get shareLabelStreak => 'STREAK';
+
+  @override
+  String get shareLabelBook => 'BOOK';
+
+  @override
+  String get shareNowReading => 'NOW READING';
+
+  @override
+  String get shareThisWeek => 'THIS WEEK';
+
+  @override
+  String shareRange(int from, int to) {
+    return 'p. $from → $to';
+  }
+
+  @override
+  String sharePageAt(int page) {
+    return 'p. $page';
+  }
+
+  @override
+  String shareOfTotal(int percent, int total) {
+    return '$percent% of $total';
+  }
+
+  @override
+  String get shareReadToday => 'pages read today';
+
+  @override
+  String get shareRead => 'pages read';
+
+  @override
+  String sharePillPace(int count) {
+    return '$count pages/h';
+  }
+
+  @override
+  String sharePillStreak(int count) {
+    return '$count-day streak';
+  }
+
+  @override
+  String get shareTemplateStats => 'Stats';
+
+  @override
+  String get shareTemplatePoster => 'Poster';
+
+  @override
+  String get shareTemplatePhoto => 'Photo';
+
+  @override
+  String get sessionPlace => 'Place';
+
+  @override
+  String get sessionPlaceHint => 'Where are you reading?';
+
+  @override
+  String get sessionQuote => 'Quote';
+
+  @override
+  String get sessionQuoteHint => 'A line that stuck with you';
+
+  @override
+  String get sessionPhotoTake => 'Take photo';
+
+  @override
+  String get sessionPhotoChoose => 'Gallery';
+
+  @override
+  String get sessionPhotoRemove => 'Remove photo';
 
   @override
   String get sessionsRecent => 'Recent sessions';

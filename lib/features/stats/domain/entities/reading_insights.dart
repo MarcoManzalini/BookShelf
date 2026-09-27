@@ -21,6 +21,23 @@ class ReadingInsights extends Equatable {
     required this.topSubjects,
   });
 
+  /// Days in a row with reading, counted back from (and including) [day].
+  /// 0 when nothing was read on [day].
+  static int streakEndingOn(Iterable<ReadingLog> logs, DateTime day) {
+    final active = {
+      for (final log in logs)
+        if (log.hasActivity)
+          DateTime(log.loggedOn.year, log.loggedOn.month, log.loggedOn.day),
+    };
+    var cursor = DateTime(day.year, day.month, day.day);
+    var streak = 0;
+    while (active.contains(cursor)) {
+      streak++;
+      cursor = DateTime(cursor.year, cursor.month, cursor.day - 1);
+    }
+    return streak;
+  }
+
   factory ReadingInsights.compute({
     required List<UserBook> books,
     required List<ReadingLog> logs,

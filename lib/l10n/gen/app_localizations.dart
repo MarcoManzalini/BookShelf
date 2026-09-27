@@ -254,6 +254,66 @@ abstract class AppLocalizations {
   /// **'Aggiungi alla libreria come'**
   String get addToLibraryAs;
 
+  /// No description provided for @welcomeTagline.
+  ///
+  /// In it, this message translates to:
+  /// **'Il tuo scaffale, sempre con te. Tieni traccia di ogni lettura.'**
+  String get welcomeTagline;
+
+  /// No description provided for @welcomeTitleFind.
+  ///
+  /// In it, this message translates to:
+  /// **'Trova e organizza'**
+  String get welcomeTitleFind;
+
+  /// No description provided for @welcomeBodyFind.
+  ///
+  /// In it, this message translates to:
+  /// **'Cerca tra milioni di libri o scansiona il codice ISBN, poi mettili sul tuo scaffale.'**
+  String get welcomeBodyFind;
+
+  /// No description provided for @welcomeTitleTrack.
+  ///
+  /// In it, this message translates to:
+  /// **'Leggi e misura'**
+  String get welcomeTitleTrack;
+
+  /// No description provided for @welcomeBodyTrack.
+  ///
+  /// In it, this message translates to:
+  /// **'Registra le sessioni, guarda le tue statistiche e condividi i progressi.'**
+  String get welcomeBodyTrack;
+
+  /// No description provided for @welcomeNext.
+  ///
+  /// In it, this message translates to:
+  /// **'Avanti'**
+  String get welcomeNext;
+
+  /// No description provided for @welcomeSkip.
+  ///
+  /// In it, this message translates to:
+  /// **'Salta'**
+  String get welcomeSkip;
+
+  /// No description provided for @welcomeSignIn.
+  ///
+  /// In it, this message translates to:
+  /// **'Accedi'**
+  String get welcomeSignIn;
+
+  /// No description provided for @welcomeStart.
+  ///
+  /// In it, this message translates to:
+  /// **'Inizia'**
+  String get welcomeStart;
+
+  /// No description provided for @welcomeHaveAccount.
+  ///
+  /// In it, this message translates to:
+  /// **'Ho già un account'**
+  String get welcomeHaveAccount;
+
   /// No description provided for @loginTitle.
   ///
   /// In it, this message translates to:
@@ -1166,6 +1226,30 @@ abstract class AppLocalizations {
   /// **'—'**
   String get statsNoData;
 
+  /// No description provided for @statsMonthBooksFinished.
+  ///
+  /// In it, this message translates to:
+  /// **'Libri finiti'**
+  String get statsMonthBooksFinished;
+
+  /// No description provided for @statsMonthPagesRead.
+  ///
+  /// In it, this message translates to:
+  /// **'Pagine lette'**
+  String get statsMonthPagesRead;
+
+  /// No description provided for @statsMonthActiveDays.
+  ///
+  /// In it, this message translates to:
+  /// **'Giorni attivi'**
+  String get statsMonthActiveDays;
+
+  /// No description provided for @statsMonthNoBooks.
+  ///
+  /// In it, this message translates to:
+  /// **'Nessun libro finito questo mese'**
+  String get statsMonthNoBooks;
+
   /// No description provided for @sessionRegister.
   ///
   /// In it, this message translates to:
@@ -1201,6 +1285,198 @@ abstract class AppLocalizations {
   /// In it, this message translates to:
   /// **'Pagina raggiunta'**
   String get sessionEndPage;
+
+  /// No description provided for @sessionSaved.
+  ///
+  /// In it, this message translates to:
+  /// **'Sessione registrata'**
+  String get sessionSaved;
+
+  /// No description provided for @sessionShare.
+  ///
+  /// In it, this message translates to:
+  /// **'Condividi'**
+  String get sessionShare;
+
+  /// No description provided for @sessionShareTitle.
+  ///
+  /// In it, this message translates to:
+  /// **'Condividi la sessione'**
+  String get sessionShareTitle;
+
+  /// No description provided for @sessionShareError.
+  ///
+  /// In it, this message translates to:
+  /// **'Impossibile condividere l\'immagine.'**
+  String get sessionShareError;
+
+  /// No description provided for @shareSessionLabel.
+  ///
+  /// In it, this message translates to:
+  /// **'SESSIONE DI LETTURA'**
+  String get shareSessionLabel;
+
+  /// No description provided for @shareUnitPages.
+  ///
+  /// In it, this message translates to:
+  /// **'pagine'**
+  String get shareUnitPages;
+
+  /// No description provided for @shareUnitMin.
+  ///
+  /// In it, this message translates to:
+  /// **'min'**
+  String get shareUnitMin;
+
+  /// No description provided for @shareUnitPagesPerHour.
+  ///
+  /// In it, this message translates to:
+  /// **'pag/h'**
+  String get shareUnitPagesPerHour;
+
+  /// No description provided for @shareUnitDays.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, =1{giorno} other{giorni}}'**
+  String shareUnitDays(int count);
+
+  /// No description provided for @shareLabelTime.
+  ///
+  /// In it, this message translates to:
+  /// **'TEMPO'**
+  String get shareLabelTime;
+
+  /// No description provided for @shareLabelPace.
+  ///
+  /// In it, this message translates to:
+  /// **'RITMO'**
+  String get shareLabelPace;
+
+  /// No description provided for @shareLabelStreak.
+  ///
+  /// In it, this message translates to:
+  /// **'SERIE'**
+  String get shareLabelStreak;
+
+  /// No description provided for @shareLabelBook.
+  ///
+  /// In it, this message translates to:
+  /// **'LIBRO'**
+  String get shareLabelBook;
+
+  /// No description provided for @shareNowReading.
+  ///
+  /// In it, this message translates to:
+  /// **'IN LETTURA ORA'**
+  String get shareNowReading;
+
+  /// No description provided for @shareThisWeek.
+  ///
+  /// In it, this message translates to:
+  /// **'QUESTA SETTIMANA'**
+  String get shareThisWeek;
+
+  /// No description provided for @shareRange.
+  ///
+  /// In it, this message translates to:
+  /// **'p. {from} → {to}'**
+  String shareRange(int from, int to);
+
+  /// No description provided for @sharePageAt.
+  ///
+  /// In it, this message translates to:
+  /// **'p. {page}'**
+  String sharePageAt(int page);
+
+  /// No description provided for @shareOfTotal.
+  ///
+  /// In it, this message translates to:
+  /// **'{percent}% di {total}'**
+  String shareOfTotal(int percent, int total);
+
+  /// No description provided for @shareReadToday.
+  ///
+  /// In it, this message translates to:
+  /// **'pagine lette oggi'**
+  String get shareReadToday;
+
+  /// No description provided for @shareRead.
+  ///
+  /// In it, this message translates to:
+  /// **'pagine lette'**
+  String get shareRead;
+
+  /// No description provided for @sharePillPace.
+  ///
+  /// In it, this message translates to:
+  /// **'{count} pagine/h'**
+  String sharePillPace(int count);
+
+  /// No description provided for @sharePillStreak.
+  ///
+  /// In it, this message translates to:
+  /// **'{count, plural, =1{serie di 1 giorno} other{serie di {count} giorni}}'**
+  String sharePillStreak(int count);
+
+  /// No description provided for @shareTemplateStats.
+  ///
+  /// In it, this message translates to:
+  /// **'Stats'**
+  String get shareTemplateStats;
+
+  /// No description provided for @shareTemplatePoster.
+  ///
+  /// In it, this message translates to:
+  /// **'Poster'**
+  String get shareTemplatePoster;
+
+  /// No description provided for @shareTemplatePhoto.
+  ///
+  /// In it, this message translates to:
+  /// **'Foto'**
+  String get shareTemplatePhoto;
+
+  /// No description provided for @sessionPlace.
+  ///
+  /// In it, this message translates to:
+  /// **'Luogo'**
+  String get sessionPlace;
+
+  /// No description provided for @sessionPlaceHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Dove stai leggendo?'**
+  String get sessionPlaceHint;
+
+  /// No description provided for @sessionQuote.
+  ///
+  /// In it, this message translates to:
+  /// **'Citazione'**
+  String get sessionQuote;
+
+  /// No description provided for @sessionQuoteHint.
+  ///
+  /// In it, this message translates to:
+  /// **'Una frase che ti ha colpito'**
+  String get sessionQuoteHint;
+
+  /// No description provided for @sessionPhotoTake.
+  ///
+  /// In it, this message translates to:
+  /// **'Scatta'**
+  String get sessionPhotoTake;
+
+  /// No description provided for @sessionPhotoChoose.
+  ///
+  /// In it, this message translates to:
+  /// **'Galleria'**
+  String get sessionPhotoChoose;
+
+  /// No description provided for @sessionPhotoRemove.
+  ///
+  /// In it, this message translates to:
+  /// **'Rimuovi foto'**
+  String get sessionPhotoRemove;
 
   /// No description provided for @sessionsRecent.
   ///

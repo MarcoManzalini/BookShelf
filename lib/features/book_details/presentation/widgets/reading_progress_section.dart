@@ -17,6 +17,14 @@ class ReadingProgressSection extends StatefulWidget {
 class _ReadingProgressSectionState extends State<ReadingProgressSection> {
   double? _dragValue;
 
+  /// Upper bound for the slider. When the total page count is unknown,
+  /// grows dynamically so the slider stays usable instead of disappearing.
+  double _sliderMax(int? total, int current) {
+    if (total != null && total > 0) return total.toDouble();
+    if (current <= 0) return 100;
+    return (((current / 50).ceil() + 1) * 50).toDouble();
+  }
+
   Future<void> _editPage() async {
     final l10n = context.l10n;
     final bloc = context.read<BookDetailsBloc>();
@@ -76,6 +84,7 @@ class _ReadingProgressSectionState extends State<ReadingProgressSection> {
     final book = widget.userBook;
     final total = book.pageCount;
     final current = _dragValue?.round() ?? book.currentPage;
+    final sliderMax = _sliderMax(total, current);
 
     return Card(
       child: Padding(
@@ -110,11 +119,11 @@ class _ReadingProgressSectionState extends State<ReadingProgressSection> {
                 ),
               ],
             ),
-            if (total != null && total > 0)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Column(
-                  children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Column(
+                children: [
+                  if (total != null && total > 0)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
@@ -122,20 +131,20 @@ class _ReadingProgressSectionState extends State<ReadingProgressSection> {
                         minHeight: 8,
                       ),
                     ),
-                    Slider(
-                      value: current.clamp(0, total).toDouble(),
-                      max: total.toDouble(),
-                      onChanged: (v) => setState(() => _dragValue = v),
-                      onChangeEnd: (v) {
-                        setState(() => _dragValue = null);
-                        context
-                            .read<BookDetailsBloc>()
-                            .add(BookDetailsProgressChanged(v.round()));
-                      },
-                    ),
-                  ],
-                ),
+                  Slider(
+                    value: current.clamp(0, sliderMax).toDouble(),
+                    max: sliderMax,
+                    onChanged: (v) => setState(() => _dragValue = v),
+                    onChangeEnd: (v) {
+                      setState(() => _dragValue = null);
+                      context
+                          .read<BookDetailsBloc>()
+                          .add(BookDetailsProgressChanged(v.round()));
+                    },
+                  ),
+                ],
               ),
+            ),
           ],
         ),
       ),

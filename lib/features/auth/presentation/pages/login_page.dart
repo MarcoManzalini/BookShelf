@@ -65,6 +65,7 @@ class _LoginViewState extends State<LoginView> {
           );
       },
       child: AuthScaffold(
+        showBack: true,
         title: l10n.loginTitle,
         subtitle: l10n.loginSubtitle,
         child: Form(
