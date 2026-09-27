@@ -201,7 +201,8 @@ class _Caption extends StatelessWidget {
               ],
               const SizedBox(height: 10),
               StatusChip(status: book.status),
-              if (book.status == ReadingStatus.reading) ...[
+              if (book.status == ReadingStatus.reading ||
+                  book.status == ReadingStatus.paused) ...[
                 const SizedBox(height: 10),
                 SizedBox(width: 180, child: BookProgress(book: book)),
               ],

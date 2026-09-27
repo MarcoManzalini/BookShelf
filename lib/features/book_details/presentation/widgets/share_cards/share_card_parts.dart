@@ -363,25 +363,33 @@ class ShareWeekBars extends StatelessWidget {
     final maxValue = values.fold<int>(0, (m, v) => v > m ? v : m);
     final muted = Colors.white.withValues(alpha: 0.55);
     return SizedBox(
-      height: height + 16,
+      height: height + 20,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           for (var i = 0; i < values.length; i++)
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    height: maxValue == 0
-                        ? 3
-                        : 3 + (height - 3) * values[i] / maxValue,
-                    decoration: BoxDecoration(
-                      color: i == values.length - 1
-                          ? AppColors.accent
-                          : Colors.white.withValues(alpha: 0.16),
-                      borderRadius: BorderRadius.circular(3),
+                  // The bars share whatever height the label leaves, so the
+                  // tallest one can never push the label out of the card.
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, box) => Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          height: maxValue == 0
+                              ? 3
+                              : 3 + (box.maxHeight - 3) * values[i] / maxValue,
+                          decoration: BoxDecoration(
+                            color: i == values.length - 1
+                                ? AppColors.accent
+                                : Colors.white.withValues(alpha: 0.16),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 6),

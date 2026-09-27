@@ -12,6 +12,8 @@ import '../../features/book_details/presentation/pages/book_details_page.dart';
 import '../../features/library/presentation/pages/library_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/library_io/presentation/pages/import_export_page.dart';
+import '../../features/recap/domain/reading_recap.dart';
+import '../../features/recap/presentation/pages/recap_page.dart';
 import '../../features/scanner/presentation/pages/scan_page.dart';
 import '../../features/stats/presentation/pages/stats_page.dart';
 import '../../features/search/domain/entities/book.dart';
@@ -38,6 +40,14 @@ abstract final class AppRoutes {
   static const data = '/data';
 
   static String bookDetails(String id) => '/book/$id';
+
+  /// The yearly recap, or the monthly one when [month] is given.
+  static String recap(int year, [int? month]) =>
+      month == null ? '/recap/$year' : '/recap/$year/$month';
+
+  /// The search tab with [query] already typed.
+  static String searchFor(String query) =>
+      '$search?q=${Uri.encodeQueryComponent(query)}';
   static String preview(String externalId) => '/preview/$externalId';
   static String exploreSection(String name) => '/explore/$name';
   static String exploreGenre(String name) => '/explore/genre/$name';
@@ -94,7 +104,8 @@ GoRouter createRouter(AuthBloc authBloc) {
             routes: [
               GoRoute(
                 path: AppRoutes.search,
-                builder: (_, __) => const SearchPage(),
+                builder: (_, state) =>
+                    SearchPage(initialQuery: state.uri.queryParameters['q']),
               ),
             ],
           ),
@@ -123,6 +134,32 @@ GoRouter createRouter(AuthBloc authBloc) {
       GoRoute(
         path: AppRoutes.stats,
         builder: (_, __) => const StatsPage(),
+      ),
+      GoRoute(
+        path: '/recap/:year',
+        redirect: (_, state) =>
+            int.tryParse(state.pathParameters['year']!) == null
+                ? AppRoutes.stats
+                : null,
+        builder: (_, state) => RecapPage(
+          period: RecapPeriod.year(int.parse(state.pathParameters['year']!)),
+        ),
+      ),
+      GoRoute(
+        path: '/recap/:year/:month',
+        redirect: (_, state) {
+          final year = int.tryParse(state.pathParameters['year']!);
+          final month = int.tryParse(state.pathParameters['month']!);
+          return year == null || month == null || month < 1 || month > 12
+              ? AppRoutes.stats
+              : null;
+        },
+        builder: (_, state) => RecapPage(
+          period: RecapPeriod.month(
+            int.parse(state.pathParameters['year']!),
+            int.parse(state.pathParameters['month']!),
+          ),
+        ),
       ),
       GoRoute(
         path: AppRoutes.scan,

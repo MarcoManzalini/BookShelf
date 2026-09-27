@@ -4,12 +4,16 @@ enum LibraryFilter {
   all,
   wantToRead,
   reading,
+  paused,
+  abandoned,
   read;
 
   ReadingStatus? get status => switch (this) {
         LibraryFilter.all => null,
         LibraryFilter.wantToRead => ReadingStatus.wantToRead,
         LibraryFilter.reading => ReadingStatus.reading,
+        LibraryFilter.paused => ReadingStatus.paused,
+        LibraryFilter.abandoned => ReadingStatus.abandoned,
         LibraryFilter.read => ReadingStatus.read,
       };
 }
@@ -24,6 +28,9 @@ class LibraryState extends Equatable {
     this.books = const [],
     this.filter = LibraryFilter.all,
     this.shelfFilter,
+    this.moodFilter,
+    this.paceFilter,
+    this.onLoanOnly = false,
     this.viewMode = LibraryViewMode.shelf,
     this.refreshing = false,
     this.offline = false,
@@ -39,6 +46,13 @@ class LibraryState extends Equatable {
 
   /// Custom shelf the list is narrowed to, or null for every book.
   final String? shelfFilter;
+
+  /// Mood and pace the list is narrowed to, or null for any.
+  final BookMood? moodFilter;
+  final ReadingPace? paceFilter;
+
+  /// Only books lent out or borrowed.
+  final bool onLoanOnly;
   final LibraryViewMode viewMode;
   final bool refreshing;
 
@@ -61,13 +75,18 @@ class LibraryState extends Equatable {
   List<UserBook> get visibleBooks {
     final wanted = filter.status;
     final shelf = shelfFilter;
-    if (wanted == null && shelf == null) return books;
+    final mood = moodFilter;
+    final pace = paceFilter;
+    if (!hasActiveFilter) return books;
     return books
         .where((b) => wanted == null || b.status == wanted)
         .where(
           (b) =>
               shelf == null || b.shelves.any((s) => ShelfNames.same(s, shelf)),
         )
+        .where((b) => mood == null || b.moods.contains(mood))
+        .where((b) => pace == null || b.pace == pace)
+        .where((b) => !onLoanOnly || b.loan != null)
         .toList();
   }
 
@@ -88,7 +107,14 @@ class LibraryState extends Equatable {
   }
 
   bool get hasActiveFilter =>
-      filter != LibraryFilter.all || shelfFilter != null;
+      filter != LibraryFilter.all ||
+      shelfFilter != null ||
+      moodFilter != null ||
+      paceFilter != null ||
+      onLoanOnly;
+
+  /// Whether any book is on loan, so the filter is worth offering.
+  bool get hasLoans => books.any((b) => b.loan != null);
 
   bool containsExternalId(String externalId) =>
       books.any((b) => b.book.externalId == externalId);
@@ -98,6 +124,9 @@ class LibraryState extends Equatable {
     List<UserBook>? books,
     LibraryFilter? filter,
     ValueGetter<String?>? shelfFilter,
+    ValueGetter<BookMood?>? moodFilter,
+    ValueGetter<ReadingPace?>? paceFilter,
+    bool? onLoanOnly,
     LibraryViewMode? viewMode,
     bool? refreshing,
     bool? offline,
@@ -111,6 +140,9 @@ class LibraryState extends Equatable {
       books: books ?? this.books,
       filter: filter ?? this.filter,
       shelfFilter: shelfFilter != null ? shelfFilter() : this.shelfFilter,
+      moodFilter: moodFilter != null ? moodFilter() : this.moodFilter,
+      paceFilter: paceFilter != null ? paceFilter() : this.paceFilter,
+      onLoanOnly: onLoanOnly ?? this.onLoanOnly,
       viewMode: viewMode ?? this.viewMode,
       refreshing: refreshing ?? this.refreshing,
       offline: offline ?? this.offline,
@@ -128,6 +160,9 @@ class LibraryState extends Equatable {
         books,
         filter,
         shelfFilter,
+        moodFilter,
+        paceFilter,
+        onLoanOnly,
         viewMode,
         refreshing,
         offline,

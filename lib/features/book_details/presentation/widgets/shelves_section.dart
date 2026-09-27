@@ -22,7 +22,26 @@ class ShelvesSection extends StatelessWidget {
       current: userBook.shelves,
       available: available,
     );
-    if (chosen != null) bloc.add(BookDetailsShelvesChanged(chosen));
+    if (chosen == null || !context.mounted) return;
+    final before = {for (final s in userBook.shelves) s.toLowerCase()};
+    final after = {for (final s in chosen) s.toLowerCase()};
+    if (before.length == after.length && before.containsAll(after)) return;
+    bloc.add(BookDetailsShelvesChanged(chosen));
+
+    // Say what happened; a failed save replaces this with the error.
+    final l10n = context.l10n;
+    final added = [
+      for (final s in chosen)
+        if (!before.contains(s.toLowerCase())) s,
+    ];
+    final message = added.isNotEmpty
+        ? l10n.shelfAdded(added.length, added.join(', '))
+        : chosen.isEmpty
+            ? l10n.shelfRemovedAll
+            : l10n.shelvesUpdated;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

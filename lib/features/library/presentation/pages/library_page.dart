@@ -9,6 +9,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../domain/entities/user_book.dart';
 import '../bloc/library_bloc.dart';
+import '../widgets/book_extras_ui.dart';
 import '../widgets/library_filter_sheet.dart';
 import '../widgets/library_skeleton.dart';
 import '../widgets/shelf_color.dart';
@@ -140,24 +141,62 @@ class _OfflineBanner extends StatelessWidget {
   }
 }
 
-/// Shows which custom shelf the list is narrowed to, with a way to clear it.
+/// Shows the extra filters in use (shelf, mood, pace, loans), each with a
+/// way to clear it.
 class _ShelfFilterChip extends StatelessWidget {
   const _ShelfFilterChip();
 
   @override
   Widget build(BuildContext context) {
-    final shelf = context.select((LibraryBloc bloc) => bloc.state.shelfFilter);
-    if (shelf == null) return const SizedBox.shrink();
+    final l10n = context.l10n;
+    final bloc = context.read<LibraryBloc>();
+    final (shelf, mood, pace, onLoan) = context.select(
+      (LibraryBloc bloc) => (
+        bloc.state.shelfFilter,
+        bloc.state.moodFilter,
+        bloc.state.paceFilter,
+        bloc.state.onLoanOnly,
+      ),
+    );
+    if (shelf == null && mood == null && pace == null && !onLoan) {
+      return const SizedBox.shrink();
+    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
       child: Align(
         alignment: Alignment.centerLeft,
-        child: InputChip(
-          avatar: CircleAvatar(radius: 6, backgroundColor: shelfColor(shelf)),
-          label: Text(context.l10n.shelfFilterLabel(shelf)),
-          onDeleted: () => context
-              .read<LibraryBloc>()
-              .add(const LibraryShelfFilterChanged(null)),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            if (shelf != null)
+              InputChip(
+                avatar:
+                    CircleAvatar(radius: 6, backgroundColor: shelfColor(shelf)),
+                label: Text(l10n.shelfFilterLabel(shelf)),
+                onDeleted: () =>
+                    bloc.add(const LibraryShelfFilterChanged(null)),
+              ),
+            if (mood != null)
+              InputChip(
+                avatar: const Icon(Icons.theater_comedy_outlined, size: 16),
+                label: Text(mood.label(l10n)),
+                onDeleted: () => bloc.add(const LibraryMoodFilterChanged(null)),
+              ),
+            if (pace != null)
+              InputChip(
+                avatar: const Icon(Icons.speed_rounded, size: 16),
+                label: Text(pace.label(l10n)),
+                onDeleted: () => bloc.add(const LibraryPaceFilterChanged(null)),
+              ),
+            if (onLoan)
+              InputChip(
+                avatar: const Icon(Icons.swap_horiz_rounded, size: 16),
+                label: Text(l10n.filterLoans),
+                onDeleted: () =>
+                    bloc.add(const LibraryLoanFilterChanged(false)),
+              ),
+          ],
         ),
       ),
     );

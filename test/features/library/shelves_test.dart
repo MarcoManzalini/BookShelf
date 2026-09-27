@@ -127,6 +127,7 @@ void main() {
     late MockBookSearchRepository search;
     late MockAddBookToLibrary addBook;
     late MockReadingLogRepository logs;
+    late MockQuoteRepository quotes;
     final saved = buildUserBook();
 
     setUpAll(() => registerFallbackValue(buildUserBook()));
@@ -137,6 +138,8 @@ void main() {
       addBook = MockAddBookToLibrary();
       logs = MockReadingLogRepository();
       when(() => logs.forBook(any())).thenAnswer((_) async => []);
+      quotes = MockQuoteRepository();
+      when(() => quotes.forBook(any())).thenAnswer((_) async => []);
     });
 
     blocTest<BookDetailsBloc, BookDetailsState>(
@@ -148,6 +151,7 @@ void main() {
         searchRepository: search,
         addBook: addBook,
         readingLogs: logs,
+        quotes: quotes,
       ),
       seed: () => BookDetailsState(
         status: RequestStatus.success,

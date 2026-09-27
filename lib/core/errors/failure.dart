@@ -11,6 +11,10 @@ enum FailureCode {
   userAlreadyExists,
   weakPassword,
   rateLimited,
+
+  /// The database lacks a column, table or value the app uses: the update
+  /// script (supabase/update.sql) has not been run yet.
+  outdatedDatabase,
   unknown,
 }
 

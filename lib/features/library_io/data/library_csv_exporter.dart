@@ -21,6 +21,7 @@ abstract final class LibraryCsvExporter {
     'Bookshelves',
     'Exclusive Shelf',
     'My Review',
+    'Read Count',
   ];
 
   static final _day = DateFormat('yyyy/MM/dd');
@@ -43,6 +44,7 @@ abstract final class LibraryCsvExporter {
           b.shelves.join(', '),
           _exclusiveShelf(b.status),
           b.notes ?? '',
+          b.readCount,
         ],
     ];
     // \n: spreadsheets and the importer both accept it, and it avoids the
@@ -54,6 +56,8 @@ abstract final class LibraryCsvExporter {
         ReadingStatus.read => 'read',
         ReadingStatus.reading => 'currently-reading',
         ReadingStatus.wantToRead => 'to-read',
+        ReadingStatus.paused => 'paused',
+        ReadingStatus.abandoned => 'did-not-finish',
       };
 
   static String? _isbn13(String? isbn) =>

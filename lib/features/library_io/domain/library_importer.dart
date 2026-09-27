@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../core/errors/failure.dart';
 import '../../../core/utils/isbn.dart';
+import '../../library/domain/entities/book_read.dart';
 import '../../library/domain/entities/reading_status.dart';
 import '../../library/domain/entities/shelf_names.dart';
 import '../../library/domain/entities/user_book.dart';
@@ -253,6 +254,11 @@ class LibraryImporter {
     if (row.pages != null && book.book.pageCount == null) {
       book = book.copyWith(book: book.book.copyWith(pageCount: row.pages));
     }
+    if (row.earlierReads > 0) {
+      book = book.copyWith(
+        pastReads: List.filled(row.earlierReads, const BookRead()),
+      );
+    }
     switch (row.status) {
       case ReadingStatus.read:
         final finished = row.finishedOn;
@@ -265,6 +271,8 @@ class LibraryImporter {
           );
         }
       case ReadingStatus.reading:
+      case ReadingStatus.paused:
+      case ReadingStatus.abandoned:
         final added = row.addedOn;
         if (added != null) book = book.copyWith(startedAt: () => added);
       case ReadingStatus.wantToRead:

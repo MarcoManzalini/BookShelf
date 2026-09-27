@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/utils/l10n_extension.dart';
+import '../../../../core/utils/minutes_text.dart';
+import '../../../../core/widgets/text_input_dialog.dart';
 import '../../../library/domain/entities/user_book.dart';
 import '../bloc/book_details_bloc.dart';
 
@@ -28,52 +30,35 @@ class _ReadingProgressSectionState extends State<ReadingProgressSection> {
   Future<void> _editPage() async {
     final l10n = context.l10n;
     final bloc = context.read<BookDetailsBloc>();
-    final total = widget.userBook.pageCount;
-    final controller =
-        TextEditingController(text: '${widget.userBook.currentPage}');
-    final formKey = GlobalKey<FormState>();
+    final audio = widget.userBook.isAudio;
+    final total = widget.userBook.progressTotal;
+    final current = widget.userBook.currentPage;
+    int? read(String value) =>
+        audio ? MinutesText.parse(value) : int.tryParse(value.trim());
 
-    final page = await showDialog<int>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.editCurrentPage),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: controller,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText: l10n.currentPage,
-              suffixText: total == null ? null : '/ $total',
-            ),
-            validator: (value) {
-              final n = int.tryParse(value ?? '');
-              if (n == null || n < 0 || (total != null && n > total)) {
-                return l10n.validationPageInvalid;
-              }
-              return null;
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(minimumSize: const Size(88, 44)),
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.pop(context, int.parse(controller.text));
-              }
-            },
-            child: Text(l10n.save),
-          ),
-        ],
-      ),
+    final page = await showTextInputDialog<int>(
+      context,
+      title: audio ? l10n.positionEdit : l10n.editCurrentPage,
+      initialText: audio ? MinutesText.edit(current) : '$current',
+      keyboardType: audio
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : TextInputType.number,
+      labelText: audio ? l10n.positionReached : l10n.currentPage,
+      hintText: audio ? l10n.durationHint : null,
+      suffixText:
+          total == null ? null : '/ ${audio ? MinutesText.edit(total) : total}',
+      validator: (value) {
+        final n = read(value);
+        if (n == null || n < 0) {
+          return audio ? l10n.durationInvalid : l10n.validationPageInvalid;
+        }
+        if (total != null && n > total) {
+          return audio ? l10n.positionInvalid : l10n.validationPageInvalid;
+        }
+        return null;
+      },
+      parse: read,
     );
-    controller.dispose();
     if (page != null) bloc.add(BookDetailsProgressChanged(page));
   }
 
@@ -82,8 +67,14 @@ class _ReadingProgressSectionState extends State<ReadingProgressSection> {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final book = widget.userBook;
-    final total = book.pageCount;
-    final current = _dragValue?.round() ?? book.currentPage;
+    final total = book.progressTotal;
+    // Books saved before the bookmark followed edition changes can be past
+    // the end: never show more than the total.
+    final saved =
+        total != null && book.currentPage > total ? total : book.currentPage;
+    final current = _dragValue?.round() ?? saved;
+    String text(int value) =>
+        book.isAudio ? MinutesText.format(l10n, value) : '$value';
     final sliderMax = _sliderMax(total, current);
 
     return Card(
@@ -96,9 +87,13 @@ class _ReadingProgressSectionState extends State<ReadingProgressSection> {
               children: [
                 Expanded(
                   child: Text(
-                    total != null
-                        ? l10n.pageOfTotal(current, total)
-                        : l10n.currentPageOnly(current),
+                    book.isAudio
+                        ? (total != null
+                            ? l10n.positionOfTotal(text(current), text(total))
+                            : text(current))
+                        : total != null
+                            ? l10n.pageOfTotal(current, total)
+                            : l10n.currentPageOnly(current),
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -113,7 +108,8 @@ class _ReadingProgressSectionState extends State<ReadingProgressSection> {
                     ),
                   ),
                 IconButton(
-                  tooltip: l10n.editCurrentPage,
+                  tooltip:
+                      book.isAudio ? l10n.positionEdit : l10n.editCurrentPage,
                   icon: const Icon(Icons.edit_outlined),
                   onPressed: _editPage,
                 ),

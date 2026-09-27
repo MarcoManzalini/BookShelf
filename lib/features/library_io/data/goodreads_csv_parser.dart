@@ -27,6 +27,22 @@ class CsvFormatException implements Exception {
 abstract final class GoodreadsCsvParser {
   static const _builtInShelves = {'read', 'currently-reading', 'to-read'};
 
+  /// Goodreads has no built-in "did not finish" or "paused" shelf: readers
+  /// make their own, with one of these names. This app exports the first.
+  static const _abandonedShelves = {
+    'did-not-finish',
+    'dnf',
+    'abandoned',
+    'abbandonati',
+    'abbandonato',
+  };
+  static const _pausedShelves = {
+    'paused',
+    'on-hold',
+    'in-pausa',
+    'in-sospeso',
+  };
+
   static CsvParseResult parse(String text) {
     // Excel likes to prepend a byte order mark.
     final clean = text.startsWith('﻿') ? text.substring(1) : text;
@@ -58,6 +74,7 @@ abstract final class GoodreadsCsvParser {
     final exclusive = col('exclusive shelf');
     final review = col('my review');
     final notes = col('private notes');
+    final readCount = col('read count');
 
     String? cell(List<dynamic> row, int? index) {
       if (index == null || index >= row.length) return null;
@@ -79,13 +96,15 @@ abstract final class GoodreadsCsvParser {
       final ratingValue = int.tryParse(cell(row, rating) ?? '');
       final reviewText = cell(row, review);
       final notesText = cell(row, notes);
+      final status = _status(cell(row, exclusive), finished);
+      final times = int.tryParse(cell(row, readCount) ?? '') ?? 0;
       rows.add(
         ImportRow(
           title: bookTitle,
           author: cell(row, author),
           isbn13: cell(row, isbn13),
           isbn10: cell(row, isbn),
-          status: _status(cell(row, exclusive), finished),
+          status: status,
           rating: (ratingValue != null && ratingValue >= 1 && ratingValue <= 5)
               ? ratingValue
               : null,
@@ -96,6 +115,10 @@ abstract final class GoodreadsCsvParser {
               ? null
               : [reviewText, notesText].nonNulls.join('\n\n'),
           shelves: _shelves(cell(row, shelves)),
+          // The read the status describes is not an earlier one.
+          earlierReads: status == ReadingStatus.read
+              ? (times - 1).clamp(0, _maxEarlierReads)
+              : times.clamp(0, _maxEarlierReads),
         ),
       );
     }
@@ -110,8 +133,14 @@ abstract final class GoodreadsCsvParser {
     return value;
   }
 
+  /// A sanity cap: a typo in a spreadsheet should not create 9999 reads.
+  static const _maxEarlierReads = 50;
+
   static ReadingStatus _status(String? exclusiveShelf, DateTime? finished) {
-    switch (exclusiveShelf?.toLowerCase()) {
+    final shelf = exclusiveShelf?.toLowerCase();
+    if (_abandonedShelves.contains(shelf)) return ReadingStatus.abandoned;
+    if (_pausedShelves.contains(shelf)) return ReadingStatus.paused;
+    switch (shelf) {
       case 'read':
         return ReadingStatus.read;
       case 'currently-reading':
@@ -144,10 +173,17 @@ abstract final class GoodreadsCsvParser {
     if (value == null) return const [];
     return [
       for (final raw in value.split(','))
-        if (raw.trim().isNotEmpty &&
-            !_builtInShelves.contains(raw.trim().toLowerCase()))
+        if (raw.trim().isNotEmpty && !_isStatusShelf(raw.trim()))
           _prettify(raw.trim()),
     ];
+  }
+
+  /// Shelves that stand for a reading status rather than a custom shelf.
+  static bool _isStatusShelf(String name) {
+    final key = name.toLowerCase();
+    return _builtInShelves.contains(key) ||
+        _abandonedShelves.contains(key) ||
+        _pausedShelves.contains(key);
   }
 
   /// Goodreads shelf names are slugs (`science-fiction`); show them as words.

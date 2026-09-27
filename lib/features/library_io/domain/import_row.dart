@@ -17,6 +17,7 @@ class ImportRow extends Equatable {
     this.addedOn,
     this.notes,
     this.shelves = const [],
+    this.earlierReads = 0,
   });
 
   final String title;
@@ -37,6 +38,10 @@ class ImportRow extends Equatable {
   /// Custom shelves, without Goodreads' three built-in ones.
   final List<String> shelves;
 
+  /// Finished reads before the one [status] describes ("Read Count" minus
+  /// the current read). Goodreads does not say when they happened.
+  final int earlierReads;
+
   /// "Dune by Frank Herbert", for messages.
   String get label => author == null ? title : '$title — $author';
 
@@ -53,5 +58,6 @@ class ImportRow extends Equatable {
         addedOn,
         notes,
         shelves,
+        earlierReads,
       ];
 }

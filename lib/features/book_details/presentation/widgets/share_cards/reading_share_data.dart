@@ -24,8 +24,9 @@ class ReadingShareData {
       day: log.loggedOn,
       pages: log.pages,
       minutes: log.minutes,
-      endPage: log.endPage,
-      totalPages: userBook.pageCount,
+      // An audiobook's bookmark is a minute, not a page the cards can show.
+      endPage: userBook.isAudio ? null : log.endPage,
+      totalPages: userBook.isAudio ? null : userBook.pageCount,
     );
   }
 

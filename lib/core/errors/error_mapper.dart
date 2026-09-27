@@ -85,6 +85,20 @@ Failure _mapAuth(AuthException e) {
   return Failure(FailureCode.server, message: e.message);
 }
 
+/// A column, table or enum value the app sends is missing on the server.
+bool _isOutdatedSchema(PostgrestException e) {
+  switch (e.code) {
+    case '42703': // undefined column
+    case '42P01': // undefined table
+    case 'PGRST204': // column not in the schema cache
+    case 'PGRST205': // table not in the schema cache
+      return true;
+    case '22P02': // invalid text representation: only for enum values
+      return e.message.contains('enum');
+  }
+  return false;
+}
+
 Failure _mapPostgrest(PostgrestException e) {
   // The screen only shows a generic message; the real cause (missing column,
   // policy, constraint) is here.
@@ -95,6 +109,9 @@ Failure _mapPostgrest(PostgrestException e) {
     );
   }
   if (e.code == 'PGRST116') return const Failure(FailureCode.notFound);
+  if (_isOutdatedSchema(e)) {
+    return Failure(FailureCode.outdatedDatabase, message: e.message);
+  }
   if (e.code == '42501' || e.code == 'PGRST301') {
     return const Failure(FailureCode.unauthorized);
   }

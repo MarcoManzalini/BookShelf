@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../library/domain/entities/reading_status.dart';
 import '../../../library/domain/entities/user_book.dart';
 import 'reading_log.dart';
 
@@ -19,7 +18,8 @@ class MonthDetail extends Equatable {
   /// First day of the month this detail covers.
   final DateTime month;
 
-  /// Books whose [UserBook.finishedAt] falls within [month], newest first.
+  /// Books with a read finished within [month] (a re-read counts too),
+  /// newest first.
   final List<UserBook> booksFinished;
 
   /// Sum of [ReadingLog.pages] logged within [month].
@@ -40,14 +40,18 @@ class MonthDetail extends Equatable {
     required int year,
     required int month,
   }) {
-    final finished = [
-      for (final book in books)
-        if (book.status == ReadingStatus.read &&
-            book.finishedAt != null &&
-            book.finishedAt!.year == year &&
-            book.finishedAt!.month == month)
-          book,
-    ]..sort((a, b) => b.finishedAt!.compareTo(a.finishedAt!));
+    // Latest finish within the month for each book, if any.
+    final finishedOn = <UserBook, DateTime>{};
+    for (final book in books) {
+      for (final read in book.completedReads) {
+        final day = read.finishedAt;
+        if (day == null || day.year != year || day.month != month) continue;
+        final seen = finishedOn[book];
+        if (seen == null || day.isAfter(seen)) finishedOn[book] = day;
+      }
+    }
+    final finished = finishedOn.keys.toList()
+      ..sort((a, b) => finishedOn[b]!.compareTo(finishedOn[a]!));
 
     var pages = 0;
     var minutes = 0;

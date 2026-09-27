@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../../../../core/errors/error_mapper.dart';
 import '../../domain/entities/reading_log.dart';
 import '../../domain/repositories/reading_log_repository.dart';
@@ -5,9 +7,13 @@ import '../datasources/reading_log_remote_data_source.dart';
 import '../mappers/reading_log_mapper.dart';
 
 class ReadingLogRepositoryImpl implements ReadingLogRepository {
-  const ReadingLogRepositoryImpl(this._remote);
+  ReadingLogRepositoryImpl(this._remote);
 
   final ReadingLogRemoteDataSource _remote;
+  final _changes = StreamController<void>.broadcast();
+
+  @override
+  Stream<void> get changes => _changes.stream;
 
   @override
   Future<ReadingLog> add({
@@ -16,8 +22,8 @@ class ReadingLogRepositoryImpl implements ReadingLogRepository {
     int? minutes,
     int? endPage,
     DateTime? on,
-  }) {
-    return _guard(
+  }) async {
+    final log = await _guard(
       () => _remote.insert(
         ReadingLogMapper.toInsertJson(
           userBookId: userBookId,
@@ -28,6 +34,8 @@ class ReadingLogRepositoryImpl implements ReadingLogRepository {
         ),
       ),
     );
+    _changes.add(null);
+    return log;
   }
 
   @override

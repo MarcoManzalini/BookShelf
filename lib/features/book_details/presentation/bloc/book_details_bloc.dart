@@ -4,12 +4,19 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/utils/request_status.dart';
+import '../../../library/domain/entities/book_format.dart';
+import '../../../library/domain/entities/book_loan.dart';
+import '../../../library/domain/entities/book_read.dart';
+import '../../../library/domain/entities/book_series.dart';
+import '../../../library/domain/entities/book_vibe.dart';
 import '../../../library/domain/entities/reading_status.dart';
 import '../../../library/domain/entities/shelf_names.dart';
 import '../../../library/domain/entities/user_book.dart';
 import '../../../library/domain/repositories/library_repository.dart';
 import '../../../library/domain/usecases/add_book_to_library.dart';
 import '../../../search/domain/entities/author_info.dart';
+import '../../../quotes/domain/entities/book_quote.dart';
+import '../../../quotes/domain/repositories/quote_repository.dart';
 import '../../../stats/domain/entities/reading_log.dart';
 import '../../../stats/domain/repositories/reading_log_repository.dart';
 import '../../../search/domain/entities/book.dart';
@@ -25,10 +32,12 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
     required BookSearchRepository searchRepository,
     required AddBookToLibrary addBook,
     required ReadingLogRepository readingLogs,
+    required QuoteRepository quotes,
   })  : _library = libraryRepository,
         _search = searchRepository,
         _addBook = addBook,
         _logs = readingLogs,
+        _quotes = quotes,
         super(const BookDetailsState()) {
     on<BookDetailsLibraryRequested>(_onLibraryRequested);
     on<BookDetailsPreviewRequested>(_onPreviewRequested);
@@ -76,6 +85,79 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
       }),
       transformer: sequential(),
     );
+    on<BookDetailsRereadStarted>(
+      (e, emit) => _edit(emit, (b) => b.withReread()),
+      transformer: droppable(),
+    );
+    on<BookDetailsPastReadAdded>(
+      (e, emit) =>
+          _edit(emit, (b) => b.copyWith(pastReads: [...b.pastReads, e.read])),
+      transformer: sequential(),
+    );
+    on<BookDetailsPastReadRemoved>(
+      (e, emit) => _edit(emit, (b) {
+        // Only one copy: two undated reads are equal but both count.
+        final reads = [...b.pastReads];
+        final index = reads.indexOf(e.read);
+        if (index >= 0) reads.removeAt(index);
+        return b.copyWith(pastReads: reads);
+      }),
+      transformer: sequential(),
+    );
+    on<BookDetailsFormatChanged>(
+      (e, emit) => _edit(emit, (b) {
+        // The bookmark means pages in one format and minutes in the other:
+        // switching between them starts it again rather than mislead.
+        final unitChanged =
+            (b.format == BookFormat.audio) != (e.format == BookFormat.audio);
+        final changed = b.copyWith(format: e.format);
+        if (changed.status == ReadingStatus.read) {
+          return changed.copyWith(
+            currentPage: changed.progressTotal ?? b.currentPage,
+          );
+        }
+        return unitChanged ? changed.copyWith(currentPage: 0) : changed;
+      }),
+      transformer: sequential(),
+    );
+    on<BookDetailsDurationChanged>(
+      (e, emit) => _edit(emit, (b) {
+        final minutes = e.minutes;
+        final updated = b.copyWith(
+          durationMinutes: () =>
+              minutes != null && minutes > 0 ? minutes : null,
+        );
+        final total = updated.progressTotal;
+        return b.isAudio && total != null && updated.currentPage > total
+            ? updated.copyWith(currentPage: total)
+            : updated;
+      }),
+      transformer: sequential(),
+    );
+    on<BookDetailsSeriesChanged>(
+      (e, emit) => _edit(emit, (b) => b.copyWith(series: () => e.series)),
+      transformer: sequential(),
+    );
+    on<BookDetailsMoodsChanged>(
+      (e, emit) => _edit(
+        emit,
+        (b) => b.copyWith(
+          moods: e.moods.toSet().take(BookMood.maxPerBook).toList(),
+        ),
+      ),
+      transformer: sequential(),
+    );
+    on<BookDetailsPaceChanged>(
+      (e, emit) => _edit(emit, (b) => b.copyWith(pace: () => e.pace)),
+      transformer: sequential(),
+    );
+    on<BookDetailsLoanChanged>(
+      (e, emit) => _edit(emit, (b) => b.copyWith(loan: () => e.loan)),
+      transformer: sequential(),
+    );
+    on<BookDetailsQuotesRequested>(_onQuotesRequested);
+    on<BookDetailsQuoteSaved>(_onQuoteSaved, transformer: sequential());
+    on<BookDetailsQuoteRemoved>(_onQuoteRemoved, transformer: sequential());
     on<BookDetailsRemoveRequested>(_onRemove, transformer: droppable());
   }
 
@@ -83,6 +165,7 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
   final BookSearchRepository _search;
   final AddBookToLibrary _addBook;
   final ReadingLogRepository _logs;
+  final QuoteRepository _quotes;
 
   /// Whether the work-level lookup (author ids, rating, ...) already ran, so
   /// the extras step does not repeat it.
@@ -113,6 +196,7 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
       );
       add(const BookDetailsExtrasRequested());
       add(const BookDetailsLogsRequested());
+      add(const BookDetailsQuotesRequested());
     } on Failure catch (failure) {
       emit(
         state.copyWith(
@@ -138,6 +222,7 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
       );
       add(const BookDetailsExtrasRequested());
       add(const BookDetailsLogsRequested());
+      add(const BookDetailsQuotesRequested());
       return;
     }
 
@@ -282,9 +367,15 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
     final saved = await _edit(emit, (b) => b.withProgress(event.page));
     if (!saved) return;
     final after = state.userBook?.currentPage ?? before;
-    // Only forward movement counts as reading.
+    // Only forward movement counts as reading (or listening).
     if (after > before) {
-      await _recordLog(emit, pages: after - before, endPage: after);
+      final audio = state.userBook?.isAudio ?? false;
+      await _recordLog(
+        emit,
+        pages: audio ? 0 : after - before,
+        minutes: audio ? after - before : null,
+        endPage: after,
+      );
     }
   }
 
@@ -298,12 +389,17 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
     final after = state.userBook?.currentPage ?? before;
     // An unchanged page is fine (time-only session) but a failed save is not.
     if (!saved && after != event.endPage) return;
-    final pages = after > before ? after - before : 0;
-    if (pages == 0 && event.minutes == null) return;
+    final moved = after > before ? after - before : 0;
+    // For an audiobook the bookmark is a minute: what moved is time.
+    final audio = state.userBook?.isAudio ?? false;
+    final pages = audio ? 0 : moved;
+    final minutes =
+        audio ? (event.minutes ?? (moved > 0 ? moved : null)) : event.minutes;
+    if (pages == 0 && minutes == null) return;
     await _recordLog(
       emit,
       pages: pages,
-      minutes: event.minutes,
+      minutes: minutes,
       endPage: after,
     );
   }
@@ -342,6 +438,109 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
       emit(state.copyWith(logs: logs));
     } on Failure {
       // No history shown.
+    }
+  }
+
+  Future<void> _onQuotesRequested(
+    BookDetailsQuotesRequested event,
+    Emitter<BookDetailsState> emit,
+  ) async {
+    final userBook = state.userBook;
+    if (userBook == null) return;
+    try {
+      final quotes = await _quotes.forBook(userBook.id);
+      emit(state.copyWith(quotes: quotes));
+    } on Failure {
+      // The section just shows no quotes.
+    }
+  }
+
+  Future<void> _onQuoteSaved(
+    BookDetailsQuoteSaved event,
+    Emitter<BookDetailsState> emit,
+  ) async {
+    final userBook = state.userBook;
+    final text = event.text.trim();
+    if (userBook == null || text.isEmpty) return;
+    final clipped = text.length > BookQuote.maxLength
+        ? text.substring(0, BookQuote.maxLength)
+        : text;
+    final page = (event.page != null && event.page! > 0) ? event.page : null;
+    final id = event.id;
+    final current =
+        id == null ? null : state.quotes.where((q) => q.id == id).firstOrNull;
+    if (id != null && current == null) return;
+    emit(
+      state.copyWith(saveStatus: RequestStatus.loading, failure: () => null),
+    );
+    try {
+      if (current == null) {
+        final saved = await _quotes.add(
+          userBookId: userBook.id,
+          text: clipped,
+          page: page,
+        );
+        emit(
+          state.copyWith(
+            quotes: [saved, ...state.quotes],
+            saveStatus: RequestStatus.success,
+          ),
+        );
+      } else {
+        final saved = await _quotes.update(
+          BookQuote(
+            id: current.id,
+            userBookId: current.userBookId,
+            text: clipped,
+            page: page,
+            createdAt: current.createdAt,
+          ),
+        );
+        emit(
+          state.copyWith(
+            quotes: [
+              for (final q in state.quotes) q.id == current.id ? saved : q,
+            ],
+            saveStatus: RequestStatus.success,
+          ),
+        );
+      }
+    } on Failure catch (failure) {
+      emit(
+        state.copyWith(
+          saveStatus: RequestStatus.failure,
+          failure: () => failure,
+        ),
+      );
+    }
+  }
+
+  /// Optimistic: the quote disappears at once and comes back on failure.
+  Future<void> _onQuoteRemoved(
+    BookDetailsQuoteRemoved event,
+    Emitter<BookDetailsState> emit,
+  ) async {
+    final previous = state.quotes;
+    if (!previous.any((q) => q.id == event.id)) return;
+    emit(
+      state.copyWith(
+        quotes: [
+          for (final q in previous)
+            if (q.id != event.id) q,
+        ],
+        failure: () => null,
+      ),
+    );
+    try {
+      await _quotes.remove(event.id);
+    } on Failure catch (failure) {
+      emit(
+        state.copyWith(
+          quotes: previous,
+          saveStatus: RequestStatus.failure,
+          failure: () => failure,
+        ),
+      );
     }
   }
 

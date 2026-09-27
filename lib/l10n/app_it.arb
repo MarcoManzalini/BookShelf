@@ -472,5 +472,471 @@
   "ioExportButton": "Esporta in CSV",
   "ioExportEmpty": "Non c'è ancora nessun libro da esportare.",
   "ioExportError": "Non è stato possibile creare il file.",
-  "ioProfileEntry": "Importa ed esporta"
+  "ioProfileEntry": "Importa ed esporta",
+  "statusPaused": "In pausa",
+  "statusAbandoned": "Abbandonato",
+  "rereadButton": "Rileggi",
+  "rereadTitle": "Iniziare una nuova lettura?",
+  "rereadMessage": "La lettura finita resta nello storico e conta nelle statistiche. Il segnalibro torna alla prima pagina.",
+  "readCount": "{count, plural, =1{Letto una volta} other{Letto {count} volte}}",
+  "@readCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pastReadsTitle": "Letture precedenti",
+  "pastReadAdd": "Aggiungi una lettura precedente",
+  "pastReadUndated": "Data non indicata",
+  "pastReadFinished": "Finito il {date}",
+  "@pastReadFinished": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pastReadRemove": "Rimuovi questa lettura",
+  "pastReadDialogTitle": "Lettura precedente",
+  "pastReadDateInvalid": "La fine non può precedere l'inizio.",
+  "quotesTitle": "Citazioni",
+  "quotesEmpty": "Salva i passaggi che ti colpiscono. Puoi anche fotografare la pagina.",
+  "quoteAdd": "Aggiungi citazione",
+  "quoteEdit": "Modifica citazione",
+  "quoteText": "Citazione",
+  "quoteTextHint": "Il passaggio che vuoi ricordare",
+  "quotePage": "Pagina (facoltativa)",
+  "quoteScanCamera": "Fotografa la pagina",
+  "quoteScanGallery": "Da una foto",
+  "quoteScanning": "Leggo il testo…",
+  "quoteScanHint": "Testo letto dalla foto: tieni solo il passaggio che ti interessa.",
+  "quoteScanEmpty": "Nessun testo trovato nella foto.",
+  "quoteScanError": "Non è stato possibile leggere il testo della foto.",
+  "quoteCopy": "Copia",
+  "quoteCopied": "Citazione copiata",
+  "quoteDelete": "Elimina",
+  "quotePageShort": "p. {page}",
+  "@quotePageShort": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "shareSavedQuotes": "Le tue citazioni",
+  "reminderTitle": "Promemoria di lettura",
+  "reminderOff": "Un invito ogni giorno a leggere qualche pagina",
+  "reminderOn": "Ogni giorno alle {time}",
+  "@reminderOn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderChangeTime": "Cambia orario",
+  "reminderDenied": "Le notifiche sono disattivate. Abilitale nelle impostazioni del telefono.",
+  "reminderChannel": "Promemoria di lettura",
+  "reminderStreakTitle": "Non perdere la tua serie",
+  "reminderStreakBody": "{count, plural, =1{Ieri hai letto: continua anche oggi e inizia una serie.} other{Hai letto {count} giorni di fila: bastano poche pagine per continuare.}}",
+  "@reminderStreakBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reminderNudgeTitle": "È ora di leggere",
+  "reminderNudgeBook": "Riprendi «{title}»: anche 10 pagine contano.",
+  "@reminderNudgeBook": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeBody": "Anche 10 pagine contano. Scegli un libro e inizia.",
+  "formatTitle": "Formato",
+  "formatPaper": "Cartaceo",
+  "formatEbook": "Ebook",
+  "formatAudio": "Audiolibro",
+  "durationTitle": "Durata",
+  "durationSet": "Imposta la durata dell'audiolibro",
+  "durationLabel": "Ore:minuti",
+  "durationHint": "Es. 11:30",
+  "durationInvalid": "Scrivi ore:minuti, ad esempio 11:30",
+  "durationHm": "{hours} h {minutes} min",
+  "@durationHm": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationH": "{hours} h",
+  "@durationH": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "durationM": "{minutes} min",
+  "@durationM": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "positionOfTotal": "{current} di {total}",
+  "@positionOfTotal": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "positionEdit": "Modifica il punto raggiunto",
+  "positionReached": "Punto raggiunto (ore:minuti)",
+  "positionInvalid": "Oltre la durata dell'audiolibro",
+  "seriesTitle": "Saga",
+  "seriesAdd": "Aggiungi a una saga",
+  "seriesEdit": "Modifica saga",
+  "seriesName": "Nome della saga",
+  "seriesIndex": "Dal volume",
+  "seriesTotal": "Volumi in totale (facoltativo)",
+  "seriesRemove": "Togli dalla saga",
+  "seriesInvalid": "Numero non valido",
+  "seriesVolume": "Volume {index}",
+  "@seriesVolume": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      }
+    }
+  },
+  "seriesVolumeOf": "Volume {index} di {total}",
+  "@seriesVolumeOf": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesNextSnack": "Il prossimo di «{name}» è il volume {index}.",
+  "@seriesNextSnack": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesNextOpen": "Apri",
+  "seriesNextSearch": "Cerca",
+  "vibeTitle": "Atmosfera",
+  "vibeMoodsHint": "Fino a 3 umori",
+  "vibePace": "Ritmo",
+  "paceSlow": "Lento",
+  "paceMedium": "Medio",
+  "paceFast": "Veloce",
+  "moodAdventurous": "Avventuroso",
+  "moodChallenging": "Impegnativo",
+  "moodDark": "Cupo",
+  "moodEmotional": "Emozionante",
+  "moodFunny": "Divertente",
+  "moodHopeful": "Speranzoso",
+  "moodInformative": "Informativo",
+  "moodInspiring": "Stimolante",
+  "moodLighthearted": "Leggero",
+  "moodMysterious": "Misterioso",
+  "moodReflective": "Riflessivo",
+  "moodRelaxing": "Rilassante",
+  "moodSad": "Triste",
+  "moodTense": "Teso",
+  "loanTitle": "Prestito",
+  "loanLend": "L'ho prestato",
+  "loanBorrow": "L'ho preso in prestito",
+  "loanLentTo": "Prestato a {person}",
+  "@loanLentTo": {
+    "placeholders": {
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "loanBorrowedFrom": "Preso da {person}",
+  "@loanBorrowedFrom": {
+    "placeholders": {
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "loanSince": "Dal {date}",
+  "@loanSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanDue": "Da restituire entro il {date}",
+  "@loanDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "loanOverdue": "In ritardo",
+  "loanReturned": "Restituito",
+  "loanPersonLent": "A chi l'hai prestato?",
+  "loanPersonBorrowed": "Da chi, o da quale biblioteca?",
+  "loanSinceLabel": "Dal",
+  "loanDueLabel": "Da restituire entro (facoltativo)",
+  "loanDueNone": "Nessuna scadenza",
+  "loanEdit": "Modifica prestito",
+  "filterLoans": "In prestito",
+  "filterAnyMood": "Tutte le atmosfere",
+  "filterAnyPace": "Qualsiasi ritmo",
+  "loanChannel": "Prestiti",
+  "loanNotifBorrowedTitle": "Libro da restituire",
+  "loanNotifBorrowedBody": "Oggi scade il prestito di «{title}» ({person}).",
+  "@loanNotifBorrowedBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "loanNotifLentTitle": "Ti devono restituire un libro",
+  "loanNotifLentBody": "Oggi {person} dovrebbe restituirti «{title}».",
+  "@loanNotifLentBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "person": {
+        "type": "String"
+      }
+    }
+  },
+  "recapTitleYear": "Il tuo {year} in lettura",
+  "@recapTitleYear": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "recapTitleMonth": "Il tuo {month} in lettura",
+  "@recapTitleMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "recapStart": "Tocca per iniziare",
+  "recapBooksLabel": "{count, plural, =1{libro finito} other{libri finiti}}",
+  "@recapBooksLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapPagesLabel": "pagine lette",
+  "recapHoursLabel": "ore di lettura",
+  "recapMinutesLabel": "minuti di lettura",
+  "recapDaysLabel": "{count, plural, =1{giorno con una lettura} other{giorni con almeno una lettura}}",
+  "@recapDaysLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapStreakLabel": "{count, plural, =1{giorno di fila, la tua serie più lunga} other{giorni di fila, la tua serie più lunga}}",
+  "@recapStreakLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapWeekday": "Il tuo giorno preferito: {day}",
+  "@recapWeekday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "recapBestDay": "Il giorno più intenso: {date}",
+  "@recapBestDay": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "recapHabits": "Le tue abitudini",
+  "recapHighlights": "I momenti migliori",
+  "recapTopRated": "Il preferito",
+  "recapLongest": "Il più lungo",
+  "recapFastest": "Il più veloce",
+  "recapFastestDays": "{days, plural, =1{letto in un giorno} other{letto in {days} giorni}}",
+  "@recapFastestDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "recapTaste": "I tuoi gusti",
+  "recapTopGenre": "Genere",
+  "recapTopMood": "Atmosfera",
+  "recapBusiestMonth": "Il mese più letto",
+  "recapHowYouRead": "Come hai letto",
+  "recapRereads": "{count, plural, =1{una rilettura} other{{count} riletture}}",
+  "@recapRereads": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapSummary": "In sintesi",
+  "recapShare": "Condividi",
+  "recapEmptyTitle": "Ancora niente da raccontare",
+  "recapEmptyBody": "Registra qualche sessione o finisci un libro: il riepilogo si riempie da solo.",
+  "recapEntryTitle": "I tuoi riepiloghi",
+  "recapEntryYear": "Anno {year}",
+  "@recapEntryYear": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "recapOpenMonth": "Riepilogo del mese",
+  "widgetNoBook": "Nessun libro in lettura",
+  "widgetStreak": "{count, plural, =0{Inizia una serie oggi} =1{1 giorno di fila} other{{count} giorni di fila}}",
+  "@widgetStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetReadToday": "Oggi hai già letto",
+  "errorOutdatedDatabase": "Il database non è aggiornato per questa versione dell'app: esegui supabase/update.sql su Supabase.",
+  "sessionsRange": "{from}–{to} di {total}",
+  "@sessionsRange": {
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionsNewer": "Più recenti",
+  "sessionsOlder": "Meno recenti",
+  "shelfAdded": "{count, plural, =1{Aggiunto a «{names}»} other{Aggiunto a {names}}}",
+  "@shelfAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "shelfRemovedAll": "Tolto dagli scaffali",
+  "shelvesUpdated": "Scaffali aggiornati",
+  "seriesVolumes": "Volumi {range}",
+  "@seriesVolumes": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "seriesVolumesOf": "Volumi {range} di {total}",
+  "@seriesVolumesOf": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesPickTitle": "Scegli la saga",
+  "seriesSearchHint": "Cerca o scrivi una nuova saga",
+  "seriesCreate": "Crea «{name}»",
+  "@seriesCreate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "seriesBooksInLibrary": "{count, plural, =1{1 libro nella tua libreria} other{{count} libri nella tua libreria}}",
+  "@seriesBooksInLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesTotalCount": "{count, plural, =1{1 volume} other{{count} volumi}}",
+  "@seriesTotalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesNoSagas": "Non hai ancora saghe: scrivi il nome per crearne una.",
+  "seriesIndexEnd": "Al volume (facoltativo)",
+  "seriesRangeHint": "Se il libro raccoglie più volumi, ad esempio i volumi 1–2 in un solo libro.",
+  "seriesRangeInvalid": "Deve venire dopo il primo volume",
+  "seriesTotalTooSmall": "Meno dei volumi indicati",
+  "seriesTotalShared": "Vale per tutta la saga",
+  "seriesVolumeTaken": "Già in «{title}»",
+  "@seriesVolumeTaken": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "seriesInLibrary": "Nella tua libreria",
+  "seriesChange": "Cambia saga"
 }

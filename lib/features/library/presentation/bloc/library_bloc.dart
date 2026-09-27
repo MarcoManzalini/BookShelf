@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/utils/request_status.dart';
 import '../../../search/domain/entities/book.dart';
+import '../../domain/entities/book_vibe.dart';
 import '../../domain/entities/reading_status.dart';
 import '../../domain/entities/shelf_names.dart';
 import '../../domain/entities/sync_status.dart';
@@ -27,6 +28,15 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     );
     on<LibraryShelfFilterChanged>(
       (event, emit) => emit(state.copyWith(shelfFilter: () => event.shelf)),
+    );
+    on<LibraryMoodFilterChanged>(
+      (event, emit) => emit(state.copyWith(moodFilter: () => event.mood)),
+    );
+    on<LibraryPaceFilterChanged>(
+      (event, emit) => emit(state.copyWith(paceFilter: () => event.pace)),
+    );
+    on<LibraryLoanFilterChanged>(
+      (event, emit) => emit(state.copyWith(onLoanOnly: event.onLoanOnly)),
     );
     on<LibraryViewModeToggled>(
       (event, emit) => emit(

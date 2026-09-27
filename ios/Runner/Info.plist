@@ -45,9 +45,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>BookShelf uses the camera to scan the barcode (ISBN) on the back of a book.</string>
+	<string>BookShelf usa la fotocamera per scansionare il codice ISBN, fotografare una pagina da cui salvare una citazione e scattare foto da condividere. / BookShelf uses the camera to scan ISBN barcodes, photograph a page to save a quote from it and take photos to share.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>BookShelf usa la tua libreria foto per scegliere l'immagine del profilo. / BookShelf uses your photo library to pick your profile picture.</string>
+	<string>BookShelf usa la tua libreria foto per l'immagine del profilo, le foto da condividere e le pagine da cui salvare citazioni. / BookShelf uses your photo library for your profile picture, photos to share and pages to save quotes from.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

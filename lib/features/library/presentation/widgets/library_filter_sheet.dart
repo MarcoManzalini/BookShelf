@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/utils/l10n_extension.dart';
 import '../bloc/library_bloc.dart';
+import '../../domain/entities/book_vibe.dart';
+import 'book_extras_ui.dart';
 import 'reading_status_ui.dart';
 import 'shelf_color.dart';
 
@@ -13,6 +15,8 @@ extension LibraryFilterLabel on LibraryFilter {
       LibraryFilter.all => l10n.filterAll,
       LibraryFilter.wantToRead => l10n.statusWantToRead,
       LibraryFilter.reading => l10n.statusReading,
+      LibraryFilter.paused => l10n.statusPaused,
+      LibraryFilter.abandoned => l10n.statusAbandoned,
       LibraryFilter.read => l10n.statusRead,
     };
   }
@@ -84,6 +88,57 @@ Future<void> showLibraryFilterSheet(BuildContext context) {
                     },
                   ),
               ],
+              const Divider(height: 24),
+              _ChipsHeader(l10n.vibeTitle),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final mood in BookMood.values)
+                      ChoiceChip(
+                        label: Text(mood.label(l10n)),
+                        selected: state.moodFilter == mood,
+                        onSelected: (on) {
+                          bloc.add(LibraryMoodFilterChanged(on ? mood : null));
+                          Navigator.pop(sheetContext);
+                        },
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              _ChipsHeader(l10n.vibePace),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final pace in ReadingPace.values)
+                      ChoiceChip(
+                        label: Text(pace.label(l10n)),
+                        selected: state.paceFilter == pace,
+                        onSelected: (on) {
+                          bloc.add(LibraryPaceFilterChanged(on ? pace : null));
+                          Navigator.pop(sheetContext);
+                        },
+                      ),
+                  ],
+                ),
+              ),
+              if (state.hasLoans || state.onLoanOnly) ...[
+                const Divider(height: 24),
+                SwitchListTile(
+                  secondary: const Icon(Icons.swap_horiz_rounded),
+                  title: Text(l10n.filterLoans),
+                  value: state.onLoanOnly,
+                  onChanged: (on) {
+                    bloc.add(LibraryLoanFilterChanged(on));
+                    Navigator.pop(sheetContext);
+                  },
+                ),
+              ],
               const SizedBox(height: 8),
             ],
           ),
@@ -91,4 +146,16 @@ Future<void> showLibraryFilterSheet(BuildContext context) {
       );
     },
   );
+}
+
+class _ChipsHeader extends StatelessWidget {
+  const _ChipsHeader(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+        child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+      );
 }

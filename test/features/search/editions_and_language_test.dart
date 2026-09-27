@@ -203,6 +203,7 @@ void main() {
     late MockBookSearchRepository search;
     late MockAddBookToLibrary addBook;
     late MockReadingLogRepository logs;
+    late MockQuoteRepository quotes;
     const edition = BookEdition(key: 'OL9M', pageCount: 700, language: 'ita');
 
     setUpAll(() => registerFallbackValue(buildUserBook()));
@@ -212,6 +213,8 @@ void main() {
       addBook = MockAddBookToLibrary();
       logs = MockReadingLogRepository();
       when(() => logs.forBook(any())).thenAnswer((_) async => []);
+      quotes = MockQuoteRepository();
+      when(() => quotes.forBook(any())).thenAnswer((_) async => []);
       logs = MockReadingLogRepository();
       when(() => logs.forBook(any())).thenAnswer((_) async => []);
     });
@@ -221,6 +224,7 @@ void main() {
           searchRepository: search,
           addBook: addBook,
           readingLogs: logs,
+          quotes: quotes,
         );
 
     blocTest<BookDetailsBloc, BookDetailsState>(

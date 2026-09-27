@@ -12,6 +12,7 @@ class BookDetailsState extends Equatable {
     this.moreByAuthor = const [],
     this.similarBooks = const [],
     this.logs = const [],
+    this.quotes = const [],
   });
 
   /// Status of the initial load.
@@ -36,6 +37,9 @@ class BookDetailsState extends Equatable {
   /// Reading sessions of this book, newest first (saved books only).
   final List<ReadingLog> logs;
 
+  /// Quotes saved from this book, newest first (saved books only).
+  final List<BookQuote> quotes;
+
   bool get isInLibrary => userBook != null;
 
   BookDetailsState copyWith({
@@ -49,6 +53,7 @@ class BookDetailsState extends Equatable {
     List<Book>? moreByAuthor,
     List<Book>? similarBooks,
     List<ReadingLog>? logs,
+    List<BookQuote>? quotes,
   }) {
     return BookDetailsState(
       status: status ?? this.status,
@@ -61,6 +66,7 @@ class BookDetailsState extends Equatable {
       moreByAuthor: moreByAuthor ?? this.moreByAuthor,
       similarBooks: similarBooks ?? this.similarBooks,
       logs: logs ?? this.logs,
+      quotes: quotes ?? this.quotes,
     );
   }
 
@@ -76,5 +82,6 @@ class BookDetailsState extends Equatable {
         moreByAuthor,
         similarBooks,
         logs,
+        quotes,
       ];
 }

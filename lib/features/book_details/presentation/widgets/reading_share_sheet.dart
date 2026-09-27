@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/utils/cover_color.dart';
 import '../../../../core/utils/l10n_extension.dart';
+import '../../../quotes/domain/entities/book_quote.dart';
 import '../../../stats/domain/entities/reading_insights.dart';
 import '../../../stats/domain/repositories/reading_log_repository.dart';
 import 'reading_share_card.dart';
@@ -17,26 +18,36 @@ import 'reading_share_card.dart';
 /// Preview of the session card with a button that opens the share sheet.
 Future<void> showReadingShareSheet(
   BuildContext context,
-  ReadingShareData data,
-) {
+  ReadingShareData data, {
+  List<BookQuote> quotes = const [],
+}) {
   return showModalBottomSheet<void>(
     context: context,
     showDragHandle: true,
     isScrollControlled: true,
-    builder: (_) => _ShareSheet(data: data),
+    // Keeps the sheet below the status bar so the scrim above it stays
+    // tappable even when the content is taller than the screen.
+    useSafeArea: true,
+    builder: (_) => _ShareSheet(data: data, quotes: quotes),
   );
 }
 
 class _ShareSheet extends StatefulWidget {
-  const _ShareSheet({required this.data});
+  const _ShareSheet({required this.data, required this.quotes});
 
   final ReadingShareData data;
+
+  /// Quotes saved from the book, offered as ready-made card quotes.
+  final List<BookQuote> quotes;
 
   @override
   State<_ShareSheet> createState() => _ShareSheetState();
 }
 
 class _ShareSheetState extends State<_ShareSheet> {
+  /// What fits on a card.
+  static const _quoteMaxLength = 140;
+
   final _boundary = GlobalKey();
   final _place = TextEditingController();
   final _quote = TextEditingController();
@@ -156,6 +167,52 @@ class _ShareSheetState extends State<_ShareSheet> {
     }
   }
 
+  /// One tap puts a saved quote on the card (clipped to the field's limit).
+  Widget _savedQuotes(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.shareSavedQuotes,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 6),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final quote in widget.quotes)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ActionChip(
+                      avatar: const Icon(Icons.format_quote_rounded, size: 16),
+                      label: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 200),
+                        child: Text(
+                          quote.text,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      onPressed: () => _quote.text = quote.text.length >
+                              _quoteMaxLength
+                          ? '${quote.text.substring(0, _quoteMaxLength - 1)}…'
+                          : quote.text,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -168,9 +225,23 @@ class _ShareSheetState extends State<_ShareSheet> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                l10n.sessionShareTitle,
-                style: Theme.of(context).textTheme.titleMedium,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.sessionShareTitle,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  // The scroll view swallows the drag-to-dismiss gesture, so
+                  // the sheet needs an explicit way out.
+                  IconButton(
+                    tooltip:
+                        MaterialLocalizations.of(context).closeButtonTooltip,
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               SegmentedButton<ShareTemplate>(
@@ -238,7 +309,7 @@ class _ShareSheetState extends State<_ShareSheet> {
               const SizedBox(height: 12),
               TextField(
                 controller: _quote,
-                maxLength: 140,
+                maxLength: _quoteMaxLength,
                 minLines: 1,
                 maxLines: 3,
                 textCapitalization: TextCapitalization.sentences,
@@ -248,6 +319,7 @@ class _ShareSheetState extends State<_ShareSheet> {
                   prefixIcon: const Icon(Icons.format_quote_rounded),
                 ),
               ),
+              if (widget.quotes.isNotEmpty) _savedQuotes(context),
               const SizedBox(height: 12),
               Row(
                 children: [

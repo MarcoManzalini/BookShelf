@@ -51,10 +51,26 @@ class MonthDetailSheet extends StatelessWidget {
                 ),
               ),
             ),
-            Text(
-              title,
-              style: theme.textTheme.titleLarge
-                  ?.copyWith(fontWeight: FontWeight.w800),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.titleLarge
+                        ?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                  label: Text(l10n.recapOpenMonth),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.push(
+                      AppRoutes.recap(detail.month.year, detail.month.month),
+                    );
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             GridView.count(

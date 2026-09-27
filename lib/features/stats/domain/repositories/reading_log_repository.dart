@@ -1,6 +1,9 @@
 import '../entities/reading_log.dart';
 
 abstract interface class ReadingLogRepository {
+  /// Emits after a session is recorded.
+  Stream<void> get changes;
+
   /// Records a session. Throws [Failure] on error.
   Future<ReadingLog> add({
     required String userBookId,

@@ -180,6 +180,23 @@ void main() {
       expect(find.text('5'), findsOneWidget);
     });
 
+    testWidgets('poster: the cover color fills only the top, cream below',
+        (tester) async {
+      await pumpCard(tester, ShareTemplate.poster);
+      final sizes = [
+        for (final box in find
+            .descendant(
+              of: find.byType(ReadingShareCard),
+              matching: find.byType(ColoredBox),
+            )
+            .evaluate())
+          tester.getSize(find.byWidget(box.widget)),
+      ];
+      // The first box is the cream card, the next the poster band.
+      expect(sizes.first, shareCardSize);
+      expect(sizes[1], const Size(360, 270));
+    });
+
     testWidgets('poster and photo cards list the figures', (tester) async {
       await pumpCard(tester, ShareTemplate.poster);
       // Poster's ticket splits each figure into its value and its unit.
@@ -268,6 +285,8 @@ void main() {
         endPage: 1234,
         totalPages: 1500,
         streak: 120,
+        // The week chart overflowed by 3 px on its tallest bar.
+        weekPages: const [0, 0, 60, 0, 67, 13, 36],
       );
       for (final template in ShareTemplate.values) {
         await pumpCard(tester, template, data: big, place: 'x' * 40);

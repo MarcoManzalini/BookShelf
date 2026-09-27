@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/errors/failure_message.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/l10n_extension.dart';
 import '../../../../core/widgets/bar_chart.dart';
 import '../../../../core/widgets/error_view.dart';
@@ -130,6 +132,8 @@ class _Content extends StatelessWidget {
           onSetGoal: (goal) => context.read<StatsCubit>().setGoal(goal),
         ),
         const SizedBox(height: 16),
+        const _RecapEntry(),
+        const SizedBox(height: 16),
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
@@ -188,6 +192,70 @@ class _Content extends StatelessWidget {
           SubjectBars(subjects: insights.topSubjects),
         ],
       ],
+    );
+  }
+}
+
+/// Opens the recaps: this year, this month and the month before.
+class _RecapEntry extends StatelessWidget {
+  const _RecapEntry();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final locale = Localizations.localeOf(context).toString();
+    final now = DateTime.now();
+    final previous = DateTime(now.year, now.month - 1);
+    String month(DateTime date) =>
+        toBeginningOfSentenceCase(DateFormat.MMMM(locale).format(date));
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.auto_awesome_rounded, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  l10n.recapEntryTitle,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ActionChip(
+                  label: Text(l10n.recapEntryYear(now.year)),
+                  onPressed: () => context.push(AppRoutes.recap(now.year)),
+                ),
+                ActionChip(
+                  label: Text(month(now)),
+                  onPressed: () =>
+                      context.push(AppRoutes.recap(now.year, now.month)),
+                ),
+                ActionChip(
+                  label: Text(month(previous)),
+                  onPressed: () => context.push(
+                    AppRoutes.recap(previous.year, previous.month),
+                  ),
+                ),
+                // Early in the year, last year's recap is the one to see.
+                if (now.month <= 2)
+                  ActionChip(
+                    label: Text(l10n.recapEntryYear(now.year - 1)),
+                    onPressed: () =>
+                        context.push(AppRoutes.recap(now.year - 1)),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

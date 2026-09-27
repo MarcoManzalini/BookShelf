@@ -54,19 +54,24 @@ class _ShelfPickerState extends State<_ShelfPicker> {
         if (!_selected.remove(key)) _selected.add(key);
       });
 
+  /// Turns the typed name into a ticked shelf, at the top where it is seen.
   void _create() {
     final name = ShelfNames.normalize(_controller.text);
     if (name == null) return;
     setState(() {
       // Typing an existing name (any case) selects it instead of duplicating.
       final existing = _all.where((s) => ShelfNames.same(s, name));
-      if (existing.isEmpty) _all.add(name);
-      _selected.add(name.toLowerCase());
+      if (existing.isEmpty) _all.insert(0, name);
+      if (_selected.length < ShelfNames.maxPerBook) {
+        _selected.add(name.toLowerCase());
+      }
       _controller.clear();
     });
   }
 
   void _done() {
+    // A name typed but not confirmed with + is what the reader meant too.
+    _create();
     final chosen = _all.where(_has).toList();
     Navigator.pop(context, chosen);
   }
@@ -110,6 +115,7 @@ class _ShelfPickerState extends State<_ShelfPicker> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: TextField(
                   controller: _controller,
+                  autofocus: _all.isEmpty,
                   textInputAction: TextInputAction.done,
                   maxLength: ShelfNames.maxLength,
                   onSubmitted: (_) => _create(),

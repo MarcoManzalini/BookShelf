@@ -25,6 +25,11 @@ begin
 end
 $$;
 
+-- v3: "paused" and "did not finish". Adding enum values never touches the
+-- rows that already use the old ones.
+alter type public.reading_status add value if not exists 'paused' before 'read';
+alter type public.reading_status add value if not exists 'abandoned' before 'read';
+
 -- ---------------------------------------------------------------------------
 -- user_books: every column the app reads or writes
 -- ---------------------------------------------------------------------------
@@ -47,6 +52,68 @@ alter table public.user_books add column if not exists updated_at     timestampt
 -- v2: custom shelves and the chosen edition
 alter table public.user_books add column if not exists shelves        text[] not null default '{}';
 alter table public.user_books add column if not exists edition_key    text;
+
+-- v3: earlier reads of books read more than once, as
+-- [{"started_at": "2021-03-01", "finished_at": "2021-03-20"}, ...].
+-- Existing books start with an empty history.
+alter table public.user_books
+  add column if not exists past_reads jsonb not null default '[]'::jsonb
+    check (jsonb_typeof(past_reads) = 'array');
+
+-- v4: format (audiobooks in minutes), saga, moods and pace, loans.
+-- Every column is nullable or has a default: existing books keep their
+-- values and simply start as "paper", with no saga, moods or loan.
+alter table public.user_books
+  add column if not exists format text not null default 'paper'
+    check (format in ('paper', 'ebook', 'audio'));
+alter table public.user_books
+  add column if not exists duration_minutes integer
+    check (duration_minutes is null or duration_minutes > 0);
+alter table public.user_books
+  add column if not exists series_name text
+    check (series_name is null or char_length(series_name) between 1 and 80);
+alter table public.user_books
+  add column if not exists series_index numeric(6, 1)
+    check (series_index is null or series_index > 0);
+alter table public.user_books
+  add column if not exists series_total integer
+    check (series_total is null or series_total > 0);
+alter table public.user_books
+  add column if not exists moods text[] not null default '{}';
+alter table public.user_books
+  add column if not exists pace text
+    check (pace is null or pace in ('slow', 'medium', 'fast'));
+alter table public.user_books
+  add column if not exists loan_kind text
+    check (loan_kind is null or loan_kind in ('lent', 'borrowed'));
+alter table public.user_books
+  add column if not exists loan_person text
+    check (loan_person is null or char_length(loan_person) between 1 and 80);
+alter table public.user_books
+  add column if not exists loan_since date;
+alter table public.user_books
+  add column if not exists loan_due date;
+
+-- v5: one book can hold several volumes of a saga (e.g. volumes 1-2 of
+-- 1Q84 in one book): the last one it holds. Null for a single volume.
+alter table public.user_books
+  add column if not exists series_index_end numeric(6, 1)
+    check (series_index_end is null or series_index_end > 0);
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.user_books'::regclass
+      and conname = 'user_books_series_range_check'
+  ) then
+    alter table public.user_books
+      add constraint user_books_series_range_check
+      check (series_index_end is null or series_index is null
+             or series_index_end >= series_index);
+  end if;
+end
+$$;
 
 -- Keeps updated_at current (only created when missing).
 create or replace function public.set_updated_at()
@@ -104,6 +171,23 @@ create index if not exists reading_logs_book_idx
 
 alter table public.reading_logs enable row level security;
 
+-- v3: quotes saved from a book
+create table if not exists public.book_quotes (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null default auth.uid()
+                 references auth.users (id) on delete cascade,
+  user_book_id uuid not null
+                 references public.user_books (id) on delete cascade,
+  text         text not null check (char_length(text) between 1 and 2000),
+  page         integer check (page is null or page > 0),
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists book_quotes_book_idx
+  on public.book_quotes (user_book_id, created_at desc);
+
+alter table public.book_quotes enable row level security;
+
 -- Policies are created only when missing, so any change you made by hand to
 -- an existing policy is kept.
 do $$
@@ -116,6 +200,10 @@ begin
       ('reading_logs', 'reading_logs_insert_own', 'insert'),
       ('reading_logs', 'reading_logs_update_own', 'update'),
       ('reading_logs', 'reading_logs_delete_own', 'delete'),
+      ('book_quotes',  'book_quotes_select_own',  'select'),
+      ('book_quotes',  'book_quotes_insert_own',  'insert'),
+      ('book_quotes',  'book_quotes_update_own',  'update'),
+      ('book_quotes',  'book_quotes_delete_own',  'delete'),
       ('user_books',   'user_books_select_own',   'select'),
       ('user_books',   'user_books_insert_own',   'insert'),
       ('user_books',   'user_books_update_own',   'update'),
@@ -158,9 +246,12 @@ notify pgrst, 'reload schema';
 
 -- ---------------------------------------------------------------------------
 -- Report: what the database contains now. Look for:
---   * every column listed above under user_books (shelves, edition_key, ...)
---   * the table reading_logs
---   * 4 policies each on user_books and reading_logs
+--   * every column listed above under user_books (shelves, edition_key,
+--     past_reads, format, series_name, series_index_end, moods, pace,
+--     loan_kind, ...)
+--   * the tables reading_logs and book_quotes
+--   * 4 policies each on user_books, reading_logs and book_quotes
+--   * the reading_status values, "paused" and "abandoned" included
 --   * any trigger or constraint you do not recognise
 -- ---------------------------------------------------------------------------
 select 'column' as kind, column_name::text as name, data_type::text as detail
@@ -169,7 +260,7 @@ where table_schema = 'public' and table_name = 'user_books'
 union all
 select 'table', table_name::text, ''
 from information_schema.tables
-where table_schema = 'public' and table_name = 'reading_logs'
+where table_schema = 'public' and table_name in ('reading_logs', 'book_quotes')
 union all
 select 'trigger', tgname::text, pg_get_triggerdef(oid)
 from pg_trigger
@@ -181,5 +272,9 @@ where conrelid = 'public.user_books'::regclass
 union all
 select 'policy', tablename::text || '.' || policyname::text, cmd::text
 from pg_policies
-where schemaname = 'public' and tablename in ('user_books', 'reading_logs')
+where schemaname = 'public' and tablename in ('user_books', 'reading_logs', 'book_quotes')
+union all
+select 'enum value', enumlabel::text, 'sort order ' || enumsortorder::text
+from pg_enum
+where enumtypid = 'public.reading_status'::regtype
 order by 1, 2;

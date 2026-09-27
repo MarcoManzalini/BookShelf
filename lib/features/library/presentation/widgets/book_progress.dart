@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/utils/l10n_extension.dart';
 import '../../domain/entities/reading_status.dart';
 import '../../domain/entities/user_book.dart';
+import 'book_extras_ui.dart';
 
-/// Linear progress for books being read; renders nothing otherwise.
+/// Linear progress for books being read or paused; renders nothing
+/// otherwise.
 class BookProgress extends StatelessWidget {
   const BookProgress({super.key, required this.book, this.showLabel = true});
 
@@ -13,8 +15,10 @@ class BookProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (book.status != ReadingStatus.reading) return const SizedBox.shrink();
-    final total = book.pageCount;
+    if (book.status != ReadingStatus.reading &&
+        book.status != ReadingStatus.paused) {
+      return const SizedBox.shrink();
+    }
     final progress = book.progress;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,9 +31,7 @@ class BookProgress extends StatelessWidget {
         if (showLabel) ...[
           const SizedBox(height: 4),
           Text(
-            total != null
-                ? context.l10n.pagesProgress(book.currentPage, total)
-                : context.l10n.currentPageOnly(book.currentPage),
+            book.progressLabel(context.l10n),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),

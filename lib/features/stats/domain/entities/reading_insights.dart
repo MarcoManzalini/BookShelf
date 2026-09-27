@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../library/domain/entities/reading_status.dart';
 import '../../../library/domain/entities/user_book.dart';
 import 'reading_log.dart';
 
@@ -55,13 +54,17 @@ class ReadingInsights extends Equatable {
     for (final b in books) {
       final rating = b.rating;
       if (rating != null) ratings.add(rating);
-      if (b.status != ReadingStatus.read) continue;
+      // Re-reads: one book, but every finish counts towards the year.
+      final reads = b.completedReads;
+      if (reads.isEmpty) continue;
       booksRead++;
-      pagesRead += b.pageCount ?? 0;
-      final finished = b.finishedAt;
-      if (finished != null && finished.year == today.year) {
-        thisYear++;
-        perMonth[finished.month - 1]++;
+      if (!b.isAudio) pagesRead += (b.pageCount ?? 0) * reads.length;
+      for (final read in reads) {
+        final finished = read.finishedAt;
+        if (finished != null && finished.year == today.year) {
+          thisYear++;
+          perMonth[finished.month - 1]++;
+        }
       }
     }
 

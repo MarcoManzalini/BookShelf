@@ -61,7 +61,12 @@ class PosterShareCard extends StatelessWidget {
           clipBehavior: Clip.hardEdge,
           fit: StackFit.expand,
           children: [
-            SizedBox(
+            // Positioned: StackFit.expand would otherwise stretch the poster
+            // color over the whole card, hiding the cream half.
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
               height: _topHeight,
               child: ColoredBox(
                 color: background,

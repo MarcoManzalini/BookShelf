@@ -5,6 +5,7 @@ import 'package:bookshelf/core/utils/cover_url.dart';
 import 'package:bookshelf/features/auth/domain/entities/auth_snapshot.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
   group('authRedirect', () {
@@ -63,6 +64,34 @@ void main() {
   });
 
   group('mapError', () {
+    test('a missing column or enum value means the database is outdated', () {
+      for (final e in const [
+        PostgrestException(
+          message: 'column user_books.format does not exist',
+          code: '42703',
+        ),
+        PostgrestException(
+          message: "Could not find the 'pace' column of 'user_books'",
+          code: 'PGRST204',
+        ),
+        PostgrestException(
+          message: 'invalid input value for enum reading_status: "paused"',
+          code: '22P02',
+        ),
+      ]) {
+        expect(mapError(e).code, FailureCode.outdatedDatabase);
+      }
+      expect(
+        mapError(
+          const PostgrestException(
+            message: 'invalid input syntax for type uuid',
+            code: '22P02',
+          ),
+        ).code,
+        FailureCode.server,
+      );
+    });
+
     test('maps Dio connection errors to network', () {
       final failure = mapError(
         DioException(

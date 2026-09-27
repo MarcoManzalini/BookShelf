@@ -27,7 +27,7 @@ Future<ReadingStatus?> showStatusPickerSheet(BuildContext context) {
                 ),
               ),
             ),
-            for (final status in ReadingStatus.values)
+            for (final status in ReadingStatus.addable)
               ListTile(
                 leading: Icon(status.icon),
                 title: Text(status.label(l10n)),

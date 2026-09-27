@@ -211,6 +211,115 @@ create policy "reading_logs_delete_own" on public.reading_logs
   using ((select auth.uid()) = user_id);
 
 -- ---------------------------------------------------------------------------
+-- v3 additions (paused / did-not-finish, re-reads, quotes)
+-- Idempotent: safe to run on a database that already has the tables above.
+-- ---------------------------------------------------------------------------
+-- v3: "paused" and "did not finish". Adding enum values never touches the
+-- rows that already use the old ones.
+alter type public.reading_status add value if not exists 'paused' before 'read';
+alter type public.reading_status add value if not exists 'abandoned' before 'read';
+
+-- v3: earlier reads of books read more than once, as
+-- [{"started_at": "2021-03-01", "finished_at": "2021-03-20"}, ...].
+-- Existing books start with an empty history.
+alter table public.user_books
+  add column if not exists past_reads jsonb not null default '[]'::jsonb
+    check (jsonb_typeof(past_reads) = 'array');
+
+-- v4: format (audiobooks in minutes), saga, moods and pace, loans.
+-- Every column is nullable or has a default: existing books keep their
+-- values and simply start as "paper", with no saga, moods or loan.
+alter table public.user_books
+  add column if not exists format text not null default 'paper'
+    check (format in ('paper', 'ebook', 'audio'));
+alter table public.user_books
+  add column if not exists duration_minutes integer
+    check (duration_minutes is null or duration_minutes > 0);
+alter table public.user_books
+  add column if not exists series_name text
+    check (series_name is null or char_length(series_name) between 1 and 80);
+alter table public.user_books
+  add column if not exists series_index numeric(6, 1)
+    check (series_index is null or series_index > 0);
+alter table public.user_books
+  add column if not exists series_total integer
+    check (series_total is null or series_total > 0);
+alter table public.user_books
+  add column if not exists moods text[] not null default '{}';
+alter table public.user_books
+  add column if not exists pace text
+    check (pace is null or pace in ('slow', 'medium', 'fast'));
+alter table public.user_books
+  add column if not exists loan_kind text
+    check (loan_kind is null or loan_kind in ('lent', 'borrowed'));
+alter table public.user_books
+  add column if not exists loan_person text
+    check (loan_person is null or char_length(loan_person) between 1 and 80);
+alter table public.user_books
+  add column if not exists loan_since date;
+alter table public.user_books
+  add column if not exists loan_due date;
+
+-- v5: one book can hold several volumes of a saga (e.g. volumes 1-2 of
+-- 1Q84 in one book): the last one it holds. Null for a single volume.
+alter table public.user_books
+  add column if not exists series_index_end numeric(6, 1)
+    check (series_index_end is null or series_index_end > 0);
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.user_books'::regclass
+      and conname = 'user_books_series_range_check'
+  ) then
+    alter table public.user_books
+      add constraint user_books_series_range_check
+      check (series_index_end is null or series_index is null
+             or series_index_end >= series_index);
+  end if;
+end
+$$;
+
+-- v3: quotes saved from a book
+create table if not exists public.book_quotes (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null default auth.uid()
+                 references auth.users (id) on delete cascade,
+  user_book_id uuid not null
+                 references public.user_books (id) on delete cascade,
+  text         text not null check (char_length(text) between 1 and 2000),
+  page         integer check (page is null or page > 0),
+  created_at   timestamptz not null default now()
+);
+
+create index if not exists book_quotes_book_idx
+  on public.book_quotes (user_book_id, created_at desc);
+
+alter table public.book_quotes enable row level security;
+
+drop policy if exists "book_quotes_select_own" on public.book_quotes;
+create policy "book_quotes_select_own" on public.book_quotes
+  for select to authenticated
+  using ((select auth.uid()) = user_id);
+
+drop policy if exists "book_quotes_insert_own" on public.book_quotes;
+create policy "book_quotes_insert_own" on public.book_quotes
+  for insert to authenticated
+  with check ((select auth.uid()) = user_id);
+
+drop policy if exists "book_quotes_update_own" on public.book_quotes;
+create policy "book_quotes_update_own" on public.book_quotes
+  for update to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id);
+
+drop policy if exists "book_quotes_delete_own" on public.book_quotes;
+create policy "book_quotes_delete_own" on public.book_quotes
+  for delete to authenticated
+  using ((select auth.uid()) = user_id);
+
+-- ---------------------------------------------------------------------------
 -- Storage: avatars bucket
 -- Files live under "<user_id>/<file>". The bucket is public so avatar URLs can
 -- be shown without signed URLs; writes are restricted to the owner's folder.

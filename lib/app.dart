@@ -6,8 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'core/di/injection.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/home_widget/reading_widget_sync.dart';
 import 'features/library/presentation/bloc/library_bloc.dart';
 import 'features/profile/presentation/cubit/theme_cubit.dart';
+import 'features/reminders/data/loan_reminders.dart';
+import 'features/reminders/data/reading_reminders.dart';
 import 'l10n/gen/app_localizations.dart';
 
 class BookShelfApp extends StatefulWidget {
@@ -23,6 +26,10 @@ class _BookShelfAppState extends State<BookShelfApp>
   final _libraryBloc = getIt<LibraryBloc>();
   final _themeCubit = getIt<ThemeCubit>();
   final _router = getIt<GoRouter>();
+  final _reminders = getIt<ReadingReminders>();
+  // Created now so it follows the library from the first load.
+  final _loanReminders = getIt<LoanReminders>();
+  final _widget = getIt<ReadingWidgetSync>();
 
   @override
   void initState() {
@@ -30,6 +37,8 @@ class _BookShelfAppState extends State<BookShelfApp>
     WidgetsBinding.instance.addObserver(this);
     if (_authBloc.state.user != null) {
       _libraryBloc.add(const LibraryStarted());
+      _reminders.refresh();
+      _widget.refresh();
     }
   }
 
@@ -45,6 +54,9 @@ class _BookShelfAppState extends State<BookShelfApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && _authBloc.state.user != null) {
       _libraryBloc.add(const LibraryRefreshRequested());
+      // A new day may have started: the reminder text depends on it.
+      _reminders.refresh();
+      _widget.refresh();
     }
   }
 
@@ -65,6 +77,14 @@ class _BookShelfAppState extends State<BookShelfApp>
                 ? const LibraryCleared()
                 : const LibraryStarted(),
           );
+          // Reminders speak about this account's reading.
+          state.user == null ? _reminders.clear() : _reminders.refresh();
+          if (state.user == null) {
+            _loanReminders.clear();
+            _widget.clear();
+          } else {
+            _widget.refresh();
+          }
         },
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, themeMode) {

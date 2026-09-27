@@ -14,6 +14,7 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/cubit/auth_form_cubit.dart';
 import '../../features/book_details/presentation/bloc/book_details_bloc.dart';
 import '../../features/book_details/presentation/bloc/editions_cubit.dart';
+import '../../features/home_widget/reading_widget_sync.dart';
 import '../../features/library/data/datasources/library_remote_data_source.dart';
 import '../../features/library/data/local/library_cache.dart';
 import '../../features/library/data/repositories/library_repository_impl.dart';
@@ -28,6 +29,12 @@ import '../../features/profile/presentation/cubit/theme_cubit.dart';
 import '../../features/library_io/data/library_export_service.dart';
 import '../../features/library_io/domain/library_importer.dart';
 import '../../features/library_io/presentation/cubit/import_cubit.dart';
+import '../../features/quotes/data/datasources/quote_remote_data_source.dart';
+import '../../features/quotes/data/repositories/quote_repository_impl.dart';
+import '../../features/quotes/domain/repositories/quote_repository.dart';
+import '../../features/reminders/data/loan_reminders.dart';
+import '../../features/reminders/data/reading_reminders.dart';
+import '../../features/reminders/data/reminder_scheduler.dart';
 import '../../features/scanner/presentation/cubit/isbn_scan_cubit.dart';
 import '../../features/stats/data/datasources/reading_log_remote_data_source.dart';
 import '../../features/stats/data/repositories/reading_log_repository_impl.dart';
@@ -88,6 +95,9 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<ReadingLogRemoteDataSource>(
       () => SupabaseReadingLogDataSource(getIt()),
     )
+    ..registerLazySingleton<QuoteRemoteDataSource>(
+      () => SupabaseQuoteDataSource(getIt()),
+    )
     // Repositories
     ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt()))
     ..registerLazySingleton<BookSearchRepository>(
@@ -105,6 +115,22 @@ Future<void> configureDependencies() async {
     )
     ..registerLazySingleton<ProfileRepository>(
       () => ProfileRepositoryImpl(getIt()),
+    )
+    ..registerLazySingleton<QuoteRepository>(
+      () => QuoteRepositoryImpl(getIt()),
+    )
+    ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
+    ..registerLazySingleton(
+      () => ReadingReminders(getIt(), getIt(), getIt(), getIt()),
+      dispose: (r) => r.dispose(),
+    )
+    ..registerLazySingleton(
+      () => LoanReminders(getIt(), getIt(), getIt()),
+      dispose: (r) => r.dispose(),
+    )
+    ..registerLazySingleton(
+      () => ReadingWidgetSync(getIt(), getIt())..start(),
+      dispose: (s) => s.dispose(),
     )
     // Use cases
     ..registerLazySingleton(() => AddBookToLibrary(getIt(), getIt()))
@@ -148,6 +174,7 @@ Future<void> configureDependencies() async {
         searchRepository: getIt(),
         addBook: getIt(),
         readingLogs: getIt(),
+        quotes: getIt(),
       ),
     );
 }

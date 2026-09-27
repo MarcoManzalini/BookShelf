@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background of the app icon artwork (reference/Icona app@1x.png) -->
+    <color name="ic_launcher_background">#111114</color>
+</resources>

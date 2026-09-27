@@ -5,7 +5,6 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../core/errors/failure.dart';
 import '../../../../core/utils/request_status.dart';
-import '../../../library/domain/entities/reading_status.dart';
 import '../../../library/domain/entities/user_book.dart';
 import '../../../library/domain/repositories/library_repository.dart';
 import '../../domain/entities/book.dart';
@@ -39,7 +38,7 @@ class RecommendationsCubit extends Cubit<RecommendationsState> {
   static List<UserBook> seedsOf(List<UserBook> library) {
     final read = library
         .where(
-          (b) => b.status == ReadingStatus.read && b.book.subjects.isNotEmpty,
+          (b) => b.readCount > 0 && b.book.subjects.isNotEmpty,
         )
         .toList()
       ..sort(

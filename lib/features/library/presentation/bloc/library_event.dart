@@ -35,6 +35,35 @@ final class LibraryShelfFilterChanged extends LibraryEvent {
   List<Object?> get props => [shelf];
 }
 
+/// Narrows the list to one mood; null shows every book.
+final class LibraryMoodFilterChanged extends LibraryEvent {
+  const LibraryMoodFilterChanged(this.mood);
+
+  final BookMood? mood;
+
+  @override
+  List<Object?> get props => [mood];
+}
+
+final class LibraryPaceFilterChanged extends LibraryEvent {
+  const LibraryPaceFilterChanged(this.pace);
+
+  final ReadingPace? pace;
+
+  @override
+  List<Object?> get props => [pace];
+}
+
+/// Shows only the books lent out or borrowed.
+final class LibraryLoanFilterChanged extends LibraryEvent {
+  const LibraryLoanFilterChanged(this.onLoanOnly);
+
+  final bool onLoanOnly;
+
+  @override
+  List<Object?> get props => [onLoanOnly];
+}
+
 final class LibraryViewModeToggled extends LibraryEvent {
   const LibraryViewModeToggled();
 }

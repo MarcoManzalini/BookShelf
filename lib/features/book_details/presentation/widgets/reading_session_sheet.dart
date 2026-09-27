@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/l10n_extension.dart';
+import '../../../../core/utils/minutes_text.dart';
 import '../../../library/domain/entities/user_book.dart';
 
-/// What the reader reports at the end of a session.
+/// What the reader reports at the end of a session. For an audiobook
+/// [endPage] is the minute reached.
 typedef ReadingSession = ({int endPage, int? minutes});
 
 /// Bottom sheet with a stopwatch, the minutes and the page reached.
@@ -33,8 +35,16 @@ class _SessionSheet extends StatefulWidget {
 
 class _SessionSheetState extends State<_SessionSheet> {
   final _formKey = GlobalKey<FormState>();
-  late final _page =
-      TextEditingController(text: '${widget.userBook.currentPage}');
+  late final _audio = widget.userBook.isAudio;
+  late final _page = TextEditingController(
+    text: _audio
+        ? MinutesText.edit(widget.userBook.currentPage)
+        : '${widget.userBook.currentPage}',
+  );
+
+  int? _readEnd(String? value) => _audio
+      ? MinutesText.parse(value ?? '')
+      : int.tryParse(value?.trim() ?? '');
   final _minutes = TextEditingController();
   final _watch = Stopwatch();
   Timer? _ticker;
@@ -80,7 +90,7 @@ class _SessionSheetState extends State<_SessionSheet> {
     Navigator.pop(
       context,
       (
-        endPage: int.parse(_page.text.trim()),
+        endPage: _readEnd(_page.text)!,
         minutes: (minutes != null && minutes > 0) ? minutes : null,
       ),
     );
@@ -90,7 +100,7 @@ class _SessionSheetState extends State<_SessionSheet> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
-    final total = widget.userBook.pageCount;
+    final total = widget.userBook.progressTotal;
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
@@ -149,16 +159,30 @@ class _SessionSheetState extends State<_SessionSheet> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _page,
-                  keyboardType: TextInputType.number,
+                  keyboardType: _audio
+                      ? const TextInputType.numberWithOptions(decimal: true)
+                      : TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: l10n.sessionEndPage,
-                    suffixText: total == null ? null : '/ $total',
+                    labelText:
+                        _audio ? l10n.positionReached : l10n.sessionEndPage,
+                    hintText: _audio ? l10n.durationHint : null,
+                    suffixText: total == null
+                        ? null
+                        : '/ ${_audio ? MinutesText.edit(total) : total}',
                   ),
                   validator: (value) {
-                    final n = int.tryParse(value?.trim() ?? '');
-                    return (n == null || n < 0 || (total != null && n > total))
-                        ? l10n.validationPageInvalid
-                        : null;
+                    final n = _readEnd(value);
+                    if (n == null || n < 0) {
+                      return _audio
+                          ? l10n.durationInvalid
+                          : l10n.validationPageInvalid;
+                    }
+                    if (total != null && n > total) {
+                      return _audio
+                          ? l10n.positionInvalid
+                          : l10n.validationPageInvalid;
+                    }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 20),

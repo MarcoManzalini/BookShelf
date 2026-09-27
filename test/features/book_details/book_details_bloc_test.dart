@@ -2,8 +2,13 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:bookshelf/core/errors/failure.dart';
 import 'package:bookshelf/core/utils/request_status.dart';
 import 'package:bookshelf/features/book_details/presentation/bloc/book_details_bloc.dart';
+import 'package:bookshelf/features/library/domain/entities/book_format.dart';
+import 'package:bookshelf/features/library/domain/entities/book_loan.dart';
+import 'package:bookshelf/features/library/domain/entities/book_read.dart';
+import 'package:bookshelf/features/library/domain/entities/book_vibe.dart';
 import 'package:bookshelf/features/library/domain/entities/reading_status.dart';
 import 'package:bookshelf/features/library/domain/entities/user_book.dart';
+import 'package:bookshelf/features/quotes/domain/entities/book_quote.dart';
 import 'package:bookshelf/features/search/domain/entities/author_info.dart';
 import 'package:bookshelf/features/search/domain/entities/book.dart';
 import 'package:bookshelf/features/stats/domain/entities/reading_log.dart';
@@ -18,6 +23,7 @@ void main() {
   late MockBookSearchRepository search;
   late MockAddBookToLibrary addBook;
   late MockReadingLogRepository logs;
+  late MockQuoteRepository quotes;
 
   final book = buildBook();
   final saved = buildUserBook(book: book);
@@ -26,6 +32,14 @@ void main() {
     registerFallbackValue(buildUserBook());
     registerFallbackValue(buildBook());
     registerFallbackValue(ReadingStatus.read);
+    registerFallbackValue(
+      BookQuote(
+        id: 'q',
+        userBookId: 'ub',
+        text: 't',
+        createdAt: DateTime(2026),
+      ),
+    );
   });
 
   setUp(() {
@@ -34,6 +48,8 @@ void main() {
     addBook = MockAddBookToLibrary();
     logs = MockReadingLogRepository();
     when(() => logs.forBook(any())).thenAnswer((_) async => []);
+    quotes = MockQuoteRepository();
+    when(() => quotes.forBook(any())).thenAnswer((_) async => []);
     when(
       () => logs.add(
         userBookId: any(named: 'userBookId'),
@@ -62,6 +78,7 @@ void main() {
         searchRepository: search,
         addBook: addBook,
         readingLogs: logs,
+        quotes: quotes,
       );
 
   BookDetailsState libraryState(UserBook userBook) => BookDetailsState(
@@ -589,6 +606,240 @@ void main() {
           failure: () => const Failure(FailureCode.server),
         ),
       ],
+    );
+  });
+
+  group('re-reads', () {
+    final finished = buildUserBook(
+      status: ReadingStatus.read,
+      currentPage: 400,
+      startedAt: DateTime(2025, 1, 1),
+      finishedAt: DateTime(2025, 2, 1),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'reading again saves the old read in the history',
+      setUp: () => when(() => library.update(any()))
+          .thenAnswer((i) async => i.positionalArguments.first as UserBook),
+      build: build,
+      seed: () => libraryState(finished),
+      act: (bloc) => bloc.add(const BookDetailsRereadStarted()),
+      verify: (bloc) {
+        final book = bloc.state.userBook!;
+        expect(book.status, ReadingStatus.reading);
+        expect(book.currentPage, 0);
+        expect(book.pastReads.single.finishedAt, DateTime(2025, 2, 1));
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'adding and removing earlier reads',
+      setUp: () => when(() => library.update(any()))
+          .thenAnswer((i) async => i.positionalArguments.first as UserBook),
+      build: build,
+      seed: () => libraryState(finished),
+      act: (bloc) async {
+        bloc
+          ..add(BookDetailsPastReadAdded(BookRead(finishedAt: DateTime(2020))))
+          ..add(const BookDetailsPastReadAdded(BookRead()))
+          ..add(const BookDetailsPastReadAdded(BookRead()))
+          ..add(const BookDetailsPastReadRemoved(BookRead()));
+      },
+      verify: (bloc) {
+        // Only one of the two undated reads goes.
+        expect(bloc.state.userBook!.pastReads, [
+          BookRead(finishedAt: DateTime(2020)),
+          const BookRead(),
+        ]);
+        expect(bloc.state.userBook!.readCount, 3);
+      },
+    );
+  });
+
+  group('quotes', () {
+    BookQuote quote(String id, String text, {int? page}) => BookQuote(
+          id: id,
+          userBookId: saved.id,
+          text: text,
+          page: page,
+          createdAt: DateTime(2026, 9, 1),
+        );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'are loaded with a saved book',
+      setUp: () {
+        when(() => library.getById('ub-1')).thenAnswer((_) async => saved);
+        when(() => quotes.forBook('ub-1'))
+            .thenAnswer((_) async => [quote('q1', 'Uno')]);
+      },
+      build: build,
+      act: (bloc) => bloc.add(const BookDetailsLibraryRequested('ub-1')),
+      verify: (bloc) => expect(bloc.state.quotes, [quote('q1', 'Uno')]),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a new quote is trimmed, saved and shown first',
+      setUp: () => when(
+        () => quotes.add(
+          userBookId: any(named: 'userBookId'),
+          text: any(named: 'text'),
+          page: any(named: 'page'),
+        ),
+      ).thenAnswer(
+        (i) async => quote(
+          'q2',
+          i.namedArguments[#text] as String,
+          page: i.namedArguments[#page] as int?,
+        ),
+      ),
+      build: build,
+      seed: () => libraryState(saved).copyWith(quotes: [quote('q1', 'Uno')]),
+      act: (bloc) =>
+          bloc.add(const BookDetailsQuoteSaved(text: '  Due  ', page: 0)),
+      expect: () => [
+        libraryState(saved).copyWith(
+          quotes: [quote('q1', 'Uno')],
+          saveStatus: RequestStatus.loading,
+        ),
+        libraryState(saved).copyWith(
+          quotes: [quote('q2', 'Due'), quote('q1', 'Uno')],
+          saveStatus: RequestStatus.success,
+        ),
+      ],
+      verify: (_) => verify(
+        () => quotes.add(userBookId: 'ub-1', text: 'Due', page: null),
+      ).called(1),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'editing replaces the quote in place',
+      setUp: () => when(() => quotes.update(any())).thenAnswer(
+        (i) async => i.positionalArguments.first as BookQuote,
+      ),
+      build: build,
+      seed: () => libraryState(saved)
+          .copyWith(quotes: [quote('q1', 'Uno'), quote('q2', 'Due')]),
+      act: (bloc) => bloc
+          .add(const BookDetailsQuoteSaved(text: 'Uno!', page: 7, id: 'q1')),
+      verify: (bloc) => expect(bloc.state.quotes, [
+        quote('q1', 'Uno!', page: 7),
+        quote('q2', 'Due'),
+      ]),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a failed delete puts the quote back',
+      setUp: () => when(() => quotes.remove('q1'))
+          .thenThrow(const Failure(FailureCode.network)),
+      build: build,
+      seed: () => libraryState(saved).copyWith(quotes: [quote('q1', 'Uno')]),
+      act: (bloc) => bloc.add(const BookDetailsQuoteRemoved('q1')),
+      expect: () => [
+        libraryState(saved),
+        libraryState(saved).copyWith(
+          quotes: [quote('q1', 'Uno')],
+          saveStatus: RequestStatus.failure,
+          failure: () => const Failure(FailureCode.network),
+        ),
+      ],
+    );
+  });
+
+  group('format, mood and loans', () {
+    void savesAsIs() => when(() => library.update(any()))
+        .thenAnswer((i) async => i.positionalArguments.first as UserBook);
+
+    final reading = buildUserBook(
+      status: ReadingStatus.reading,
+      currentPage: 120,
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'switching to audiobook restarts the bookmark (pages are not minutes)',
+      setUp: savesAsIs,
+      build: build,
+      seed: () => libraryState(reading),
+      act: (bloc) => bloc
+        ..add(const BookDetailsFormatChanged(BookFormat.audio))
+        ..add(const BookDetailsDurationChanged(600)),
+      verify: (bloc) {
+        final book = bloc.state.userBook!;
+        expect(book.format, BookFormat.audio);
+        expect(book.currentPage, 0);
+        expect(book.durationMinutes, 600);
+      },
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'ebook and print share the page bookmark',
+      setUp: savesAsIs,
+      build: build,
+      seed: () => libraryState(reading),
+      act: (bloc) => bloc.add(const BookDetailsFormatChanged(BookFormat.ebook)),
+      verify: (bloc) => expect(bloc.state.userBook!.currentPage, 120),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'listening logs minutes, not pages',
+      setUp: savesAsIs,
+      build: build,
+      seed: () => libraryState(
+        reading.copyWith(
+          format: BookFormat.audio,
+          durationMinutes: () => 600,
+          currentPage: 60,
+        ),
+      ),
+      act: (bloc) => bloc.add(const BookDetailsProgressChanged(90)),
+      verify: (_) => verify(
+        () => logs.add(
+          userBookId: 'ub-1',
+          pages: 0,
+          minutes: 30,
+          endPage: 90,
+        ),
+      ).called(1),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'at most three moods',
+      setUp: savesAsIs,
+      build: build,
+      seed: () => libraryState(reading),
+      act: (bloc) => bloc.add(
+        const BookDetailsMoodsChanged([
+          BookMood.dark,
+          BookMood.tense,
+          BookMood.sad,
+          BookMood.funny,
+        ]),
+      ),
+      verify: (bloc) => expect(
+        bloc.state.userBook!.moods,
+        [BookMood.dark, BookMood.tense, BookMood.sad],
+      ),
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'a loan is set and then returned',
+      setUp: savesAsIs,
+      build: build,
+      seed: () => libraryState(reading),
+      act: (bloc) async {
+        bloc.add(
+          BookDetailsLoanChanged(
+            BookLoan(
+              kind: LoanKind.lent,
+              person: 'Anna',
+              since: DateTime(2026, 9, 1),
+            ),
+          ),
+        );
+        await Future<void>.delayed(Duration.zero);
+        expect(bloc.state.userBook!.loan?.person, 'Anna');
+        bloc.add(const BookDetailsLoanChanged(null));
+      },
+      verify: (bloc) => expect(bloc.state.userBook!.loan, isNull),
     );
   });
 }

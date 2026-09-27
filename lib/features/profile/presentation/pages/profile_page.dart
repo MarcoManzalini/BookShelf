@@ -8,9 +8,11 @@ import '../../../../core/errors/failure_message.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/l10n_extension.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../../../core/widgets/text_input_dialog.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../library/domain/entities/reading_stats.dart';
 import '../../../library/presentation/bloc/library_bloc.dart';
+import '../../../reminders/presentation/reminder_tile.dart';
 import '../bloc/profile_bloc.dart';
 import '../cubit/theme_cubit.dart';
 import '../widgets/change_password_dialog.dart';
@@ -106,31 +108,14 @@ class _ProfileBody extends StatelessWidget {
   Future<void> _editName(BuildContext context) async {
     final l10n = context.l10n;
     final bloc = context.read<ProfileBloc>();
-    final controller = TextEditingController(text: state.profile?.displayName);
-    final name = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.editDisplayName),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          decoration: InputDecoration(labelText: l10n.displayNameLabel),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(minimumSize: const Size(88, 44)),
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(l10n.save),
-          ),
-        ],
-      ),
+    final name = await showTextInputDialog<String>(
+      context,
+      title: l10n.editDisplayName,
+      initialText: state.profile?.displayName ?? '',
+      labelText: l10n.displayNameLabel,
+      textCapitalization: TextCapitalization.words,
+      parse: (text) => text,
     );
-    controller.dispose();
     if (name != null && name.trim().isNotEmpty) {
       bloc.add(ProfileDisplayNameSubmitted(name));
     }
@@ -280,6 +265,8 @@ class _ProfileBody extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 16),
+        const Card(child: ReminderTile()),
         const SizedBox(height: 16),
         Card(
           child: Padding(

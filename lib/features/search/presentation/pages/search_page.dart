@@ -18,7 +18,10 @@ import '../widgets/explore_home.dart';
 import '../widgets/search_result_tile.dart';
 
 class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
+  const SearchPage({super.key, this.initialQuery});
+
+  /// Typed in for the reader, e.g. to look for the next book of a saga.
+  final String? initialQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +34,15 @@ class SearchPage extends StatelessWidget {
         BlocProvider(create: (_) => getIt<GenreShelfCubit>()..load()),
         BlocProvider(create: (_) => getIt<RecommendationsCubit>()..load()),
       ],
-      child: const SearchView(),
+      child: SearchView(initialQuery: initialQuery),
     );
   }
 }
 
 class SearchView extends StatefulWidget {
-  const SearchView({super.key});
+  const SearchView({super.key, this.initialQuery});
+
+  final String? initialQuery;
 
   @override
   State<SearchView> createState() => _SearchViewState();
@@ -45,6 +50,27 @@ class SearchView extends StatefulWidget {
 
 class _SearchViewState extends State<SearchView> {
   final _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _apply(widget.initialQuery);
+  }
+
+  /// The tab stays alive between visits, so a new query arrives here.
+  @override
+  void didUpdateWidget(SearchView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialQuery != oldWidget.initialQuery) {
+      _apply(widget.initialQuery);
+    }
+  }
+
+  void _apply(String? query) {
+    if (query == null || query.trim().isEmpty) return;
+    _controller.text = query;
+    context.read<SearchBloc>().add(SearchQueryChanged(query));
+  }
 
   @override
   void dispose() {

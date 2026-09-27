@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_reading">Reading</string>
+    <string name="widget_no_book">No book in progress</string>
+    <string name="widget_description">The book you are reading and your streak</string>
+</resources>

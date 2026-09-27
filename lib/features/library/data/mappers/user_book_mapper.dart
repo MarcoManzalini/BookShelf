@@ -1,4 +1,9 @@
 import '../../../search/domain/entities/book.dart';
+import '../../domain/entities/book_format.dart';
+import '../../domain/entities/book_loan.dart';
+import '../../domain/entities/book_read.dart';
+import '../../domain/entities/book_series.dart';
+import '../../domain/entities/book_vibe.dart';
 import '../../domain/entities/reading_status.dart';
 import '../../domain/entities/user_book.dart';
 
@@ -23,6 +28,13 @@ class UserBookMapper {
         editionKey: json['edition_key'] as String?,
       ),
       shelves: _stringList(json['shelves']),
+      pastReads: _reads(json['past_reads']),
+      format: BookFormat.fromDb(json['format'] as String?),
+      durationMinutes: (json['duration_minutes'] as num?)?.toInt(),
+      series: _series(json),
+      moods: BookMood.fromDb(_stringList(json['moods'])),
+      pace: ReadingPace.fromDb(json['pace'] as String?),
+      loan: _loan(json),
       status: ReadingStatus.fromDb(json['status'] as String),
       currentPage: (json['current_page'] as int?) ?? 0,
       rating: json['rating'] as int?,
@@ -60,6 +72,19 @@ class UserBookMapper {
       'started_at': _formatDate(book.startedAt),
       'finished_at': _formatDate(book.finishedAt),
       'shelves': book.shelves,
+      'past_reads': [for (final r in book.pastReads) r.toJson()],
+      'format': book.format.dbValue,
+      'duration_minutes': book.durationMinutes,
+      'series_name': book.series?.name,
+      'series_index': book.series?.index,
+      'series_index_end': book.series?.indexEnd,
+      'series_total': book.series?.total,
+      'moods': [for (final m in book.moods) m.dbValue],
+      'pace': book.pace?.dbValue,
+      'loan_kind': book.loan?.kind.dbValue,
+      'loan_person': book.loan?.person,
+      'loan_since': _formatDate(book.loan?.since),
+      'loan_due': _formatDate(book.loan?.due),
       // The reader can switch edition, which changes these book fields.
       'isbn': book.book.isbn,
       'page_count': book.book.pageCount,
@@ -97,11 +122,55 @@ class UserBookMapper {
       'finished_at': _formatDate(userBook.finishedAt),
       'created_at': userBook.createdAt.toIso8601String(),
       'shelves': userBook.shelves,
+      'past_reads': [for (final r in userBook.pastReads) r.toJson()],
+      'format': userBook.format.dbValue,
+      'duration_minutes': userBook.durationMinutes,
+      'series_name': userBook.series?.name,
+      'series_index': userBook.series?.index,
+      'series_index_end': userBook.series?.indexEnd,
+      'series_total': userBook.series?.total,
+      'moods': [for (final m in userBook.moods) m.dbValue],
+      'pace': userBook.pace?.dbValue,
+      'loan_kind': userBook.loan?.kind.dbValue,
+      'loan_person': userBook.loan?.person,
+      'loan_since': _formatDate(userBook.loan?.since),
+      'loan_due': _formatDate(userBook.loan?.due),
     };
   }
 
   static List<String> _stringList(Object? raw) =>
       raw is List ? raw.whereType<String>().toList() : const [];
+
+  static BookSeries? _series(Map<String, dynamic> json) {
+    final name = json['series_name'] as String?;
+    if (name == null || name.trim().isEmpty) return null;
+    return BookSeries(
+      name: name,
+      index: (json['series_index'] as num?)?.toDouble(),
+      indexEnd: (json['series_index_end'] as num?)?.toDouble(),
+      total: (json['series_total'] as num?)?.toInt(),
+    );
+  }
+
+  static BookLoan? _loan(Map<String, dynamic> json) {
+    final kind = LoanKind.fromDb(json['loan_kind'] as String?);
+    final person = json['loan_person'] as String?;
+    final since = _parseDate(json['loan_since']);
+    if (kind == null || person == null || since == null) return null;
+    return BookLoan(
+      kind: kind,
+      person: person,
+      since: since,
+      due: _parseDate(json['loan_due']),
+    );
+  }
+
+  static List<BookRead> _reads(Object? raw) => raw is List
+      ? [
+          for (final item in raw)
+            if (item is Map) BookRead.fromJson(item.cast<String, dynamic>()),
+        ]
+      : const [];
 
   static DateTime? _parseDate(Object? raw) =>
       raw is String ? DateTime.parse(raw) : null;

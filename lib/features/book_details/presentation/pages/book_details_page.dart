@@ -10,16 +10,21 @@ import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/expandable_text.dart';
 import '../../../../core/widgets/rating_bar.dart';
 import '../../../library/domain/entities/reading_status.dart';
+import '../../../library/domain/entities/series_catalog.dart';
 import '../../../library/domain/entities/user_book.dart';
+import '../../../library/presentation/bloc/library_bloc.dart';
 import '../../../library/presentation/widgets/reading_status_ui.dart';
 import '../../../library/presentation/widgets/status_picker_sheet.dart';
 import '../../../search/domain/entities/book.dart';
 import '../bloc/book_details_bloc.dart';
 import '../widgets/author_section.dart';
 import '../widgets/book_image_carousel.dart';
+import '../widgets/book_format_section.dart';
 import '../widgets/book_info_section.dart';
 import '../widgets/edition_picker_sheet.dart';
+import '../widgets/loan_section.dart';
 import '../widgets/notes_field.dart';
+import '../widgets/quotes_section.dart';
 import '../widgets/reading_dates_section.dart';
 import '../widgets/shelves_section.dart';
 import '../widgets/reading_progress_section.dart';
@@ -29,6 +34,8 @@ import '../widgets/reading_share_sheet.dart';
 import '../widgets/reading_sessions_list.dart';
 import '../widgets/related_books_row.dart';
 import '../widgets/section_title.dart';
+import '../widgets/series_section.dart';
+import '../widgets/vibe_section.dart';
 
 class BookDetailsPage extends StatelessWidget {
   /// A book saved in the library, addressed by its `user_books.id`.
@@ -68,68 +75,114 @@ class BookDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return BlocListener<BookDetailsBloc, BookDetailsState>(
-      listenWhen: (previous, current) =>
-          previous.removed != current.removed ||
-          (previous.saveStatus != current.saveStatus &&
-              current.saveStatus.isFailure),
-      listener: (context, state) {
-        final messenger = ScaffoldMessenger.of(context);
-        if (state.removed) {
-          messenger
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(content: Text(l10n.bookRemoved)));
-          context.pop();
-        } else if (state.failure != null) {
-          messenger
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text(failureMessage(l10n, state.failure!))),
-            );
-        }
-      },
-      // Unfocusing on pop makes the notes field save before the page closes.
-      child: PopScope(
-        onPopInvokedWithResult: (_, __) => FocusScope.of(context).unfocus(),
-        child: Scaffold(
-          appBar: AppBar(
-            actions: [
-              BlocBuilder<BookDetailsBloc, BookDetailsState>(
-                buildWhen: (p, c) => p.isInLibrary != c.isInLibrary,
-                builder: (context, state) => state.isInLibrary
-                    ? IconButton(
-                        tooltip: l10n.removeBook,
-                        icon: const Icon(Icons.delete_outline_rounded),
-                        onPressed: () => _confirmRemove(context),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(2),
-              child: BlocSelector<BookDetailsBloc, BookDetailsState, bool>(
-                selector: (state) => state.saveStatus.isLoading,
-                builder: (context, saving) => saving
-                    ? const LinearProgressIndicator(minHeight: 2)
-                    : const SizedBox(height: 2),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<BookDetailsBloc, BookDetailsState>(
+          listenWhen: (previous, current) =>
+              previous.userBook?.status != ReadingStatus.read &&
+              previous.userBook != null &&
+              current.userBook?.series?.lastIndex != null &&
+              current.userBook?.status == ReadingStatus.read,
+          listener: _suggestNextInSeries,
+        ),
+      ],
+      child: BlocListener<BookDetailsBloc, BookDetailsState>(
+        listenWhen: (previous, current) =>
+            previous.removed != current.removed ||
+            (previous.saveStatus != current.saveStatus &&
+                current.saveStatus.isFailure),
+        listener: (context, state) {
+          final messenger = ScaffoldMessenger.of(context);
+          if (state.removed) {
+            messenger
+              ..hideCurrentSnackBar()
+              ..showSnackBar(SnackBar(content: Text(l10n.bookRemoved)));
+            context.pop();
+          } else if (state.failure != null) {
+            messenger
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(content: Text(failureMessage(l10n, state.failure!))),
+              );
+          }
+        },
+        // Unfocusing on pop makes the notes field save before the page closes.
+        child: PopScope(
+          onPopInvokedWithResult: (_, __) => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            appBar: AppBar(
+              actions: [
+                BlocBuilder<BookDetailsBloc, BookDetailsState>(
+                  buildWhen: (p, c) => p.isInLibrary != c.isInLibrary,
+                  builder: (context, state) => state.isInLibrary
+                      ? IconButton(
+                          tooltip: l10n.removeBook,
+                          icon: const Icon(Icons.delete_outline_rounded),
+                          onPressed: () => _confirmRemove(context),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(2),
+                child: BlocSelector<BookDetailsBloc, BookDetailsState, bool>(
+                  selector: (state) => state.saveStatus.isLoading,
+                  builder: (context, saving) => saving
+                      ? const LinearProgressIndicator(minHeight: 2)
+                      : const SizedBox(height: 2),
+                ),
               ),
             ),
-          ),
-          body: BlocBuilder<BookDetailsBloc, BookDetailsState>(
-            builder: (context, state) {
-              if (state.status.isFailure && state.failure != null) {
-                return ErrorView(failure: state.failure!);
-              }
-              final book = state.book;
-              if (book == null) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              return _Content(state: state, book: book);
-            },
+            body: BlocBuilder<BookDetailsBloc, BookDetailsState>(
+              builder: (context, state) {
+                if (state.status.isFailure && state.failure != null) {
+                  return ErrorView(failure: state.failure!);
+                }
+                final book = state.book;
+                if (book == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return _Content(state: state, book: book);
+              },
+            ),
           ),
         ),
       ),
     );
+  }
+
+  /// Finishing a volume points to the next one: open it if it is already in
+  /// the library, else search for it.
+  void _suggestNextInSeries(BuildContext context, BookDetailsState state) {
+    final l10n = context.l10n;
+    final finished = state.userBook!;
+    final series = finished.series!;
+    final books = context.read<LibraryBloc>().state.books;
+    final saga = SeriesCatalog.find(books, series.name);
+    final next = series.nextIndex(sagaTotal: saga?.total);
+    if (next == null) return;
+    final inLibrary = saga?.bookWith(next);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 8),
+          content: Text(l10n.seriesNextSnack(series.name, next)),
+          action: SnackBarAction(
+            label:
+                inLibrary != null ? l10n.seriesNextOpen : l10n.seriesNextSearch,
+            onPressed: () => inLibrary != null
+                ? context.push(AppRoutes.bookDetails(inLibrary.id))
+                : context.go(
+                    AppRoutes.searchFor(
+                      [series.name, finished.book.authors.firstOrNull]
+                          .nonNulls
+                          .join(' '),
+                    ),
+                  ),
+          ),
+        ),
+      );
   }
 }
 
@@ -315,6 +368,7 @@ class _Content extends StatelessWidget {
             showReadingShareSheet(
               context,
               ReadingShareData.from(saveBook, log),
+              quotes: bloc.state.quotes,
             );
           },
         ),
@@ -324,9 +378,14 @@ class _Content extends StatelessWidget {
 
   List<Widget> _readingSections(BuildContext context, UserBook userBook) {
     final l10n = context.l10n;
+    final library = context.select((LibraryBloc bloc) => bloc.state.books);
     return [
       SectionTitle(l10n.shelvesTitle),
       ShelvesSection(userBook: userBook),
+      SectionTitle(l10n.seriesTitle),
+      SeriesSection(userBook: userBook, library: library),
+      SectionTitle(l10n.formatTitle),
+      BookFormatSection(userBook: userBook),
       SectionTitle(l10n.myProgress),
       ReadingProgressSection(userBook: userBook),
       const SizedBox(height: 8),
@@ -345,6 +404,7 @@ class _Content extends StatelessWidget {
           onShare: (log) => showReadingShareSheet(
             context,
             ReadingShareData.from(userBook, log),
+            quotes: state.quotes,
           ),
         ),
       ],
@@ -358,8 +418,14 @@ class _Content extends StatelessWidget {
               .add(BookDetailsRatingChanged(rating)),
         ),
       ),
+      SectionTitle(l10n.vibeTitle),
+      VibeSection(userBook: userBook),
       SectionTitle(l10n.readingDates),
       ReadingDatesSection(userBook: userBook),
+      SectionTitle(l10n.loanTitle),
+      LoanSection(userBook: userBook),
+      SectionTitle(l10n.quotesTitle),
+      QuotesSection(quotes: state.quotes),
       SectionTitle(l10n.notes),
       NotesField(initialNotes: userBook.notes),
     ];
@@ -447,23 +513,27 @@ class _StatusSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return SegmentedButton<ReadingStatus>(
-      showSelectedIcon: false,
-      segments: [
+    // Five statuses do not fit a segmented button on a phone: chips wrap.
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8,
+      runSpacing: 8,
+      children: [
         for (final s in ReadingStatus.values)
-          ButtonSegment(
-            value: s,
-            label: Text(
-              s.label(l10n),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+          ChoiceChip(
+            avatar: Icon(s.icon, size: 18),
+            showCheckmark: false,
+            label: Text(s.label(l10n)),
+            selected: s == status,
+            onSelected: (_) {
+              if (s != status) {
+                context
+                    .read<BookDetailsBloc>()
+                    .add(BookDetailsStatusChanged(s));
+              }
+            },
           ),
       ],
-      selected: {status},
-      onSelectionChanged: (selection) => context
-          .read<BookDetailsBloc>()
-          .add(BookDetailsStatusChanged(selection.first)),
     );
   }
 }

@@ -13,6 +13,7 @@ String failureMessage(AppLocalizations l10n, Failure failure) {
     FailureCode.userAlreadyExists => l10n.errorUserAlreadyExists,
     FailureCode.weakPassword => l10n.errorWeakPassword,
     FailureCode.rateLimited => l10n.errorRateLimited,
+    FailureCode.outdatedDatabase => l10n.errorOutdatedDatabase,
     FailureCode.unknown => l10n.errorUnknown,
   };
 }

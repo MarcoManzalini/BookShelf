@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-import 'reading_status.dart';
 import 'user_book.dart';
 
 class ReadingStats extends Equatable {
@@ -16,10 +15,14 @@ class ReadingStats extends Equatable {
     var pages = 0;
     var thisYear = 0;
     for (final b in books) {
-      if (b.status != ReadingStatus.read) continue;
+      // A book read twice counts once as a book, but its pages and each
+      // finish (towards the yearly count) count every time.
+      final reads = b.completedReads;
+      if (reads.isEmpty) continue;
       read++;
-      pages += b.pageCount ?? 0;
-      if (b.finishedAt?.year == year) thisYear++;
+      // Audiobooks are listened to: their time is in the reading log.
+      if (!b.isAudio) pages += (b.pageCount ?? 0) * reads.length;
+      thisYear += reads.where((r) => r.finishedAt?.year == year).length;
     }
     return ReadingStats(
       booksRead: read,

@@ -24,6 +24,14 @@ class StatusChip extends StatelessWidget {
           scheme.secondaryContainer,
           AppColors.accentDeep
         ),
+      ReadingStatus.paused => (
+          scheme.tertiaryContainer,
+          scheme.onTertiaryContainer,
+        ),
+      ReadingStatus.abandoned => (
+          scheme.surfaceContainerHighest,
+          scheme.onSurfaceVariant,
+        ),
       ReadingStatus.read => (scheme.primary, scheme.onPrimary),
     };
     return Container(
