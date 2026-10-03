@@ -2,7 +2,7 @@ import '../entities/auth_snapshot.dart';
 
 enum SignUpResult { signedIn, confirmationRequired }
 
-enum SocialProvider { google, apple }
+enum SocialProvider { apple }
 
 abstract interface class AuthRepository {
   AuthSnapshot get current;

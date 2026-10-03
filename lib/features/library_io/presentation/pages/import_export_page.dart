@@ -7,13 +7,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/errors/failure_message.dart';
 import '../../../../core/utils/l10n_extension.dart';
+import '../../../../core/widgets/text_input_dialog.dart';
 import '../../../library/domain/entities/reading_status.dart';
 import '../../../library/presentation/bloc/library_bloc.dart';
 import '../../data/library_export_service.dart';
+import '../../data/open_library_reading_log.dart';
 import '../../domain/import_row.dart';
 import '../cubit/import_cubit.dart';
 
-/// Bring a Goodreads library in, or take yours out as a CSV.
+/// Bring a Goodreads or Open Library library in, or take yours out as a CSV.
 class ImportExportPage extends StatelessWidget {
   const ImportExportPage({super.key});
 
@@ -74,6 +76,22 @@ class _ImportCard extends StatelessWidget {
     cubit.loadFile(file.name, utf8.decode(bytes, allowMalformed: true));
   }
 
+  Future<void> _askUsername(BuildContext context) async {
+    final l10n = context.l10n;
+    final cubit = context.read<ImportCubit>();
+    final username = await showTextInputDialog<String>(
+      context,
+      title: l10n.ioOpenLibraryDialogTitle,
+      hintText: l10n.ioOpenLibraryHint,
+      keyboardType: TextInputType.url,
+      parse: OpenLibraryReadingLog.parseUsername,
+      validator: (text) => OpenLibraryReadingLog.parseUsername(text) == null
+          ? l10n.ioOpenLibraryInvalid
+          : null,
+    );
+    if (username != null) await cubit.loadOpenLibrary(username);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -81,8 +99,16 @@ class _ImportCard extends StatelessWidget {
       title: l10n.ioImportTitle,
       child: BlocBuilder<ImportCubit, ImportState>(
         builder: (context, state) => switch (state.step) {
-          ImportStep.idle => _Idle(onPick: () => _pick(context)),
+          ImportStep.idle => _Idle(
+              onPick: () => _pick(context),
+              onOpenLibrary: () => _askUsername(context),
+            ),
+          ImportStep.fetching => const _Fetching(),
           ImportStep.invalidFile => _Invalid(onPick: () => _pick(context)),
+          ImportStep.sourceFailed => _SourceFailed(
+              error: state.sourceError!,
+              onRetry: () => _askUsername(context),
+            ),
           ImportStep.ready => _Ready(state: state),
           ImportStep.running => _Running(state: state),
           ImportStep.done => _Done(state: state),
@@ -93,22 +119,124 @@ class _ImportCard extends StatelessWidget {
 }
 
 class _Idle extends StatelessWidget {
-  const _Idle({required this.onPick});
+  const _Idle({required this.onPick, required this.onOpenLibrary});
 
   final VoidCallback onPick;
+  final VoidCallback onOpenLibrary;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n.ioImportBody, style: Theme.of(context).textTheme.bodyMedium),
+        Text(l10n.ioImportBody, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 16),
         FilledButton.icon(
           onPressed: onPick,
           icon: const Icon(Icons.upload_file_rounded),
           label: Text(l10n.ioPickFile),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            const Expanded(child: Divider()),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                l10n.ioOrSeparator,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            const Expanded(child: Divider()),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Text(l10n.ioOpenLibraryBody, style: theme.textTheme.bodyMedium),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: onOpenLibrary,
+          icon: const Icon(Icons.local_library_outlined),
+          label: Text(l10n.ioOpenLibraryButton),
+        ),
+      ],
+    );
+  }
+}
+
+class _Fetching extends StatelessWidget {
+  const _Fetching();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              context.l10n.ioFetching,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The Open Library reading log could not be read.
+class _SourceFailed extends StatelessWidget {
+  const _SourceFailed({required this.error, required this.onRetry});
+
+  final ReadingLogError error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final message = switch (error) {
+      ReadingLogError.userNotFound => l10n.ioOlUserNotFound,
+      ReadingLogError.private => l10n.ioOlPrivate,
+      ReadingLogError.empty => l10n.ioOlEmpty,
+      ReadingLogError.network => l10n.ioOlNetwork,
+    };
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          message,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.error,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => context.read<ImportCubit>().reset(),
+                child: Text(l10n.ioBack),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: FilledButton(
+                onPressed: onRetry,
+                child: Text(l10n.ioOpenLibraryButton),
+              ),
+            ),
+          ],
         ),
       ],
     );

@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:bookshelf/core/errors/failure.dart';
 import 'package:bookshelf/features/library/domain/entities/reading_status.dart';
 import 'package:bookshelf/features/library/domain/entities/user_book.dart';
+import 'package:bookshelf/features/library_io/data/open_library_reading_log.dart';
 import 'package:bookshelf/features/library_io/domain/import_row.dart';
 import 'package:bookshelf/features/library_io/domain/library_importer.dart';
 import 'package:bookshelf/features/library_io/presentation/cubit/import_cubit.dart';
@@ -12,6 +13,8 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../helpers/fixtures.dart';
 import '../../helpers/mocks.dart';
+
+class MockReadingLog extends Mock implements OpenLibraryReadingLog {}
 
 void main() {
   late MockBookSearchRepository search;
@@ -73,6 +76,23 @@ void main() {
 
       expect(progress.imported, 1);
       verifyNever(() => search.search(any(), language: any(named: 'language')));
+    });
+
+    test('an Open Library work id is matched directly', () async {
+      when(() => search.findByWorkId('OL9W'))
+          .thenAnswer((_) async => buildBook(id: 'OL9W'));
+
+      final progress = await runAll([
+        const ImportRow(
+          title: 'Dune',
+          workId: 'OL9W',
+          status: ReadingStatus.wantToRead,
+        ),
+      ]);
+
+      expect(progress.imported, 1);
+      verifyNever(() => search.search(any(), language: any(named: 'language')));
+      verifyNever(() => search.findByIsbn(any()));
     });
 
     test('without an ISBN it searches title and author', () async {
@@ -323,7 +343,7 @@ void main() {
   group('ImportCubit', () {
     const csv = 'Title,Exclusive Shelf\nDune,read\nEmma,to-read\n';
 
-    ImportCubit cubit() => ImportCubit(build());
+    ImportCubit cubit() => ImportCubit(build(), MockReadingLog());
 
     blocTest<ImportCubit, ImportState>(
       'reading a file shows what it holds',
@@ -333,6 +353,57 @@ void main() {
         expect(c.state.step, ImportStep.ready);
         expect(c.state.rows, hasLength(2));
         expect(c.state.fileName, 'lib.csv');
+      },
+    );
+
+    blocTest<ImportCubit, ImportState>(
+      'an Open Library reading log is fetched and shown',
+      build: () {
+        final log = MockReadingLog();
+        when(() => log.fetch('reader')).thenAnswer(
+          (_) async => const [
+            ImportRow(
+              title: 'Dune',
+              workId: 'OL1W',
+              status: ReadingStatus.read,
+            ),
+          ],
+        );
+        return ImportCubit(build(), log);
+      },
+      act: (c) => c.loadOpenLibrary('reader'),
+      expect: () => [
+        const ImportState(
+          step: ImportStep.fetching,
+          fileName: 'Open Library · reader',
+        ),
+        const ImportState(
+          step: ImportStep.ready,
+          fileName: 'Open Library · reader',
+          rows: [
+            ImportRow(
+              title: 'Dune',
+              workId: 'OL1W',
+              status: ReadingStatus.read,
+            ),
+          ],
+        ),
+      ],
+    );
+
+    blocTest<ImportCubit, ImportState>(
+      'a private reading log is explained',
+      build: () {
+        final log = MockReadingLog();
+        when(() => log.fetch(any())).thenThrow(
+          const ReadingLogException(ReadingLogError.private),
+        );
+        return ImportCubit(build(), log);
+      },
+      act: (c) => c.loadOpenLibrary('reader'),
+      verify: (c) {
+        expect(c.state.step, ImportStep.sourceFailed);
+        expect(c.state.sourceError, ReadingLogError.private);
       },
     );
 

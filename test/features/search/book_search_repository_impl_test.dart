@@ -233,7 +233,54 @@ void main() {
       when(() => remote.search(any(), page: any(named: 'page'))).thenAnswer(
         (_) async => const BookSearchPage(books: [], page: 1, hasMore: false),
       );
+      when(() => remote.fetchByIsbn(any())).thenAnswer((_) async => null);
       expect(await build().findByIsbn('9780441172719'), isNull);
+    });
+
+    test('falls back to the edition record when the index misses it', () async {
+      final edition = buildBook(id: 'OL7W');
+      when(() => remote.search(any(), page: any(named: 'page'))).thenAnswer(
+        (_) async => const BookSearchPage(books: [], page: 1, hasMore: false),
+      );
+      when(() => remote.fetchByIsbn('9780441172719'))
+          .thenAnswer((_) async => edition);
+
+      expect(await build().findByIsbn('9780441172719'), edition);
+    });
+
+    test('does not read the edition record when the index has the book',
+        () async {
+      await build().findByIsbn('9780441172719');
+      verifyNever(() => remote.fetchByIsbn(any()));
+    });
+
+    test('maps edition lookup errors to a Failure', () {
+      when(() => remote.search(any(), page: any(named: 'page'))).thenAnswer(
+        (_) async => const BookSearchPage(books: [], page: 1, hasMore: false),
+      );
+      when(() => remote.fetchByIsbn(any())).thenThrow(
+        DioException(
+          requestOptions: RequestOptions(),
+          type: DioExceptionType.connectionError,
+        ),
+      );
+      expect(
+        build().findByIsbn('9780441172719'),
+        throwsA(isA<Failure>()),
+      );
+    });
+  });
+
+  group('findByWorkId', () {
+    test('searches the work key and keeps only that work', () async {
+      when(() => remote.search('key:/works/OL1W', page: 1)).thenAnswer(
+        (_) async => BookSearchPage(
+          books: [buildBook(id: 'OL2W'), buildBook(id: 'OL1W')],
+          page: 1,
+          hasMore: false,
+        ),
+      );
+      expect((await build().findByWorkId('OL1W'))?.externalId, 'OL1W');
     });
   });
 }

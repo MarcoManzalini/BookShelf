@@ -21,6 +21,7 @@ import '../../../stats/domain/entities/reading_log.dart';
 import '../../../stats/domain/repositories/reading_log_repository.dart';
 import '../../../search/domain/entities/book.dart';
 import '../../../search/domain/entities/book_edition.dart';
+import '../../../search/domain/entities/reader_activity.dart';
 import '../../../search/domain/repositories/book_search_repository.dart';
 
 part 'book_details_event.dart';
@@ -265,6 +266,10 @@ class BookDetailsBloc extends Bloc<BookDetailsEvent, BookDetailsState> {
     final book = current;
     final authorKey = book.authorKeys.firstOrNull;
     await Future.wait([
+      _load(
+        () => _search.getReaderActivity(book),
+        (activity) => emit(state.copyWith(activity: activity)),
+      ),
       if (authorKey != null) ...[
         _load(
           () => _search.getAuthor(authorKey),

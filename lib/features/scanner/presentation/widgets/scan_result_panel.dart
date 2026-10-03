@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/config/app_config.dart';
 import '../../../../core/errors/failure_message.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/utils/l10n_extension.dart';
@@ -45,6 +48,7 @@ class ScanResultPanel extends StatelessWidget {
           icon: Icons.search_off_rounded,
           message: l10n.scanNotFound(state.isbn!),
           onRescan: onRescan,
+          action: _AddToOpenLibraryButton(isbn: state.isbn!),
         ),
       ScanStatus.failure => _MessageCard(
           key: const ValueKey('failure'),
@@ -214,11 +218,15 @@ class _MessageCard extends StatelessWidget {
     required this.icon,
     required this.message,
     required this.onRescan,
+    this.action,
   });
 
   final IconData icon;
   final String message;
   final VoidCallback onRescan;
+
+  /// Extra button above "scan another".
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -236,12 +244,54 @@ class _MessageCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
+          if (action != null) ...[
+            action!,
+            const SizedBox(height: 10),
+          ],
           FilledButton(
             onPressed: onRescan,
             child: Text(context.l10n.scanAgain),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Open Library's "add a book" form can't be pre-filled, so the ISBN is
+/// copied for the reader to paste. The form asks to sign in to Open Library.
+class _AddToOpenLibraryButton extends StatelessWidget {
+  const _AddToOpenLibraryButton({required this.isbn});
+
+  final String isbn;
+
+  static final _addBookUri =
+      Uri.parse('${AppConfig.openLibraryBaseUrl}/books/add');
+
+  Future<void> _open(BuildContext context) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    await Clipboard.setData(ClipboardData(text: isbn));
+    var opened = false;
+    try {
+      opened =
+          await launchUrl(_addBookUri, mode: LaunchMode.externalApplication);
+    } catch (_) {}
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(opened ? l10n.scanIsbnCopied : l10n.linkOpenFailed),
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: () => _open(context),
+      icon: const Icon(Icons.library_add_outlined, size: 20),
+      label: Text(context.l10n.scanAddToOpenLibrary),
     );
   }
 }

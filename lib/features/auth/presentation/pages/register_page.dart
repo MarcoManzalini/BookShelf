@@ -10,6 +10,7 @@ import '../../../../core/utils/validators.dart';
 import '../cubit/auth_form_cubit.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/password_field.dart';
+import '../widgets/social_login_section.dart';
 import '../widgets/submit_button.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -133,6 +134,7 @@ class _RegisterViewState extends State<_RegisterView> {
                     onPressed: _submit,
                   ),
                 ),
+                const SocialLoginSection(),
                 const SizedBox(height: 16),
                 Wrap(
                   alignment: WrapAlignment.center,

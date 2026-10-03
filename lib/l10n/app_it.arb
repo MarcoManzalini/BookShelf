@@ -59,8 +59,8 @@
   "resetPasswordSubtitle": "Scegli una nuova password per il tuo account.",
   "updatePasswordButton": "Aggiorna password",
   "passwordUpdated": "Password aggiornata.",
-  "continueWithGoogle": "Continua con Google",
   "continueWithApple": "Continua con Apple",
+  "orSeparator": "oppure",
   "validationRequired": "Campo obbligatorio",
   "validationEmail": "Inserisci un indirizzo email valido",
   "validationPasswordShort": "Almeno {min} caratteri",
@@ -186,6 +186,38 @@
     }
   },
   "similarBooks": "Libri simili",
+  "readersWantToRead": "{count, plural, =1{1 vuole leggerlo} other{{count} vogliono leggerlo}}",
+  "@readersWantToRead": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "readersReading": "{count, plural, =1{1 lo sta leggendo} other{{count} lo stanno leggendo}}",
+  "@readersReading": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "readersRead": "{count, plural, =1{1 l'ha letto} other{{count} l'hanno letto}}",
+  "@readersRead": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "readOnlineFree": "Leggi gratis su Open Library",
+  "readOnlineBorrow": "Prestito digitale su Open Library · serve un account",
+  "buyTitle": "Dove comprarlo",
+  "buyFromPublisher": "Dall'editore",
+  "linkOpenFailed": "Impossibile aprire il link.",
   "authorWorkCount": "{count, plural, =1{1 opera} other{{count} opere}}",
   "@authorWorkCount": {
     "placeholders": {
@@ -234,6 +266,8 @@
       }
     }
   },
+  "scanAddToOpenLibrary": "Aggiungilo a Open Library",
+  "scanIsbnCopied": "ISBN copiato: incollalo nel modulo di Open Library.",
   "scanAgain": "Scansiona un altro",
   "scanDetails": "Dettagli",
   "scanTorch": "Torcia",
@@ -421,7 +455,7 @@
     }
   },
   "ioTitle": "Importa ed esporta",
-  "ioImportTitle": "Importa da Goodreads",
+  "ioImportTitle": "Importa la tua libreria",
   "ioImportBody": "Su Goodreads apri «I miei libri» → «Importa ed esporta» → «Esporta libreria», poi scegli qui il file .csv scaricato. Stato, voto, date, note e scaffali vengono ripresi.",
   "ioPickFile": "Scegli il file CSV",
   "ioFound": "{count, plural, =1{Trovato 1 libro} other{Trovati {count} libri}}",
@@ -467,6 +501,18 @@
   "ioAborted": "Connessione persa: importazione fermata. Riprova più tardi: i libri già presenti vengono saltati.",
   "ioInvalidFile": "Questo file non sembra un'esportazione di libri (manca la colonna «Title»).",
   "ioTryAnother": "Scegli un altro file",
+  "ioOrSeparator": "oppure",
+  "ioOpenLibraryBody": "Hai un account Open Library? Importa il tuo diario di lettura con il nome utente: deve essere pubblico (Open Library → Impostazioni → Privacy).",
+  "ioOpenLibraryButton": "Importa da Open Library",
+  "ioOpenLibraryDialogTitle": "Nome utente Open Library",
+  "ioOpenLibraryHint": "nome utente o link al profilo",
+  "ioOpenLibraryInvalid": "Nome utente non valido",
+  "ioFetching": "Leggo il diario di lettura di Open Library…",
+  "ioOlUserNotFound": "Nessun account Open Library con questo nome utente.",
+  "ioOlPrivate": "Questo diario di lettura è privato. Rendilo pubblico nelle impostazioni di Open Library e riprova.",
+  "ioOlEmpty": "Questo diario di lettura non contiene ancora libri.",
+  "ioOlNetwork": "Impossibile raggiungere Open Library. Riprova più tardi.",
+  "ioBack": "Indietro",
   "ioExportTitle": "Esporta la libreria",
   "ioExportBody": "Crea un file CSV con tutti i tuoi libri, compatibile con Goodreads e con i fogli di calcolo.",
   "ioExportButton": "Esporta in CSV",

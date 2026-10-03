@@ -10,6 +10,7 @@ import 'package:bookshelf/features/library/domain/entities/reading_status.dart';
 import 'package:bookshelf/features/library/domain/entities/user_book.dart';
 import 'package:bookshelf/features/quotes/domain/entities/book_quote.dart';
 import 'package:bookshelf/features/search/domain/entities/author_info.dart';
+import 'package:bookshelf/features/search/domain/entities/reader_activity.dart';
 import 'package:bookshelf/features/search/domain/entities/book.dart';
 import 'package:bookshelf/features/stats/domain/entities/reading_log.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,6 +46,9 @@ void main() {
   setUp(() {
     library = MockLibraryRepository();
     search = MockBookSearchRepository();
+    // Hidden unless a test asks for it, so state sequences stay short.
+    when(() => search.getReaderActivity(any()))
+        .thenThrow(const Failure(FailureCode.notFound));
     addBook = MockAddBookToLibrary();
     logs = MockReadingLogRepository();
     when(() => logs.forBook(any())).thenAnswer((_) async => []);
@@ -226,6 +230,31 @@ void main() {
           book: book.copyWith(description: 'Spice.'),
         ),
       ],
+    );
+
+    blocTest<BookDetailsBloc, BookDetailsState>(
+      'loads what Open Library readers do with the book',
+      setUp: () {
+        when(() => library.findCachedByExternalId(any())).thenReturn(null);
+        when(() => search.getBookDetails(any())).thenAnswer((_) async => book);
+        when(() => search.getReaderActivity(any())).thenAnswer(
+          (_) async => const ReaderActivity(
+            wantToRead: 12,
+            read: 3,
+            ebookAccess: EbookAccess.public,
+          ),
+        );
+      },
+      build: build,
+      act: (bloc) => bloc.add(BookDetailsPreviewRequested(book)),
+      verify: (bloc) => expect(
+        bloc.state.activity,
+        const ReaderActivity(
+          wantToRead: 12,
+          read: 3,
+          ebookAccess: EbookAccess.public,
+        ),
+      ),
     );
 
     blocTest<BookDetailsBloc, BookDetailsState>(

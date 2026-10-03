@@ -77,8 +77,8 @@ class ImportProgress extends Equatable {
       ];
 }
 
-/// Turns CSV rows into library books: each row is matched to an Open Library
-/// book (by ISBN, then by title and author) and added with the status,
+/// Turns imported rows into library books: each row is matched to an Open
+/// Library book (by work id, ISBN, then title and author) and added with the status,
 /// rating, dates, notes and shelves the file carries.
 class LibraryImporter {
   LibraryImporter(
@@ -191,6 +191,11 @@ class LibraryImporter {
   }
 
   Future<Book?> _match(ImportRow row) async {
+    final workId = row.workId;
+    if (workId != null) {
+      final book = await _search.findByWorkId(workId);
+      if (book != null) return book;
+    }
     for (final raw in [row.isbn13, row.isbn10]) {
       final isbn = Isbn.parse(raw);
       if (isbn == null) continue;

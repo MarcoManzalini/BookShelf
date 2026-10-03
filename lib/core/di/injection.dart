@@ -27,6 +27,7 @@ import '../../features/profile/domain/repositories/profile_repository.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/cubit/theme_cubit.dart';
 import '../../features/library_io/data/library_export_service.dart';
+import '../../features/library_io/data/open_library_reading_log.dart';
 import '../../features/library_io/domain/library_importer.dart';
 import '../../features/library_io/presentation/cubit/import_cubit.dart';
 import '../../features/quotes/data/datasources/quote_remote_data_source.dart';
@@ -157,7 +158,12 @@ Future<void> configureDependencies() async {
     ..registerFactory(() => IsbnScanCubit(getIt()))
     ..registerFactory(() => StatsCubit(getIt(), getIt()))
     ..registerLazySingleton(() => const LibraryExportService())
-    ..registerFactory(() => ImportCubit(LibraryImporter(getIt(), getIt())))
+    ..registerFactory(
+      () => ImportCubit(
+        LibraryImporter(getIt(), getIt()),
+        OpenLibraryReadingLog(getIt()),
+      ),
+    )
     ..registerFactoryParam<EditionsCubit, Book, void>(
       (book, _) => EditionsCubit(getIt(), book),
     )

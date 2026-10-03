@@ -9,6 +9,7 @@ class BookDetailsState extends Equatable {
     this.removed = false,
     this.failure,
     this.author,
+    this.activity,
     this.moreByAuthor = const [],
     this.similarBooks = const [],
     this.logs = const [],
@@ -31,6 +32,9 @@ class BookDetailsState extends Equatable {
 
   /// Profile of the first author; null until loaded (or when unavailable).
   final AuthorInfo? author;
+
+  /// Open Library readers and online availability; null until loaded.
+  final ReaderActivity? activity;
   final List<Book> moreByAuthor;
   final List<Book> similarBooks;
 
@@ -50,6 +54,7 @@ class BookDetailsState extends Equatable {
     bool? removed,
     Failure? Function()? failure,
     AuthorInfo? author,
+    ReaderActivity? activity,
     List<Book>? moreByAuthor,
     List<Book>? similarBooks,
     List<ReadingLog>? logs,
@@ -63,6 +68,7 @@ class BookDetailsState extends Equatable {
       removed: removed ?? this.removed,
       failure: failure != null ? failure() : this.failure,
       author: author ?? this.author,
+      activity: activity ?? this.activity,
       moreByAuthor: moreByAuthor ?? this.moreByAuthor,
       similarBooks: similarBooks ?? this.similarBooks,
       logs: logs ?? this.logs,
@@ -79,6 +85,7 @@ class BookDetailsState extends Equatable {
         removed,
         failure,
         author,
+        activity,
         moreByAuthor,
         similarBooks,
         logs,

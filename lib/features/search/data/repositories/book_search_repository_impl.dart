@@ -6,6 +6,7 @@ import '../../domain/entities/book_search_page.dart';
 import '../../domain/entities/book_ranking.dart';
 import '../../domain/entities/explore_genre.dart';
 import '../../domain/entities/explore_section.dart';
+import '../../domain/entities/reader_activity.dart';
 import '../../domain/repositories/book_search_repository.dart';
 import '../datasources/book_remote_data_source.dart';
 
@@ -64,8 +65,22 @@ class BookSearchRepositoryImpl implements BookSearchRepository {
   @override
   Future<Book?> findByIsbn(String isbn) async {
     final page = await search('isbn:$isbn');
-    return page.books.firstOrNull;
+    // The search index carries the work's rating and subjects; the edition
+    // record is the fallback for editions it has not indexed yet.
+    return page.books.firstOrNull ??
+        await _guard(() => _remote.fetchByIsbn(isbn));
   }
+
+  @override
+  Future<Book?> findByWorkId(String workId) async {
+    final page = await search('key:/works/$workId');
+    return page.books.where((b) => b.externalId == workId).firstOrNull;
+  }
+
+  @override
+  Future<ReaderActivity> getReaderActivity(Book book) => _guard(
+        () => _remote.fetchReaderActivity(book.externalId),
+      );
 
   @override
   Future<Book> getBookDetails(Book book) => _guard(

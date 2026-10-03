@@ -215,7 +215,10 @@ I font sono distribuiti con licenza SIL OFL (testi in `assets/fonts/licenses/`).
 
 - **Open Library**: `search.json`, `works/{id}.json`, edizioni e `covers.openlibrary.org`, con un `User-Agent` descrittivo (`AppConfig.userAgent`). Se pubblichi l'app, aggiungi un contatto come chiede Open Library.
 - **Eliminazione dell'account**: il client non può cancellare la propria riga in `auth.users`, quindi `schema.sql` definisce la funzione `delete_my_account()` (`security definer`, solo per utenti autenticati). L'app rimuove prima gli avatar, poi chiama la funzione; `on delete cascade` elimina il resto. Non serve nessuna Edge Function.
-- **Accesso con Google / Apple**: predisposto ma spento (`AppConfig.socialLoginEnabled = false`). Per attivarlo abilita il provider in Supabase, configura i client id nativi e imposta il flag a `true`.
+- **Accesso con Apple**: OAuth di Supabase nel browser di sistema, con ritorno all'app sul deep link `io.supabase.bookshelf://login-callback/`. Il profilo prende il nome condiviso da Apple (trigger `handle_new_user`, aggiornato anche in `update.sql`). Per attivarlo:
+  1. Supabase → Authentication → URL Configuration: aggiungi `io.supabase.bookshelf://login-callback/` ai *Redirect URLs*.
+  2. In Apple Developer crea un *Services ID* con *Sign in with Apple*, dominio `<progetto>.supabase.co` e return URL `https://<progetto>.supabase.co/auth/v1/callback`, più una chiave *Sign in with Apple*; inserisci Services ID, Team ID, Key ID e chiave in Supabase → Authentication → Providers → Apple.
+  3. Per nascondere il pulsante imposta `AppConfig.socialLoginEnabled = false`.
 - **Android**: deep link `io.supabase.bookshelf://login-callback`; notifiche (`POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, desugaring attivo); ML Kit per il testo delle citazioni (`MainActivity.kt`); widget in `ReadingWidgetProvider.kt` e `res/layout/reading_widget.xml`; icona adattiva.
 - **iOS**: URL scheme `io.supabase.bookshelf`; permessi per fotocamera e foto; Apple Vision per il testo delle citazioni e delegate delle notifiche in `AppDelegate.swift`. Il widget è pronto in `ios/ReadingWidget/` ma non è collegato al progetto, perché richiede un App Group e quindi un account Apple Developer a pagamento (istruzioni in `ios/ReadingWidget/README.md`).
 - Il progetto è pensato per Android e iOS: il target web non è supportato.

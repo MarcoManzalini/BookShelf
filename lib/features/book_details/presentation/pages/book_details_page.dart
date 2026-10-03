@@ -16,11 +16,14 @@ import '../../../library/presentation/bloc/library_bloc.dart';
 import '../../../library/presentation/widgets/reading_status_ui.dart';
 import '../../../library/presentation/widgets/status_picker_sheet.dart';
 import '../../../search/domain/entities/book.dart';
+import '../../../search/domain/entities/reader_activity.dart';
 import '../bloc/book_details_bloc.dart';
 import '../widgets/author_section.dart';
 import '../widgets/book_image_carousel.dart';
 import '../widgets/book_format_section.dart';
 import '../widgets/book_info_section.dart';
+import '../widgets/buy_links_section.dart';
+import '../widgets/reader_activity_view.dart';
 import '../widgets/edition_picker_sheet.dart';
 import '../widgets/loan_section.dart';
 import '../widgets/notes_field.dart';
@@ -263,11 +266,18 @@ class _Content extends StatelessWidget {
             count: book.ratingsCount!,
           ),
         ],
+        if (state.activity case final activity?)
+          ReaderCountsLine(activity: activity),
         const SizedBox(height: 20),
         if (userBook == null)
           _AddButton(adding: state.saveStatus.isLoading)
         else
           _StatusSelector(status: userBook.status),
+        if (state.activity case final activity?)
+          ReadOnlineButton(
+            workId: book.externalId,
+            access: activity.ebookAccess,
+          ),
         if (book.description != null) ...[
           SectionTitle(l10n.description),
           ExpandableText(book.description!),
@@ -287,6 +297,11 @@ class _Content extends StatelessWidget {
               }
             },
           ),
+        ),
+        SectionTitle(l10n.buyTitle),
+        BuyLinksSection(
+          book: book,
+          borrowable: state.activity?.ebookAccess == EbookAccess.borrowable,
         ),
         if (book.subjects.isNotEmpty) ...[
           SectionTitle(l10n.subjects),

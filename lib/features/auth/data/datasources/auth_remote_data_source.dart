@@ -37,9 +37,12 @@ class AuthRemoteDataSource {
   Future<void> updatePassword(String password) =>
       _auth.updateUser(UserAttributes(password: password));
 
-  Future<void> signInWithOAuth(OAuthProvider provider) => _auth.signInWithOAuth(
+  /// Opens the provider's consent page in the system browser; the session
+  /// arrives later through the `login-callback` deep link.
+  Future<bool> signInWithOAuth(OAuthProvider provider) => _auth.signInWithOAuth(
         provider,
         redirectTo: AppConfig.authRedirectUrl,
+        authScreenLaunchMode: LaunchMode.externalApplication,
       );
 
   Future<void> signOut() => _auth.signOut();

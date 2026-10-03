@@ -58,8 +58,8 @@
   "resetPasswordSubtitle": "Choose a new password for your account.",
   "updatePasswordButton": "Update password",
   "passwordUpdated": "Password updated.",
-  "continueWithGoogle": "Continue with Google",
   "continueWithApple": "Continue with Apple",
+  "orSeparator": "or",
   "validationRequired": "Required field",
   "validationEmail": "Enter a valid email address",
   "validationPasswordShort": "At least {min} characters",
@@ -138,6 +138,38 @@
     }
   },
   "similarBooks": "Similar books",
+  "readersWantToRead": "{count, plural, other{{count} want to read}}",
+  "@readersWantToRead": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "readersReading": "{count, plural, other{{count} reading}}",
+  "@readersReading": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "readersRead": "{count, plural, other{{count} read}}",
+  "@readersRead": {
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "readOnlineFree": "Read free on Open Library",
+  "readOnlineBorrow": "Digital loan on Open Library · account needed",
+  "buyTitle": "Where to buy",
+  "buyFromPublisher": "From the publisher",
+  "linkOpenFailed": "Couldn't open the link.",
   "authorWorkCount": "{count, plural, =1{1 work} other{{count} works}}",
   "@authorWorkCount": {
     "placeholders": {
@@ -186,6 +218,8 @@
       }
     }
   },
+  "scanAddToOpenLibrary": "Add it to Open Library",
+  "scanIsbnCopied": "ISBN copied: paste it into the Open Library form.",
   "scanAgain": "Scan another",
   "scanDetails": "Details",
   "scanTorch": "Torch",
@@ -373,7 +407,7 @@
     }
   },
   "ioTitle": "Import and export",
-  "ioImportTitle": "Import from Goodreads",
+  "ioImportTitle": "Import your library",
   "ioImportBody": "On Goodreads open “My Books” → “Import and export” → “Export Library”, then pick the downloaded .csv file here. Status, rating, dates, notes and shelves are kept.",
   "ioPickFile": "Choose the CSV file",
   "ioFound": "{count, plural, =1{Found 1 book} other{Found {count} books}}",
@@ -419,6 +453,18 @@
   "ioAborted": "Connection lost: the import stopped. Try again later; books already added are skipped.",
   "ioInvalidFile": "This file does not look like a book export (no “Title” column).",
   "ioTryAnother": "Choose another file",
+  "ioOrSeparator": "or",
+  "ioOpenLibraryBody": "Have an Open Library account? Import your reading log with your username: it must be public (Open Library → Settings → Privacy).",
+  "ioOpenLibraryButton": "Import from Open Library",
+  "ioOpenLibraryDialogTitle": "Open Library username",
+  "ioOpenLibraryHint": "username or profile link",
+  "ioOpenLibraryInvalid": "Not a valid username",
+  "ioFetching": "Reading the Open Library reading log…",
+  "ioOlUserNotFound": "No Open Library account with this username.",
+  "ioOlPrivate": "This reading log is private. Make it public in the Open Library settings, then try again.",
+  "ioOlEmpty": "This reading log has no books yet.",
+  "ioOlNetwork": "Couldn't reach Open Library. Try again later.",
+  "ioBack": "Back",
   "ioExportTitle": "Export your library",
   "ioExportBody": "Creates a CSV file with all your books, compatible with Goodreads and spreadsheets.",
   "ioExportButton": "Export as CSV",

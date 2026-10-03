@@ -12,8 +12,13 @@ class AppConfig {
   /// Shorter queries match too much of the catalogue to be worth a request.
   static const searchMinChars = 2;
 
-  /// Google/Apple login is wired in the data layer but hidden until enabled.
-  static const socialLoginEnabled = false;
+  /// Shows the Apple button. The provider must also be enabled in the
+  /// Supabase dashboard (Authentication -> Providers).
+  static const socialLoginEnabled = true;
+
+  /// Amazon Associates tag added to the Amazon "where to buy" link, e.g.
+  /// `bookshelf-21`. Null = plain links.
+  static const String? amazonAffiliateTag = null;
 }
 
 class Env {

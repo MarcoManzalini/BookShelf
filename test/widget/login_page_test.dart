@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:bookshelf/core/errors/failure.dart';
 import 'package:bookshelf/core/utils/request_status.dart';
+import 'package:bookshelf/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bookshelf/features/auth/presentation/cubit/auth_form_cubit.dart';
 import 'package:bookshelf/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,10 @@ void main() {
     cubit = MockAuthFormCubit();
     when(() => cubit.state).thenReturn(const AuthFormState());
     when(() => cubit.signIn(any(), any())).thenAnswer((_) async {});
+    when(() => cubit.signInWithProvider(any())).thenAnswer((_) async {});
   });
+
+  setUpAll(() => registerFallbackValue(SocialProvider.apple));
 
   Future<void> pumpLogin(WidgetTester tester) {
     return tester.pumpApp(
@@ -93,5 +97,25 @@ void main() {
 
     expect(find.text('Welcome back'), findsOneWidget);
     expect(find.text('Forgot password?'), findsOneWidget);
+  });
+
+  testWidgets('starts Apple sign-in', (tester) async {
+    await pumpLogin(tester);
+
+    await tester.ensureVisible(find.text('Continua con Apple'));
+    await tester.tap(find.text('Continua con Apple'));
+
+    verify(() => cubit.signInWithProvider(SocialProvider.apple)).called(1);
+  });
+
+  testWidgets('disables the Apple button while a request runs', (tester) async {
+    when(() => cubit.state)
+        .thenReturn(const AuthFormState(status: RequestStatus.loading));
+    await pumpLogin(tester);
+
+    await tester.ensureVisible(find.text('Continua con Apple'));
+    await tester.tap(find.text('Continua con Apple'));
+
+    verifyNever(() => cubit.signInWithProvider(any()));
   });
 }

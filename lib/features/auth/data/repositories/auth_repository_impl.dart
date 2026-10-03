@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import '../../../../core/errors/error_mapper.dart';
+import '../../../../core/errors/failure.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/entities/auth_snapshot.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -15,7 +16,12 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthSnapshot get current => _fromSession(_remote.currentSession);
 
   @override
-  Stream<AuthSnapshot> get changes => _remote.authStateChanges.map(
+  Stream<AuthSnapshot> get changes => _remote.authStateChanges
+      // A deep link carrying an error (e.g. the user cancelled the Apple
+      // consent page) is reported here as a stream error. Nothing
+      // changed for the session, and an error would end the listener.
+      .handleError((Object _) {})
+      .map(
         (state) => state.event == supabase.AuthChangeEvent.passwordRecovery
             ? AuthSnapshot(AuthStatus.passwordRecovery, _user(state.session))
             : _fromSession(state.session),
@@ -52,14 +58,14 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> signInWithProvider(SocialProvider provider) {
-    return _guard(
-      () => _remote.signInWithOAuth(
+    return _guard(() async {
+      final launched = await _remote.signInWithOAuth(
         switch (provider) {
-          SocialProvider.google => supabase.OAuthProvider.google,
           SocialProvider.apple => supabase.OAuthProvider.apple,
         },
-      ),
-    );
+      );
+      if (!launched) throw const Failure(FailureCode.unknown);
+    });
   }
 
   @override

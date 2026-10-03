@@ -4,10 +4,23 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../data/goodreads_csv_parser.dart';
+import '../../data/open_library_reading_log.dart';
 import '../../domain/import_row.dart';
 import '../../domain/library_importer.dart';
 
-enum ImportStep { idle, ready, running, done, invalidFile }
+enum ImportStep {
+  idle,
+
+  /// Downloading an Open Library reading log.
+  fetching,
+  ready,
+  running,
+  done,
+  invalidFile,
+
+  /// The Open Library reading log could not be read: see [ImportState.sourceError].
+  sourceFailed,
+}
 
 class ImportState extends Equatable {
   const ImportState({
@@ -16,6 +29,7 @@ class ImportState extends Equatable {
     this.rows = const [],
     this.skippedLines = 0,
     this.progress,
+    this.sourceError,
   });
 
   final ImportStep step;
@@ -25,17 +39,20 @@ class ImportState extends Equatable {
   /// Lines of the file that had no title.
   final int skippedLines;
   final ImportProgress? progress;
+  final ReadingLogError? sourceError;
 
   @override
-  List<Object?> get props => [step, fileName, rows, skippedLines, progress];
+  List<Object?> get props =>
+      [step, fileName, rows, skippedLines, progress, sourceError];
 }
 
 /// Drives the import screen: read the file, show what it holds, run the
 /// import with progress, and report what happened.
 class ImportCubit extends Cubit<ImportState> {
-  ImportCubit(this._importer) : super(const ImportState());
+  ImportCubit(this._importer, this._readingLog) : super(const ImportState());
 
   final LibraryImporter _importer;
+  final OpenLibraryReadingLog _readingLog;
   bool _cancel = false;
   StreamSubscription<ImportProgress>? _subscription;
 
@@ -58,6 +75,30 @@ class ImportCubit extends Cubit<ImportState> {
     } catch (_) {
       // Anything else the CSV decoder chokes on is "not a readable file".
       emit(ImportState(step: ImportStep.invalidFile, fileName: name));
+    }
+  }
+
+  /// Loads the public reading log of an Open Library account. [username]
+  /// must already be parsed with [OpenLibraryReadingLog.parseUsername].
+  Future<void> loadOpenLibrary(String username) async {
+    if (state.step == ImportStep.fetching || state.step == ImportStep.running) {
+      return;
+    }
+    final source = 'Open Library · $username';
+    emit(ImportState(step: ImportStep.fetching, fileName: source));
+    try {
+      final rows = await _readingLog.fetch(username);
+      if (isClosed) return;
+      emit(ImportState(step: ImportStep.ready, fileName: source, rows: rows));
+    } on ReadingLogException catch (e) {
+      if (isClosed) return;
+      emit(
+        ImportState(
+          step: ImportStep.sourceFailed,
+          fileName: source,
+          sourceError: e.error,
+        ),
+      );
     }
   }
 

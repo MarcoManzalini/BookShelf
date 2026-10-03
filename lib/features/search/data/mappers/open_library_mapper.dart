@@ -1,6 +1,7 @@
 import '../../domain/entities/author_info.dart';
 import '../../domain/entities/book.dart';
 import '../../domain/entities/book_edition.dart';
+import '../../domain/entities/reader_activity.dart';
 
 class OpenLibraryMapper {
   const OpenLibraryMapper._();
@@ -56,6 +57,63 @@ class OpenLibraryMapper {
       extraImages: coverIds,
       coverUrl: base.coverUrl ?? (coverIds.isNotEmpty ? coverIds.first : null),
       authorKeys: base.authorKeys.isEmpty ? _workAuthorKeys(work) : null,
+    );
+  }
+
+  /// A book built from an edition record (`/isbn/{isbn}.json`), with the
+  /// author names looked up separately. Null without a work or a title.
+  static Book? bookFromEdition(
+    Map<String, dynamic> json, {
+    List<String> authors = const [],
+    List<String> authorKeys = const [],
+  }) {
+    final workId = workIdOfEdition(json);
+    final edition = editionFromJson(json);
+    final title = edition?.title;
+    if (workId == null || edition == null || title == null) return null;
+    final base = Book(
+      externalId: workId,
+      title: title,
+      authors: authors,
+      authorKeys: authorKeys,
+    );
+    return edition.applyTo(base);
+  }
+
+  /// `works: [{key: '/works/OL1W'}]` of an edition record.
+  static String? workIdOfEdition(Map<String, dynamic> json) =>
+      _keysOf(json['works']).firstOrNull;
+
+  /// Author ids of an edition record (`authors: [{key: '/authors/OL1A'}]`).
+  static List<String> editionAuthorKeys(Map<String, dynamic> json) =>
+      _keysOf(json['authors']);
+
+  /// Author ids of a work record.
+  static List<String> workAuthorKeys(Map<String, dynamic> work) =>
+      _workAuthorKeys(work);
+
+  static List<String> _keysOf(Object? raw) {
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map<String, dynamic>>()
+        .map((e) => e['key'])
+        .whereType<String>()
+        .map((key) => key.split('/').last)
+        .where((id) => id.isNotEmpty)
+        .toList();
+  }
+
+  /// A search document asked for the reading-log counts and `ebook_access`.
+  static ReaderActivity readerActivityFromDoc(Map<String, dynamic> doc) {
+    return ReaderActivity(
+      wantToRead: _positiveInt(doc['want_to_read_count']) ?? 0,
+      reading: _positiveInt(doc['currently_reading_count']) ?? 0,
+      read: _positiveInt(doc['already_read_count']) ?? 0,
+      ebookAccess: switch (doc['ebook_access']) {
+        'public' => EbookAccess.public,
+        'borrowable' => EbookAccess.borrowable,
+        _ => EbookAccess.none,
+      },
     );
   }
 

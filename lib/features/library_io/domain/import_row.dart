@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 
 import '../../library/domain/entities/reading_status.dart';
 
-/// One book from a Goodreads (or BookShelf) CSV file, before it is matched to
-/// a real book.
+/// One book from a Goodreads (or BookShelf) CSV file or an Open Library
+/// reading log, before it is matched to a real book.
 class ImportRow extends Equatable {
   const ImportRow({
     required this.title,
@@ -11,6 +11,7 @@ class ImportRow extends Equatable {
     this.author,
     this.isbn13,
     this.isbn10,
+    this.workId,
     this.rating,
     this.pages,
     this.finishedOn,
@@ -24,6 +25,9 @@ class ImportRow extends Equatable {
   final String? author;
   final String? isbn13;
   final String? isbn10;
+
+  /// Open Library work id (`OL45804W`), when the source already knows it.
+  final String? workId;
   final ReadingStatus status;
 
   /// 1-5; Goodreads uses 0 for "not rated", which becomes null.
@@ -51,6 +55,7 @@ class ImportRow extends Equatable {
         author,
         isbn13,
         isbn10,
+        workId,
         status,
         rating,
         pages,

@@ -63,8 +63,9 @@ create policy "profiles_delete_own" on public.profiles
   using ((select auth.uid()) = id);
 
 -- Creates the profile row automatically when a user signs up.
--- display_name comes from the `data` passed to auth.signUp, falling back to
--- the local part of the email.
+-- display_name comes from the `data` passed to auth.signUp or, for Sign in
+-- with Apple, from the name Apple shares, falling back to the local part of
+-- the email.
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -77,6 +78,8 @@ begin
     new.id,
     coalesce(
       nullif(trim(new.raw_user_meta_data ->> 'display_name'), ''),
+      nullif(trim(new.raw_user_meta_data ->> 'full_name'), ''),
+      nullif(trim(new.raw_user_meta_data ->> 'name'), ''),
       split_part(new.email, '@', 1)
     )
   )

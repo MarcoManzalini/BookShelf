@@ -6,11 +6,21 @@ import '../../domain/entities/book_edition.dart';
 import '../../domain/entities/book_search_page.dart';
 import '../../domain/entities/explore_genre.dart';
 import '../../domain/entities/explore_section.dart';
+import '../../domain/entities/reader_activity.dart';
 import '../mappers/open_library_mapper.dart';
 
 abstract interface class BookRemoteDataSource {
   Future<BookSearchPage> search(String query, {required int page});
   Future<Book> fetchDetails(Book base);
+
+  /// The edition with this ISBN, read straight from Open Library's records
+  /// (`/isbn/{isbn}.json`) rather than from the search index, which lags
+  /// behind new editions. Open Library may also import a missing ISBN from
+  /// its partners on this call. Null when it has no such edition.
+  Future<Book?> fetchByIsbn(String isbn);
+
+  /// Reading-log counts and online availability of a work.
+  Future<ReaderActivity> fetchReaderActivity(String workId);
   Future<List<BookEdition>> fetchEditions(String workId);
   Future<AuthorInfo?> fetchAuthor(String authorKey);
   Future<List<Book>> fetchBooksByAuthor(String authorKey, {int limit});
@@ -81,6 +91,60 @@ class OpenLibraryDataSource implements BookRemoteDataSource {
       book = OpenLibraryMapper.applyRatings(book, ratingsJson);
     }
     return book;
+  }
+
+  @override
+  Future<Book?> fetchByIsbn(String isbn) async {
+    final Map<String, dynamic> edition;
+    try {
+      // Redirects to the edition, `/books/OL...M.json`.
+      edition = await _getJson('/isbn/$isbn.json');
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
+      rethrow;
+    }
+    final workId = OpenLibraryMapper.workIdOfEdition(edition);
+    if (workId == null) return null;
+    var authorKeys = OpenLibraryMapper.editionAuthorKeys(edition);
+    if (authorKeys.isEmpty) {
+      try {
+        authorKeys = OpenLibraryMapper.workAuthorKeys(await _work(workId));
+      } on DioException {
+        // A book without author is still a book.
+      }
+    }
+    // Editions only reference their authors: the names need one lookup each.
+    final keys = authorKeys.take(_maxEditionAuthors).toList();
+    final names = await Future.wait([
+      for (final key in keys)
+        _getJson('/authors/$key.json')
+            .then<String?>((json) => (json['name'] as String?)?.trim())
+            .catchError((Object _) => null),
+    ]);
+    return OpenLibraryMapper.bookFromEdition(
+      edition,
+      authors: names.nonNulls.where((n) => n.isNotEmpty).toList(),
+      authorKeys: keys,
+    );
+  }
+
+  static const _maxEditionAuthors = 3;
+
+  @override
+  Future<ReaderActivity> fetchReaderActivity(String workId) async {
+    final data = await _getJson(
+      '/search.json',
+      queryParameters: {
+        'q': 'key:/works/$workId',
+        'fields': 'want_to_read_count,currently_reading_count,'
+            'already_read_count,ebook_access',
+        'limit': 1,
+      },
+    );
+    final doc = _docs(data).firstOrNull;
+    return doc == null
+        ? const ReaderActivity()
+        : OpenLibraryMapper.readerActivityFromDoc(doc);
   }
 
   @override

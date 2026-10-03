@@ -6,8 +6,9 @@ import '../../../../core/utils/l10n_extension.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../cubit/auth_form_cubit.dart';
 
-/// Google/Apple buttons. Hidden until [AppConfig.socialLoginEnabled] is true
-/// (the providers must also be enabled in the Supabase dashboard).
+/// "or" separator plus the Apple button, under the email form of the
+/// login and register pages. Hidden when [AppConfig.socialLoginEnabled] is
+/// false (the providers must also be enabled in the Supabase dashboard).
 class SocialLoginSection extends StatelessWidget {
   const SocialLoginSection({super.key});
 
@@ -15,20 +16,39 @@ class SocialLoginSection extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!AppConfig.socialLoginEnabled) return const SizedBox.shrink();
     final l10n = context.l10n;
-    final cubit = context.read<AuthFormCubit>();
+    final theme = Theme.of(context);
+    final loading = context.select<AuthFormCubit, bool>(
+      (cubit) => cubit.state.status.isLoading,
+    );
+    void signIn(SocialProvider provider) =>
+        context.read<AuthFormCubit>().signInWithProvider(provider);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 16),
-        OutlinedButton(
-          onPressed: () => cubit.signInWithProvider(SocialProvider.google),
-          child: Text(l10n.continueWithGoogle),
+        const SizedBox(height: 24),
+        Row(
+          children: [
+            const Expanded(child: Divider()),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                l10n.orSeparator,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            const Expanded(child: Divider()),
+          ],
         ),
-        const SizedBox(height: 12),
-        OutlinedButton(
-          onPressed: () => cubit.signInWithProvider(SocialProvider.apple),
-          child: Text(l10n.continueWithApple),
+        const SizedBox(height: 24),
+        OutlinedButton.icon(
+          onPressed: loading ? null : () => signIn(SocialProvider.apple),
+          icon: const Icon(Icons.apple, size: 22),
+          label: Text(l10n.continueWithApple),
         ),
       ],
     );
   }
 }
+
