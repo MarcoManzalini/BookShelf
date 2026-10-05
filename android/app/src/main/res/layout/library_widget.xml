@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Library widget. Rows and sections are shown or hidden by
+     LibraryWidgetProvider depending on the widget's height. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lib_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/reading_widget_background"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- How many books on each shelf -->
+    <LinearLayout
+        android:id="@+id/lib_counts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/lib_reading_count"
+                style="@style/WidgetBigNumber" />
+
+            <TextView
+                android:id="@+id/lib_reading_label"
+                style="@style/WidgetSmallLabel" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/lib_want_count"
+                style="@style/WidgetBigNumber" />
+
+            <TextView
+                android:id="@+id/lib_want_label"
+                style="@style/WidgetSmallLabel" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/lib_read_count"
+                style="@style/WidgetBigNumber" />
+
+            <TextView
+                android:id="@+id/lib_read_label"
+                style="@style/WidgetSmallLabel" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lib_reading_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/lib_reading_header"
+            style="@style/WidgetHeader" />
+
+        <TextView
+            android:id="@+id/lib_reading_empty"
+            style="@style/WidgetSmallLabel"
+            android:layout_marginTop="6dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/lib_r_0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lib_r_0_title"
+                style="@style/WidgetBookTitle" />
+
+            <TextView
+                android:id="@+id/lib_r_0_sub"
+                style="@style/WidgetSmallLabel" />
+
+            <ProgressBar
+                android:id="@+id/lib_r_0_progress"
+                style="@style/WidgetBar"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lib_r_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lib_r_1_title"
+                style="@style/WidgetBookTitle" />
+
+            <TextView
+                android:id="@+id/lib_r_1_sub"
+                style="@style/WidgetSmallLabel" />
+
+            <ProgressBar
+                android:id="@+id/lib_r_1_progress"
+                style="@style/WidgetBar"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lib_r_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lib_r_2_title"
+                style="@style/WidgetBookTitle" />
+
+            <TextView
+                android:id="@+id/lib_r_2_sub"
+                style="@style/WidgetSmallLabel" />
+
+            <ProgressBar
+                android:id="@+id/lib_r_2_progress"
+                style="@style/WidgetBar"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lib_want_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/lib_want_header"
+            style="@style/WidgetHeader" />
+
+        <TextView
+            android:id="@+id/lib_want_empty"
+            style="@style/WidgetSmallLabel"
+            android:layout_marginTop="6dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/lib_w_0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lib_w_0_title"
+                style="@style/WidgetBookTitle" />
+
+            <TextView
+                android:id="@+id/lib_w_0_sub"
+                style="@style/WidgetSmallLabel" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lib_w_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lib_w_1_title"
+                style="@style/WidgetBookTitle" />
+
+            <TextView
+                android:id="@+id/lib_w_1_sub"
+                style="@style/WidgetSmallLabel" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lib_w_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lib_w_2_title"
+                style="@style/WidgetBookTitle" />
+
+            <TextView
+                android:id="@+id/lib_w_2_sub"
+                style="@style/WidgetSmallLabel" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/lib_shelves"
+        style="@style/WidgetSmallLabel"
+        android:layout_marginTop="12dp"
+        android:textColor="#E6FFFFFF"
+        android:visibility="gone" />
+</LinearLayout>

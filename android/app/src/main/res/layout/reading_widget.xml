@@ -39,6 +39,28 @@
         android:textSize="13sp"
         android:visibility="gone" />
 
+    <!-- Large widget only: what is left, finish estimate, start date -->
+    <LinearLayout
+        android:id="@+id/widget_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/widget_info_left"
+            style="@style/ReadingWidgetInfo" />
+
+        <TextView
+            android:id="@+id/widget_info_finish"
+            style="@style/ReadingWidgetInfo" />
+
+        <TextView
+            android:id="@+id/widget_info_since"
+            style="@style/ReadingWidgetInfo" />
+    </LinearLayout>
+
     <!-- Spacer. Widgets only allow a few view classes: a plain View makes
          the launcher refuse the whole layout ("Can't load widget"). -->
     <FrameLayout

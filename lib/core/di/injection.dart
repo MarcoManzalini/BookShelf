@@ -130,7 +130,7 @@ Future<void> configureDependencies() async {
       dispose: (r) => r.dispose(),
     )
     ..registerLazySingleton(
-      () => ReadingWidgetSync(getIt(), getIt())..start(),
+      () => ReadingWidgetSync(getIt(), getIt(), getIt())..start(),
       dispose: (s) => s.dispose(),
     )
     // Use cases

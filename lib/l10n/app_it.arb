@@ -894,6 +894,72 @@
     }
   },
   "widgetReadToday": "Oggi hai già letto",
+  "widgetPagesLeft": "{count, plural, =1{1 pagina rimasta} other{{count} pagine rimaste}}",
+  "@widgetPagesLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetTimeLeft": "{time} rimasti",
+  "@widgetTimeLeft": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetFinishBy": "Al tuo ritmo finisci verso il {date}",
+  "@widgetFinishBy": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetReadingSince": "In lettura dal {date}",
+  "@widgetReadingSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetShelfRead": "Letti",
+  "widgetShelves": "Scaffali",
+  "widgetShelfEmpty": "Niente qui per ora",
+  "widgetYear": "Il tuo {year}",
+  "@widgetYear": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetBooksRead": "{count, plural, =1{libro letto} other{libri letti}}",
+  "@widgetBooksRead": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetGoal": "Obiettivo: {done} di {goal}",
+  "@widgetGoal": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetNoGoal": "Nessun obiettivo annuale",
+  "widgetDayStreak": "giorni di fila",
+  "widgetPagesMonth": "pagine questo mese",
+  "widgetPagesPerDay": "pagine al giorno",
   "errorOutdatedDatabase": "Il database non è aggiornato per questa versione dell'app: esegui supabase/update.sql su Supabase.",
   "sessionsRange": "{from}–{to} di {total}",
   "@sessionsRange": {

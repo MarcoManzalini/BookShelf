@@ -55,7 +55,25 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/reading_widget_info" />
         </receiver>
-        <!-- Redraws the widget after midnight, also after a reboot -->
+        <!-- Home screen widget: books being read, next ones and shelves -->
+        <receiver android:name=".LibraryWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/library_widget_info" />
+        </receiver>
+        <!-- Home screen widget: reading statistics -->
+        <receiver android:name=".StatsWidgetProvider" android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/stats_widget_info" />
+        </receiver>
+        <!-- Redraws the widgets after midnight, also after a reboot -->
         <receiver android:name="es.antonborri.home_widget.HomeWidgetScheduledUpdateReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

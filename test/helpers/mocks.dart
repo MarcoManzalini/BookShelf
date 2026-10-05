@@ -1,6 +1,7 @@
 import 'package:bookshelf/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bookshelf/features/library/domain/repositories/library_repository.dart';
 import 'package:bookshelf/features/library/domain/usecases/add_book_to_library.dart';
+import 'package:bookshelf/features/profile/domain/repositories/profile_repository.dart';
 import 'package:bookshelf/features/quotes/domain/repositories/quote_repository.dart';
 import 'package:bookshelf/features/search/domain/repositories/book_search_repository.dart';
 import 'package:bookshelf/features/stats/domain/repositories/reading_log_repository.dart';
@@ -17,3 +18,5 @@ class MockReadingLogRepository extends Mock implements ReadingLogRepository {}
 class MockAddBookToLibrary extends Mock implements AddBookToLibrary {}
 
 class MockQuoteRepository extends Mock implements QuoteRepository {}
+
+class MockProfileRepository extends Mock implements ProfileRepository {}

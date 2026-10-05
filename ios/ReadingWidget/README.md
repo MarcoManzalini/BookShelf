@@ -1,4 +1,4 @@
-# Widget iOS (non ancora attivo)
+# Widget iOS (non ancora attivi)
 
 Il codice del widget è pronto (`ReadingWidget.swift`) ma **non è collegato al
 progetto Xcode**. Su iOS il widget è un'estensione separata che legge i dati
@@ -20,6 +20,7 @@ Con un account a pagamento:
    aggiungi `group.com.marcomanzalini.bookshelf`. Ripeti sul target
    **ReadingWidget** con lo stesso gruppo.
 6. In `ios/Runner/Info.plist` non serve altro: l'app scrive già i dati nel
-   gruppo (`ReadingWidgetSync.iOSAppGroup`) e chiede l'aggiornamento del
-   widget `ReadingWidget`.
+   gruppo (`ReadingWidgetSync.iOSAppGroup`) e chiede l'aggiornamento dei
+   widget `ReadingWidget`, `LibraryWidget` e `StatsWidget` (un unico
+   `WidgetBundle` nello stesso file).
 7. `flutter run` sul telefono, poi aggiungi il widget dalla schermata Home.

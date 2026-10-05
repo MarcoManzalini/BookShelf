@@ -6,7 +6,7 @@ class WelcomeIllustration extends StatelessWidget {
 
   final String asset;
 
-  static const mascot = 'assets/images/welcome_frog.png';
+  static const mascot = 'assets/images/welcome_read.png';
   static const find = 'assets/images/welcome_find.png';
   static const track = 'assets/images/welcome_track.png';
 

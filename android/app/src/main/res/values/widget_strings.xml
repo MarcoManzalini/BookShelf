@@ -3,4 +3,10 @@
     <string name="widget_reading">Reading</string>
     <string name="widget_no_book">No book in progress</string>
     <string name="widget_description">The book you are reading and your streak</string>
+    <string name="widget_want">Want to read</string>
+    <string name="widget_read">Read</string>
+    <string name="widget_shelves">Shelves</string>
+    <string name="widget_empty">Nothing here yet</string>
+    <string name="widget_library_description">The books you are reading, the next ones and your shelves</string>
+    <string name="widget_stats_description">Books read this year, goal, streak and pages</string>
 </resources>

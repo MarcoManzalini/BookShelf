@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Statistics widget: the year on the left; on wide widgets, the streak
+     and the pages on the right (see StatsWidgetProvider). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/stat_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/reading_widget_background"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/stat_year"
+            style="@style/WidgetHeader" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/stat_books"
+            style="@style/WidgetBigNumber"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/stat_books_label"
+            style="@style/WidgetSmallLabel"
+            android:textSize="13sp" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ProgressBar
+            android:id="@+id/stat_goal_bar"
+            style="@style/WidgetBar"
+            android:layout_height="6dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/stat_goal"
+            style="@style/WidgetSmallLabel"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/stat_side"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/stat_streak"
+                style="@style/WidgetBigNumber"
+                android:minWidth="44dp"
+                android:textSize="17sp"
+                android:drawableStart="@drawable/reading_widget_flame"
+                android:drawablePadding="4dp"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/stat_streak_label"
+                style="@style/WidgetSmallLabel"
+                android:layout_width="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:maxLines="2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/stat_month"
+                style="@style/WidgetBigNumber"
+                android:minWidth="44dp"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/stat_month_label"
+                style="@style/WidgetSmallLabel"
+                android:layout_width="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:maxLines="2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/stat_avg"
+                style="@style/WidgetBigNumber"
+                android:minWidth="44dp"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/stat_avg_label"
+                style="@style/WidgetSmallLabel"
+                android:layout_width="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:maxLines="2" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

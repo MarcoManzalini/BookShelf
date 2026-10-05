@@ -83,7 +83,11 @@ Ogni sessione diventa un'immagine 1080×1920 pronta per le storie, in tre stili 
 
 ### 🔔 Promemoria e widget
 - **Promemoria di lettura** giornaliero all'ora che scegli, che ti avvisa se stai per perdere la serie
-- **Widget per la schermata Home** (Android) con il libro in lettura, il progresso e la serie
+- **Widget per la schermata Home** (Android), ridimensionabili:
+  - *Lettura*: il libro in lettura, il progresso e la serie; grande mostra anche pagine rimaste, quando lo finisci al tuo ritmo e da quando lo leggi
+  - *Libreria*: i libri in lettura, quanti ne hai su ogni scaffale, i prossimi da leggere e i tuoi scaffali
+  - *Statistiche*: libri letti quest'anno e obiettivo, serie, pagine del mese e media al giorno
+  - Toccando un libro si apre la sua scheda, le statistiche aprono la pagina delle statistiche
 
 <p>
   <img src="docs/screenshots/widget_android.png" width="300" alt="Widget Android" />

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Background of the app icon artwork (reference/Icona app@1x.png) -->
-    <color name="ic_launcher_background">#111114</color>
+    <!-- Background of the app icon artwork (peach);
+         the dark icon's is in values-night -->
+    <color name="ic_launcher_background">#FCCFA8</color>
 </resources>

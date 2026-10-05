@@ -3,4 +3,10 @@
     <string name="widget_reading">In lettura</string>
     <string name="widget_no_book">Nessun libro in lettura</string>
     <string name="widget_description">Il libro che stai leggendo e la tua serie</string>
+    <string name="widget_want">Da leggere</string>
+    <string name="widget_read">Letti</string>
+    <string name="widget_shelves">Scaffali</string>
+    <string name="widget_empty">Niente qui per ora</string>
+    <string name="widget_library_description">I libri che stai leggendo, i prossimi e i tuoi scaffali</string>
+    <string name="widget_stats_description">Libri letti quest\'anno, obiettivo, serie e pagine</string>
 </resources>
