@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scaffale condiviso · BookShelf</title>
+  <meta name="description" content="Uno scaffale condiviso su BookShelf">
+  <meta property="og:title" content="Uno scaffale condiviso su BookShelf">
+  <meta property="og:description" content="Guarda i libri di questo scaffale e salvalo nella tua libreria.">
+  <meta property="og:type" content="website">
+  <meta name="robots" content="noindex">
+  <style>
+    :root {
+      --bg: #faf8f5; --surface: #ffffff; --ink: #18181b; --muted: #6b6b73;
+      --line: #e7e3dd; --accent: #f2b544; --accent-ink: #18181b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111113; --surface: #1c1c1f; --ink: #f4f4f5; --muted: #a1a1aa;
+        --line: #2c2c31;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 720px; margin: 0 auto; padding: 32px 16px 120px; }
+    .brand { font-weight: 800; letter-spacing: .02em; color: var(--muted); font-size: 14px; }
+    h1 { font-size: clamp(28px, 7vw, 40px); line-height: 1.1; margin: 12px 0 6px; }
+    .meta { color: var(--muted); margin: 0 0 24px; }
+    .grid {
+      list-style: none; padding: 0; margin: 0; display: grid; gap: 20px 16px;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .cover {
+      aspect-ratio: 2 / 3; width: 100%; border-radius: 4px; object-fit: cover;
+      background: var(--line); display: flex; align-items: center; justify-content: center;
+      padding: 8px; text-align: center; font-size: 13px; color: var(--muted);
+      box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    }
+    .title { font-weight: 600; font-size: 14px; margin: 8px 0 0; }
+    .author { color: var(--muted); font-size: 13px; margin: 2px 0 0; }
+    .state { text-align: center; padding: 64px 0; color: var(--muted); }
+    .state strong { display: block; color: var(--ink); font-size: 20px; margin-bottom: 6px; }
+    .cta {
+      position: fixed; left: 0; right: 0; bottom: 0; padding: 16px;
+      background: linear-gradient(transparent, var(--bg) 30%);
+      display: flex; justify-content: center;
+    }
+    .cta a {
+      display: inline-block; background: var(--accent); color: var(--accent-ink);
+      font-weight: 700; text-decoration: none; padding: 14px 28px; border-radius: 999px;
+    }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">BOOKSHELF</div>
+    <section id="loading" class="state">Caricamento…</section>
+    <section id="gone" class="state" hidden>
+      <strong>Questo scaffale non è più condiviso</strong>
+      Il link potrebbe essere stato sostituito o disattivato.
+    </section>
+    <section id="error" class="state" hidden>
+      <strong>Impossibile caricare lo scaffale</strong>
+      Controlla la connessione e riprova.
+    </section>
+    <section id="shelf" hidden>
+      <h1 id="name"></h1>
+      <p id="meta" class="meta"></p>
+      <p id="empty" class="state" hidden>Lo scaffale è vuoto</p>
+      <ul id="books" class="grid"></ul>
+    </section>
+  </main>
+  <div id="cta" class="cta" hidden><a id="open">Apri in BookShelf</a></div>
+
+  <script src="config.js"></script>
+  <script>
+    (function () {
+      var cfg = window.BOOKSHELF || {};
+      var token = (new URLSearchParams(location.search).get('t') || '').trim();
+      var $ = function (id) { return document.getElementById(id); };
+
+      function show(id) {
+        ['loading', 'gone', 'error', 'shelf'].forEach(function (s) {
+          $(s).hidden = s !== id;
+        });
+      }
+
+      function el(tag, cls, text) {
+        var node = document.createElement(tag);
+        if (cls) node.className = cls;
+        if (text) node.textContent = text;
+        return node;
+      }
+
+      function render(shelf) {
+        var books = shelf.books || [];
+        document.title = shelf.shelf_name + ' · BookShelf';
+        $('name').textContent = shelf.shelf_name;
+        var count = books.length === 1 ? '1 libro' : books.length + ' libri';
+        $('meta').textContent = shelf.owner_name
+          ? 'Uno scaffale di ' + shelf.owner_name + ' · ' + count
+          : count;
+        $('empty').hidden = books.length > 0;
+        books.forEach(function (b) {
+          var item = el('li');
+          var cover;
+          if (b.cover_url && /^https:\/\//.test(b.cover_url)) {
+            cover = el('img', 'cover');
+            cover.src = b.cover_url;
+            cover.alt = b.title;
+            cover.loading = 'lazy';
+          } else {
+            cover = el('div', 'cover', b.title);
+          }
+          item.appendChild(cover);
+          item.appendChild(el('p', 'title', b.title));
+          if (b.authors && b.authors.length) {
+            item.appendChild(el('p', 'author', b.authors.join(', ')));
+          }
+          $('books').appendChild(item);
+        });
+        show('shelf');
+      }
+
+      if (!token) { show('gone'); return; }
+
+      $('open').href = 'io.supabase.bookshelf://shelf/shared-shelf/' +
+        encodeURIComponent(token);
+      $('cta').hidden = false;
+
+      fetch(cfg.supabaseUrl + '/rest/v1/rpc/get_shared_shelf', {
+        method: 'POST',
+        headers: {
+          'apikey': cfg.anonKey,
+          'Authorization': 'Bearer ' + cfg.anonKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ p_token: token })
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function (shelf) {
+          if (!shelf) { show('gone'); return; }
+          render(shelf);
+        })
+        .catch(function () { show('error'); });
+    })();
+  </script>
+</body>
+</html>

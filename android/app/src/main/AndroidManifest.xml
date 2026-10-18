@@ -28,12 +28,14 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <!-- Supabase auth deep link (email confirmation / password recovery) -->
+            <!-- Supabase auth deep link (email confirmation / password recovery)
+                 and shared shelf links (io.supabase.bookshelf://shelf/shared-shelf/<token>) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="io.supabase.bookshelf" android:host="login-callback"/>
+                <data android:scheme="io.supabase.bookshelf" android:host="shelf"/>
             </intent-filter>
         </activity>
         <!-- Scheduled reading reminders (flutter_local_notifications) -->

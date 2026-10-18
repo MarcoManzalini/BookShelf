@@ -7,6 +7,8 @@ import '../../../../core/utils/l10n_extension.dart';
 import '../../../../core/widgets/bookshelf_mark.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../../shelf_share/presentation/widgets/shelf_share_sheet.dart';
+import '../../domain/entities/shelf_names.dart';
 import '../../domain/entities/user_book.dart';
 import '../bloc/library_bloc.dart';
 import '../widgets/book_extras_ui.dart';
@@ -176,6 +178,21 @@ class _ShelfFilterChip extends StatelessWidget {
                 label: Text(l10n.shelfFilterLabel(shelf)),
                 onDeleted: () =>
                     bloc.add(const LibraryShelfFilterChanged(null)),
+              ),
+            if (shelf != null)
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                tooltip: l10n.shelfShareAction,
+                icon: const Icon(Icons.ios_share_rounded, size: 20),
+                onPressed: () => showShelfShareSheet(
+                  context,
+                  shelfName: shelf,
+                  books: [
+                    for (final b in bloc.state.books)
+                      if (b.shelves.any((s) => ShelfNames.same(s, shelf)))
+                        b.book,
+                  ],
+                ),
               ),
             if (mood != null)
               InputChip(

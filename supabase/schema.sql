@@ -322,6 +322,73 @@ create policy "book_quotes_delete_own" on public.book_quotes
   for delete to authenticated
   using ((select auth.uid()) = user_id);
 
+-- v7: shared shelves. One link (token) per custom shelf; anyone with the
+-- token reads the shelf through get_shared_shelf(), never the table.
+create table if not exists public.shelf_shares (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null default auth.uid()
+               references auth.users (id) on delete cascade,
+  shelf_name text not null
+               check (char_length(btrim(shelf_name)) between 1 and 30),
+  token      text not null unique
+               default substr(translate(encode(extensions.gen_random_bytes(16),
+                                               'base64'), '+/=', '-_'), 1, 22),
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists shelf_shares_user_shelf_unique
+  on public.shelf_shares (user_id, lower(shelf_name));
+
+alter table public.shelf_shares enable row level security;
+
+drop policy if exists "shelf_shares_select_own" on public.shelf_shares;
+create policy "shelf_shares_select_own" on public.shelf_shares
+  for select to authenticated
+  using ((select auth.uid()) = user_id);
+
+drop policy if exists "shelf_shares_insert_own" on public.shelf_shares;
+create policy "shelf_shares_insert_own" on public.shelf_shares
+  for insert to authenticated
+  with check ((select auth.uid()) = user_id);
+
+drop policy if exists "shelf_shares_delete_own" on public.shelf_shares;
+create policy "shelf_shares_delete_own" on public.shelf_shares
+  for delete to authenticated
+  using ((select auth.uid()) = user_id);
+
+-- Public read of a shared shelf: only the shelf name, the owner's display
+-- name and title/authors/cover/year of its books. Null for an unknown token.
+create or replace function public.get_shared_shelf(p_token text)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select jsonb_build_object(
+    'shelf_name', s.shelf_name,
+    'owner_name', p.display_name,
+    'books', coalesce((
+      select jsonb_agg(jsonb_build_object(
+               'external_id', b.external_id,
+               'title', b.title,
+               'authors', b.authors,
+               'cover_url', b.cover_url,
+               'published_year', b.published_year)
+             order by b.created_at)
+      from public.user_books b
+      where b.user_id = s.user_id
+        and exists (select 1 from unnest(b.shelves) t(name)
+                    where lower(t.name) = lower(s.shelf_name))
+    ), '[]'::jsonb))
+  from public.shelf_shares s
+  left join public.profiles p on p.id = s.user_id
+  where s.token = p_token;
+$$;
+
+revoke all on function public.get_shared_shelf(text) from public;
+grant execute on function public.get_shared_shelf(text) to anon, authenticated;
+
 -- ---------------------------------------------------------------------------
 -- Storage: avatars bucket
 -- Files live under "<user_id>/<file>". The bucket is public so avatar URLs can

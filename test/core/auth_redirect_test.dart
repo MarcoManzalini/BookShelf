@@ -3,9 +3,14 @@ import 'package:bookshelf/core/errors/failure.dart';
 import 'package:bookshelf/core/router/app_router.dart';
 import 'package:bookshelf/core/utils/cover_url.dart';
 import 'package:bookshelf/features/auth/domain/entities/auth_snapshot.dart';
+import 'package:bookshelf/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../helpers/fixtures.dart';
+import '../helpers/mocks.dart';
 
 void main() {
   group('authRedirect', () {
@@ -18,6 +23,97 @@ void main() {
         authRedirect(AuthStatus.unauthenticated, '/book/abc'),
         AppRoutes.welcome,
       );
+    });
+
+    group('shared shelf links', () {
+      test('unauthenticated on a shared shelf remembers it and goes to welcome',
+          () {
+        final pending = PendingDeepLink();
+        expect(
+          authRedirect(
+            AuthStatus.unauthenticated,
+            AppRoutes.sharedShelf('abc'),
+            pending: pending,
+          ),
+          AppRoutes.welcome,
+        );
+        expect(pending.location, '/shared-shelf/abc');
+      });
+
+      test('authenticated in the auth area resumes the pending shared shelf',
+          () {
+        final pending = PendingDeepLink()..location = '/shared-shelf/abc';
+        expect(
+          authRedirect(
+            AuthStatus.authenticated,
+            AppRoutes.login,
+            pending: pending,
+          ),
+          '/shared-shelf/abc',
+        );
+        expect(pending.location, isNull);
+      });
+
+      test('authenticated in the auth area without pending goes to library',
+          () {
+        expect(
+          authRedirect(
+            AuthStatus.authenticated,
+            AppRoutes.login,
+            pending: PendingDeepLink(),
+          ),
+          AppRoutes.library,
+        );
+      });
+
+      test('the link host as a path segment is remembered normalized', () {
+        final pending = PendingDeepLink();
+        authRedirect(
+          AuthStatus.unauthenticated,
+          '/shelf/shared-shelf/abc',
+          pending: pending,
+        );
+        expect(pending.location, '/shared-shelf/abc');
+      });
+
+      test('a login completed outside the auth pages still resumes once', () {
+        final pending = PendingDeepLink()..location = '/shared-shelf/abc';
+        expect(
+          authRedirect(
+            AuthStatus.authenticated,
+            AppRoutes.library,
+            pending: pending,
+          ),
+          '/shared-shelf/abc',
+        );
+        expect(pending.location, isNull);
+        expect(
+          authRedirect(
+            AuthStatus.authenticated,
+            AppRoutes.library,
+            pending: pending,
+          ),
+          isNull,
+        );
+      });
+
+      test('a link without a token opens the shared shelf page', () {
+        final auth = MockAuthRepository();
+        when(() => auth.current)
+            .thenReturn(const AuthSnapshot(AuthStatus.authenticated, testUser));
+        final router = createRouter(AuthBloc(auth));
+        addTearDown(router.dispose);
+        for (final path in ['/shared-shelf', '/shelf/shared-shelf']) {
+          final match = router.configuration.findMatch(Uri.parse(path));
+          expect(match.isError, isFalse, reason: path);
+        }
+      });
+
+      test('pending ignores locations other than shared shelves', () {
+        final pending = PendingDeepLink();
+        authRedirect(AuthStatus.unauthenticated, '/book/x', pending: pending);
+        expect(pending.location, isNull);
+      });
     });
 
     test('unauthenticated users can use the auth pages', () {
@@ -77,6 +173,10 @@ void main() {
         PostgrestException(
           message: 'invalid input value for enum reading_status: "paused"',
           code: '22P02',
+        ),
+        PostgrestException(
+          message: 'Could not find the function public.get_shared_shelf',
+          code: 'PGRST202',
         ),
       ]) {
         expect(mapError(e).code, FailureCode.outdatedDatabase);

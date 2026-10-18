@@ -37,6 +37,12 @@ import '../../features/reminders/data/loan_reminders.dart';
 import '../../features/reminders/data/reading_reminders.dart';
 import '../../features/reminders/data/reminder_scheduler.dart';
 import '../../features/scanner/presentation/cubit/isbn_scan_cubit.dart';
+import '../../features/shelf_share/data/datasources/shelf_share_remote_data_source.dart';
+import '../../features/shelf_share/data/repositories/shelf_share_repository_impl.dart';
+import '../../features/shelf_share/domain/repositories/shelf_share_repository.dart';
+import '../../features/shelf_share/domain/usecases/save_shared_shelf.dart';
+import '../../features/shelf_share/presentation/cubit/shared_shelf_cubit.dart';
+import '../../features/shelf_share/presentation/cubit/shelf_share_cubit.dart';
 import '../../features/stats/data/datasources/reading_log_remote_data_source.dart';
 import '../../features/stats/data/repositories/reading_log_repository_impl.dart';
 import '../../features/stats/domain/repositories/reading_log_repository.dart';
@@ -99,6 +105,9 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<QuoteRemoteDataSource>(
       () => SupabaseQuoteDataSource(getIt()),
     )
+    ..registerLazySingleton<ShelfShareRemoteDataSource>(
+      () => SupabaseShelfShareDataSource(getIt()),
+    )
     // Repositories
     ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt()))
     ..registerLazySingleton<BookSearchRepository>(
@@ -120,6 +129,10 @@ Future<void> configureDependencies() async {
     ..registerLazySingleton<QuoteRepository>(
       () => QuoteRepositoryImpl(getIt()),
     )
+    ..registerLazySingleton<ShelfShareRepository>(
+      () => ShelfShareRepositoryImpl(getIt()),
+    )
+    ..registerLazySingleton(() => SaveSharedShelf(getIt()))
     ..registerLazySingleton<ReminderScheduler>(LocalNotificationScheduler.new)
     ..registerLazySingleton(
       () => ReadingReminders(getIt(), getIt(), getIt(), getIt()),
@@ -163,6 +176,12 @@ Future<void> configureDependencies() async {
         LibraryImporter(getIt(), getIt()),
         OpenLibraryReadingLog(getIt()),
       ),
+    )
+    ..registerFactoryParam<ShelfShareCubit, String, void>(
+      (shelfName, _) => ShelfShareCubit(shelfName, getIt()),
+    )
+    ..registerFactoryParam<SharedShelfCubit, String, void>(
+      (token, _) => SharedShelfCubit(token, getIt(), getIt()),
     )
     ..registerFactoryParam<EditionsCubit, Book, void>(
       (book, _) => EditionsCubit(getIt(), book),

@@ -19,6 +19,14 @@ class AppConfig {
   /// Amazon Associates tag added to the Amazon "where to buy" link, e.g.
   /// `bookshelf-21`. Null = plain links.
   static const String? amazonAffiliateTag = null;
+
+  /// Public page (GitHub Pages, `share_site/s/`) that shows a shared shelf;
+  /// the token goes in the `t` query parameter.
+  static const shelfShareBaseUrl =
+      'https://marcomanzalini.github.io/BookShelf/s/';
+
+  /// Opens a shared shelf in the app; the token is appended.
+  static const shelfShareAppUrl = 'io.supabase.bookshelf://shelf/shared-shelf/';
 }
 
 class Env {

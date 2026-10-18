@@ -15,6 +15,7 @@ import '../../features/library_io/presentation/pages/import_export_page.dart';
 import '../../features/recap/domain/reading_recap.dart';
 import '../../features/recap/presentation/pages/recap_page.dart';
 import '../../features/scanner/presentation/pages/scan_page.dart';
+import '../../features/shelf_share/presentation/pages/shared_shelf_page.dart';
 import '../../features/stats/presentation/pages/stats_page.dart';
 import '../../features/search/domain/entities/book.dart';
 import '../../features/search/domain/entities/explore_genre.dart';
@@ -51,23 +52,53 @@ abstract final class AppRoutes {
   static String preview(String externalId) => '/preview/$externalId';
   static String exploreSection(String name) => '/explore/$name';
   static String exploreGenre(String name) => '/explore/genre/$name';
+  static String sharedShelf(String token) => '/shared-shelf/$token';
+}
+
+/// A shared shelf link opened before signing in, resumed after the login.
+class PendingDeepLink {
+  String? location;
 }
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 GoRouter createRouter(AuthBloc authBloc) {
+  final pending = PendingDeepLink();
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.library,
     refreshListenable: GoRouterRefreshStream(authBloc.stream),
-    redirect: (context, state) =>
-        authRedirect(authBloc.state.status, state.matchedLocation),
+    redirect: (context, state) => authRedirect(
+      authBloc.state.status,
+      state.matchedLocation,
+      pending: pending,
+    ),
     routes: [
       // Supabase deep links (email confirmation / recovery) arrive as `/`.
       GoRoute(path: '/', redirect: (_, __) => AppRoutes.library),
       GoRoute(
         path: '/login-callback',
         redirect: (_, __) => AppRoutes.library,
+      ),
+      GoRoute(
+        path: '/shared-shelf/:token',
+        builder: (_, state) =>
+            SharedShelfPage(token: state.pathParameters['token']!),
+      ),
+      // A link without a token: the page shows "no longer shared".
+      GoRoute(
+        path: '/shared-shelf',
+        builder: (_, __) => const SharedShelfPage(token: ''),
+      ),
+      // In case the link's host (`shelf`) reaches the router as a segment.
+      GoRoute(
+        path: '/shelf/shared-shelf',
+        redirect: (_, __) => '/shared-shelf',
+      ),
+      GoRoute(
+        path: '/shelf/shared-shelf/:token',
+        redirect: (_, state) =>
+            AppRoutes.sharedShelf(state.pathParameters['token']!),
       ),
       GoRoute(
         path: AppRoutes.welcome,
@@ -199,7 +230,11 @@ GoRouter createRouter(AuthBloc authBloc) {
 }
 
 /// Pure guard logic, exposed for testing.
-String? authRedirect(AuthStatus status, String location) {
+String? authRedirect(
+  AuthStatus status,
+  String location, {
+  PendingDeepLink? pending,
+}) {
   final inAuthArea = location.startsWith('/auth');
   switch (status) {
     case AuthStatus.passwordRecovery:
@@ -208,8 +243,30 @@ String? authRedirect(AuthStatus status, String location) {
           : AppRoutes.resetPassword;
     case AuthStatus.unauthenticated:
       final allowed = inAuthArea && location != AppRoutes.resetPassword;
+      if (!allowed) {
+        final shelf = _sharedShelfLocation(location);
+        if (shelf != null) pending?.location = shelf;
+      }
       return allowed ? null : AppRoutes.welcome;
     case AuthStatus.authenticated:
+      // A shelf link opened before signing in is resumed once, however the
+      // sign-in completed (form, social login, email link).
+      final resume = pending?.location;
+      if (resume != null) {
+        pending!.location = null;
+        return resume == location ? null : resume;
+      }
       return inAuthArea ? AppRoutes.library : null;
   }
+}
+
+/// A shared shelf link as `/shared-shelf/<token>`, also when the link's host
+/// reaches the router as a path segment; null for any other location.
+String? _sharedShelfLocation(String location) {
+  const route = '/shared-shelf/';
+  if (location.startsWith(route)) return location;
+  if (location.startsWith('/shelf$route')) {
+    return location.substring('/shelf'.length);
+  }
+  return null;
 }

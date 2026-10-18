@@ -990,6 +990,64 @@
   },
   "shelfRemovedAll": "Tolto dagli scaffali",
   "shelvesUpdated": "Scaffali aggiornati",
+  "sharedShelfOwner": "Uno scaffale di {name}",
+  "@sharedShelfOwner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sharedShelfBookCount": "{count, plural, =0{Nessun libro} =1{1 libro} other{{count} libri}}",
+  "@sharedShelfBookCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sharedShelfSave": "Salva nella mia libreria",
+  "sharedShelfSaved": "{count, plural, =0{Era già tutto nella tua libreria} =1{1 libro aggiunto} other{{count} libri aggiunti}}",
+  "@sharedShelfSaved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sharedShelfNotFound": "Questo scaffale non è più condiviso",
+  "sharedShelfEmpty": "Lo scaffale è vuoto",
+  "sharedShelfToLibrary": "Vai alla libreria",
+  "shelfShareAction": "Condividi scaffale",
+  "shelfShareSheetTitle": "Condividi «{name}»",
+  "@shelfShareSheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shelfShareSend": "Condividi",
+  "shelfShareCopy": "Copia link",
+  "shelfShareCopied": "Link copiato",
+  "shelfShareRegenerate": "Nuovo link",
+  "shelfShareRegenerateHint": "Il link precedente smetterà di funzionare",
+  "shelfShareStop": "Interrompi condivisione",
+  "shelfShareStopConfirm": "Chi ha il link non vedrà più questo scaffale.",
+  "shelfShareStopped": "Condivisione interrotta",
+  "shelfShareMessage": "Guarda il mio scaffale «{name}» su BookShelf: {url}",
+  "@shelfShareMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "shelfShareInfo": "Chi ha il link vede titoli e copertine, non voti, note o progressi.",
+  "shelfShareError": "Non sono riuscito a preparare la condivisione. Riprova.",
   "seriesVolumes": "Volumi {range}",
   "@seriesVolumes": {
     "placeholders": {

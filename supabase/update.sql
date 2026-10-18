@@ -188,6 +188,25 @@ create index if not exists book_quotes_book_idx
 
 alter table public.book_quotes enable row level security;
 
+-- v7: shared shelves. One link (token) per custom shelf; anyone with the
+-- token reads the shelf through get_shared_shelf(), never the table.
+create table if not exists public.shelf_shares (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null default auth.uid()
+               references auth.users (id) on delete cascade,
+  shelf_name text not null
+               check (char_length(btrim(shelf_name)) between 1 and 30),
+  token      text not null unique
+               default substr(translate(encode(extensions.gen_random_bytes(16),
+                                               'base64'), '+/=', '-_'), 1, 22),
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists shelf_shares_user_shelf_unique
+  on public.shelf_shares (user_id, lower(shelf_name));
+
+alter table public.shelf_shares enable row level security;
+
 -- Policies are created only when missing, so any change you made by hand to
 -- an existing policy is kept.
 do $$
@@ -204,6 +223,9 @@ begin
       ('book_quotes',  'book_quotes_insert_own',  'insert'),
       ('book_quotes',  'book_quotes_update_own',  'update'),
       ('book_quotes',  'book_quotes_delete_own',  'delete'),
+      ('shelf_shares', 'shelf_shares_select_own', 'select'),
+      ('shelf_shares', 'shelf_shares_insert_own', 'insert'),
+      ('shelf_shares', 'shelf_shares_delete_own', 'delete'),
       ('user_books',   'user_books_select_own',   'select'),
       ('user_books',   'user_books_insert_own',   'insert'),
       ('user_books',   'user_books_update_own',   'update'),
@@ -287,6 +309,39 @@ begin
 end
 $$;
 
+-- v7: public read of a shared shelf: only the shelf name, the owner's display
+-- name and title/authors/cover/year of its books. Null for an unknown token.
+create or replace function public.get_shared_shelf(p_token text)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select jsonb_build_object(
+    'shelf_name', s.shelf_name,
+    'owner_name', p.display_name,
+    'books', coalesce((
+      select jsonb_agg(jsonb_build_object(
+               'external_id', b.external_id,
+               'title', b.title,
+               'authors', b.authors,
+               'cover_url', b.cover_url,
+               'published_year', b.published_year)
+             order by b.created_at)
+      from public.user_books b
+      where b.user_id = s.user_id
+        and exists (select 1 from unnest(b.shelves) t(name)
+                    where lower(t.name) = lower(s.shelf_name))
+    ), '[]'::jsonb))
+  from public.shelf_shares s
+  left join public.profiles p on p.id = s.user_id
+  where s.token = p_token;
+$$;
+
+revoke all on function public.get_shared_shelf(text) from public;
+grant execute on function public.get_shared_shelf(text) to anon, authenticated;
+
 -- Make sure the API sees the new columns and tables right away.
 notify pgrst, 'reload schema';
 
@@ -295,8 +350,10 @@ notify pgrst, 'reload schema';
 --   * every column listed above under user_books (shelves, edition_key,
 --     past_reads, format, series_name, series_index_end, moods, pace,
 --     loan_kind, ...)
---   * the tables reading_logs and book_quotes
---   * 4 policies each on user_books, reading_logs and book_quotes
+--   * the tables reading_logs, book_quotes and shelf_shares
+--   * 4 policies each on user_books, reading_logs and book_quotes, 3 on
+--     shelf_shares
+--   * the function get_shared_shelf
 --   * the reading_status values, "paused" and "abandoned" included
 --   * any trigger or constraint you do not recognise
 -- ---------------------------------------------------------------------------
@@ -306,7 +363,12 @@ where table_schema = 'public' and table_name = 'user_books'
 union all
 select 'table', table_name::text, ''
 from information_schema.tables
-where table_schema = 'public' and table_name in ('reading_logs', 'book_quotes')
+where table_schema = 'public'
+  and table_name in ('reading_logs', 'book_quotes', 'shelf_shares')
+union all
+select 'function', routine_name::text, security_type::text
+from information_schema.routines
+where routine_schema = 'public' and routine_name = 'get_shared_shelf'
 union all
 select 'trigger', tgname::text, pg_get_triggerdef(oid)
 from pg_trigger
@@ -318,7 +380,8 @@ where conrelid = 'public.user_books'::regclass
 union all
 select 'policy', tablename::text || '.' || policyname::text, cmd::text
 from pg_policies
-where schemaname = 'public' and tablename in ('user_books', 'reading_logs', 'book_quotes')
+where schemaname = 'public'
+  and tablename in ('user_books', 'reading_logs', 'book_quotes', 'shelf_shares')
 union all
 select 'enum value', enumlabel::text, 'sort order ' || enumsortorder::text
 from pg_enum

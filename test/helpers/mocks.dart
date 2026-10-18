@@ -4,6 +4,8 @@ import 'package:bookshelf/features/library/domain/usecases/add_book_to_library.d
 import 'package:bookshelf/features/profile/domain/repositories/profile_repository.dart';
 import 'package:bookshelf/features/quotes/domain/repositories/quote_repository.dart';
 import 'package:bookshelf/features/search/domain/repositories/book_search_repository.dart';
+import 'package:bookshelf/features/shelf_share/domain/repositories/shelf_share_repository.dart';
+import 'package:bookshelf/features/shelf_share/domain/usecases/save_shared_shelf.dart';
 import 'package:bookshelf/features/stats/domain/repositories/reading_log_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -20,3 +22,7 @@ class MockAddBookToLibrary extends Mock implements AddBookToLibrary {}
 class MockQuoteRepository extends Mock implements QuoteRepository {}
 
 class MockProfileRepository extends Mock implements ProfileRepository {}
+
+class MockShelfShareRepository extends Mock implements ShelfShareRepository {}
+
+class MockSaveSharedShelf extends Mock implements SaveSharedShelf {}

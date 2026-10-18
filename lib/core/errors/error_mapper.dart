@@ -90,6 +90,7 @@ bool _isOutdatedSchema(PostgrestException e) {
   switch (e.code) {
     case '42703': // undefined column
     case '42P01': // undefined table
+    case 'PGRST202': // function not in the schema cache
     case 'PGRST204': // column not in the schema cache
     case 'PGRST205': // table not in the schema cache
       return true;
