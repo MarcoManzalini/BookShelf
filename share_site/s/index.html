@@ -48,10 +48,13 @@
       background: linear-gradient(transparent, var(--bg) 30%);
       display: flex; justify-content: center;
     }
-    .cta a {
+    .cta { flex-direction: column; align-items: center; gap: 8px; }
+    .cta .open {
       display: inline-block; background: var(--accent); color: var(--accent-ink);
       font-weight: 700; text-decoration: none; padding: 14px 28px; border-radius: 999px;
     }
+    .cta .hint { margin: 0; font-size: 14px; color: var(--muted); text-align: center; }
+    .cta .hint a { color: var(--ink); font-weight: 600; }
     [hidden] { display: none !important; }
   </style>
 </head>
@@ -74,9 +77,13 @@
       <ul id="books" class="grid"></ul>
     </section>
   </main>
-  <div id="cta" class="cta" hidden><a id="open">Apri in BookShelf</a></div>
+  <div id="cta" class="cta" hidden>
+    <a id="open" class="open">Apri in BookShelf</a>
+    <p id="hint" class="hint" hidden></p>
+  </div>
 
   <script src="config.js"></script>
+  <script src="open.js"></script>
   <script>
     (function () {
       var cfg = window.BOOKSHELF || {};
@@ -126,11 +133,62 @@
         show('shelf');
       }
 
+      // "Apri in BookShelf": opens the app; if it is not installed, the
+      // store page (when published) or a hint.
+      function setUpOpen(token) {
+        var open = window.BookShelfOpen;
+        var kind = open.platform(navigator.userAgent, navigator.maxTouchPoints || 0);
+        var store = open.storeUrl(kind, cfg);
+        var button = $('open');
+        var hint = $('hint');
+
+        function showHint() {
+          hint.textContent = '';
+          if (kind === 'desktop') {
+            hint.appendChild(document.createTextNode(
+              'Apri questo link dal telefono per vedere lo scaffale in BookShelf.'));
+          } else {
+            hint.appendChild(document.createTextNode('Non hai BookShelf? '));
+            if (store) {
+              var link = el('a', null, 'Scaricala qui');
+              link.href = store;
+              hint.appendChild(link);
+            } else {
+              hint.appendChild(document.createTextNode(
+                "L'app non è ancora disponibile negli store."));
+            }
+          }
+          hint.hidden = false;
+        }
+
+        $('cta').hidden = false;
+        if (kind === 'desktop') {
+          button.hidden = true;
+          showHint();
+          return;
+        }
+
+        button.href = kind === 'android'
+          ? open.androidLink(token, cfg)
+          : open.schemeLink(token);
+
+        // If the page is still in front shortly after the tap, the app did
+        // not open: go to the store, or explain.
+        button.addEventListener('click', function () {
+          var timer = setTimeout(function () {
+            if (document.hidden) return;
+            if (kind === 'ios' && store) { location.href = store; return; }
+            showHint();
+          }, 1500);
+          var cancel = function () { clearTimeout(timer); };
+          document.addEventListener('visibilitychange', cancel, { once: true });
+          window.addEventListener('pagehide', cancel, { once: true });
+        });
+      }
+
       if (!token) { show('gone'); return; }
 
-      $('open').href = 'io.supabase.bookshelf://shelf/shared-shelf/' +
-        encodeURIComponent(token);
-      $('cta').hidden = false;
+      setUpOpen(token);
 
       fetch(cfg.supabaseUrl + '/rest/v1/rpc/get_shared_shelf', {
         method: 'POST',
